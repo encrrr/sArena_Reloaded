@@ -58,12 +58,10 @@ if isRetail then
     local function EnableCastBar(bar, unit, style)
         if not bar then return end
 
-        if bar.SetUnit then
-            bar:SetUnit(unit, true, false)
-            if bar.UpdateInterruptibleState then bar:UpdateInterruptibleState() end
-            if bar.UpdateDisplayedVisuals then bar:UpdateDisplayedVisuals() end
-            if bar.UpdateDisplayType then bar:UpdateDisplayType() end
-        end
+        bar:SetUnit(unit, true, false)
+        if bar.UpdateInterruptibleState then bar:UpdateInterruptibleState() end
+        if bar.UpdateDisplayedVisuals then bar:UpdateDisplayedVisuals() end
+        if bar.UpdateDisplayType then bar:UpdateDisplayType() end
 
         if style == "modern" then
             bar.Text:ClearAllPoints()
@@ -180,6 +178,7 @@ if isRetail then
         newBar:SetFrameStrata(old:GetFrameStrata())
         newBar:SetFrameLevel(old:GetFrameLevel())
         newBar:Hide()
+        newBar.Spark:SetSize(3, 16)
 
         frame.modernCastBar = newBar
         return newBar

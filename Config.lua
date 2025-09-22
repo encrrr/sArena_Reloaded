@@ -630,18 +630,37 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             end,
                         },
 
-                        -- moved from iconSettings: hide shield when un-interruptible
+                        spacerOne = {
+                            order = 2.4,
+                            type  = "description",
+                            name  = "",
+                            width = "full",
+                        },
+
                         hideBorderShield = {
                             order = 2.5,
                             name = "Hide Shield on Un-Interruptible",
                             desc = "Hides the shield texture around spell icon on un-interruptible casts.",
-                            width = "full",
                             type = "toggle",
                             get = function(info)
                                 return info.handler.db.profile.layoutSettings[layoutName].castBar.hideBorderShield
                             end,
                             set = function(info, val)
                                 info.handler.db.profile.layoutSettings[layoutName].castBar.hideBorderShield = val
+                                info.handler:UpdateCastBarSettings(info.handler.db.profile.layoutSettings[layoutName].castBar, info, val)
+                            end,
+                        },
+
+                        hideCastbarSpark = {
+                            order = 2.6,
+                            name = "Hide Castbar Spark",
+                            desc = "Hides the trailing spark on the castbar",
+                            type = "toggle",
+                            get = function(info)
+                                return info.handler.db.profile.layoutSettings[layoutName].castBar.hideCastbarSpark
+                            end,
+                            set = function(info, val)
+                                info.handler.db.profile.layoutSettings[layoutName].castBar.hideCastbarSpark = val
                                 info.handler:UpdateCastBarSettings(info.handler.db.profile.layoutSettings[layoutName].castBar, info, val)
                             end,
                         },
@@ -790,7 +809,6 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         },
                     },
                 },
-                -- iconSettings moved into positioning/icon and sizing/icon groups
             },
         },
         dr = {
@@ -1043,6 +1061,12 @@ function sArenaMixin:UpdateCastBarSettings(db, info, val)
             frame.CastBar.BorderShield:SetTexture(nil)
         end
 
+        if db.hideCastbarSpark then
+            frame.CastBar.Spark:SetAlpha(0)
+        else
+            frame.CastBar.Spark:SetAlpha(1)
+        end
+
         frame.CastBar.BorderShield:SetScale(db.iconScale or 1)
         frame.CastBar.Icon:SetScale(db.iconScale or 1)
     end
@@ -1136,7 +1160,6 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
         end
     end
 
-    -- Handle Pixelated layout pixel borders when bright border setting changes
     if self.db.profile.currentLayout == "Pixelated" then
         self:AddPixelBorder()
     end
@@ -1322,9 +1345,6 @@ local function setDRIcons()
 
     return inputs
 end
-
--- ...existing code...
-
 
 
 if C_AddOns.IsAddOnLoaded("sArena_Updated2_by_sammers") then
@@ -1792,7 +1812,6 @@ else
                                 end,
                                 args = setDRIcons(),
                             },
-                            -- per-class UI removed: the existing DR Icons list will act per-class when enabled
                         },
                     },
                     racialGroup = {
