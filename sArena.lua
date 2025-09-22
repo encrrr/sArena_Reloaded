@@ -11,6 +11,10 @@ sArenaMixin.defaultSettings = {
         showArenaNumber = false,
         showDecimalsDR = true,
         showDecimalsClassIcon = true,
+        invertClassIconCooldown = false,
+        invertTrinketRacialCooldown = false,
+        disableClassIconSwipe = false,
+        disableTrinketRacialSwipe = false,
         darkMode = (BetterBlizzFramesDB and BetterBlizzFramesDB.darkModeUi) or C_AddOns.IsAddOnLoaded("FrameColor") or nil,
         statusText = {
             usePercentage = false,
@@ -1107,6 +1111,10 @@ function sArenaMixin:SetLayout(_, layout)
         frame:UpdatePlayer()
         sArenaMixin:ApplyPrototypeFont(frame)
         frame:UpdateDRCooldownReverse()
+        frame:UpdateClassIconCooldownReverse()
+        frame:UpdateTrinketRacialCooldownReverse()
+        frame:UpdateClassIconSwipeSettings()
+        frame:UpdateTrinketRacialSwipeSettings()
         frame:DarkModeFrame()
     end
 

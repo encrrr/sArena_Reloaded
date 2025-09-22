@@ -1255,6 +1255,70 @@ function sArenaMixin:UpdateRacialSettings(db, info, val)
     end
 end
 
+function sArenaFrameMixin:UpdateClassIconCooldownReverse()
+    local reverse = self.parent.db.profile.invertClassIconCooldown
+    
+    -- Update Class Icon cooldown reverse
+    if self.ClassIconCooldown then
+        self.ClassIconCooldown:SetReverse(reverse)
+    end
+end
+
+function sArenaFrameMixin:UpdateTrinketRacialCooldownReverse()
+    local reverse = self.parent.db.profile.invertTrinketRacialCooldown
+    
+    -- Update Trinket cooldown reverse
+    if self.Trinket and self.Trinket.Cooldown then
+        self.Trinket.Cooldown:SetReverse(reverse)
+    end
+    
+    -- Update Racial cooldown reverse
+    if self.Racial and self.Racial.Cooldown then
+        self.Racial.Cooldown:SetReverse(reverse)
+    end
+end
+
+function sArenaFrameMixin:UpdateClassIconSwipeSettings()
+    local disableSwipe = self.parent.db.profile.disableClassIconSwipe
+    
+    -- Update Class Icon swipe settings
+    if self.ClassIconCooldown then
+        if disableSwipe then
+            self.ClassIconCooldown:SetDrawSwipe(false)
+            self.ClassIconCooldown:SetDrawEdge(false)
+        else
+            self.ClassIconCooldown:SetDrawSwipe(true)
+            self.ClassIconCooldown:SetDrawEdge(true)
+        end
+    end
+end
+
+function sArenaFrameMixin:UpdateTrinketRacialSwipeSettings()
+    local disableSwipe = self.parent.db.profile.disableTrinketRacialSwipe
+    
+    -- Update Trinket swipe settings
+    if self.Trinket and self.Trinket.Cooldown then
+        if disableSwipe then
+            self.Trinket.Cooldown:SetDrawSwipe(false)
+            self.Trinket.Cooldown:SetDrawEdge(false)
+        else
+            self.Trinket.Cooldown:SetDrawSwipe(true)
+            self.Trinket.Cooldown:SetDrawEdge(true)
+        end
+    end
+    
+    -- Update Racial swipe settings
+    if self.Racial and self.Racial.Cooldown then
+        if disableSwipe then
+            self.Racial.Cooldown:SetDrawSwipe(false)
+            self.Racial.Cooldown:SetDrawEdge(false)
+        else
+            self.Racial.Cooldown:SetDrawSwipe(true)
+            self.Racial.Cooldown:SetDrawEdge(true)
+        end
+    end
+end
+
 local function setDRIcons()
     local inputs = {
         drIconsTitle = {
@@ -1625,10 +1689,106 @@ else
                                             end
                                         end,
                                     },
+
+                                },
+                            },
+                            swipeAnimations = {
+                                order = 7,
+                                name = "Swipe Animations",
+                                type = "group",
+                                inline = true,
+                                args = {
+                                    disableClassIconSwipe = {
+                                        order = 1,
+                                        name = "Disable Class Icon Swipe",
+                                        type = "toggle",
+                                        width = "full",
+                                        desc = "Disables the spiral cooldown swipe animation on Class Icon.",
+                                        get = function(info) return info.handler.db.profile.disableClassIconSwipe end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.disableClassIconSwipe = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                info.handler["arena" .. i]:UpdateClassIconSwipeSettings()
+                                            end
+                                        end,
+                                    },
+                                    drSwipeOff = {
+                                        order = 2,
+                                        name = "Disable DR Swipe Animation",
+                                        desc = "Disables the spiral cooldown swipe on DR icons.",
+                                        type = "toggle",
+                                        width = "full",
+                                        get = function(info)
+                                            return info.handler.db.profile.drSwipeOff
+                                        end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.drSwipeOff = val
+                                            info.handler:UpdateGlobalDRSettings()
+                                        end,
+                                    },
+                                    disableTrinketRacialSwipe = {
+                                        order = 3,
+                                        name = "Disable Trinket & Racial Swipe",
+                                        type = "toggle",
+                                        width = "full",
+                                        desc = "Disables the spiral cooldown swipe animation on Trinket and Racial icons.",
+                                        get = function(info) return info.handler.db.profile.disableTrinketRacialSwipe end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.disableTrinketRacialSwipe = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                info.handler["arena" .. i]:UpdateTrinketRacialSwipeSettings()
+                                            end
+                                        end,
+                                    },
+                                    invertClassIconCooldown = {
+                                        order = 4,
+                                        name = "Reverse Class Icon Swipe",
+                                        type = "toggle",
+                                        width = "full",
+                                        desc = "Reverses the cooldown sweep direction for Class Icon cooldowns. Changes whether they start empty and fill up, or start full and empty out.",
+                                        disabled = function(info) return info.handler.db.profile.disableClassIconSwipe end,
+                                        get = function(info) return info.handler.db.profile.invertClassIconCooldown end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.invertClassIconCooldown = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                info.handler["arena" .. i]:UpdateClassIconCooldownReverse()
+                                            end
+                                        end,
+                                    },
+                                    invertDRCooldown = {
+                                        order = 5,
+                                        name = "Reverse DR Swipe Animation",
+                                        desc = "Reverses the DR cooldown swipe direction.",
+                                        type = "toggle",
+                                        width = "full",
+                                        disabled = function(info) return info.handler.db.profile.drSwipeOff end,
+                                        get = function(info) return info.handler.db.profile.invertDRCooldown end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.invertDRCooldown = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                info.handler["arena" .. i]:UpdateDRCooldownReverse()
+                                            end
+                                        end
+                                    },
+                                    invertTrinketRacialCooldown = {
+                                        order = 6,
+                                        name = "Reverse Trinket & Racial Swipe",
+                                        type = "toggle",
+                                        width = "full",
+                                        desc = "Reverses the cooldown sweep direction for Trinket and Racial cooldowns. Changes whether they start empty and fill up, or start full and empty out.",
+                                        disabled = function(info) return info.handler.db.profile.disableTrinketRacialSwipe end,
+                                        get = function(info) return info.handler.db.profile.invertTrinketRacialCooldown end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.invertTrinketRacialCooldown = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                info.handler["arena" .. i]:UpdateTrinketRacialCooldownReverse()
+                                            end
+                                        end,
+                                    },
                                 },
                             },
                             masque = {
-                                order = 7,
+                                order = 8,
                                 name = "Masque",
                                 type = "group",
                                 inline = true,
@@ -1689,34 +1849,6 @@ else
                                             info.handler.db.profile.showDecimalsDR = val
                                             info.handler:SetupCustomCD()
                                         end
-                                    },
-                                    invertDRCooldown = {
-                                        order = 3,
-                                        name = "Reverse Swipe Animation",
-                                        desc = "Reverses the DR cooldown swipe direction.",
-                                        type = "toggle",
-                                        width = "full",
-                                        get = function(info) return info.handler.db.profile.invertDRCooldown end,
-                                        set = function(info, val)
-                                            info.handler.db.profile.invertDRCooldown = val
-                                            for i = 1, sArenaMixin.maxArenaOpponents do
-                                                info.handler["arena" .. i]:UpdateDRCooldownReverse()
-                                            end
-                                        end
-                                    },
-                                    drSwipeOff = {
-                                        order = 4,
-                                        name = "Disable Swipe Animation",
-                                        desc = "Disables the spiral cooldown swipe on DR icons.",
-                                        type = "toggle",
-                                        width = "full",
-                                        get = function(info)
-                                            return info.handler.db.profile.drSwipeOff
-                                        end,
-                                        set = function(info, val)
-                                            info.handler.db.profile.drSwipeOff = val
-                                            info.handler:UpdateGlobalDRSettings()
-                                        end,
                                     },
                                     drTextOn = {
                                         order = 6,
