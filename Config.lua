@@ -1900,7 +1900,7 @@ else
                             dynamicIconsPerClass = {
                                 order = 3.1,
                                 name = "Static Icons: Per Class",
-                                desc = "Chose different static icons depending on which class you are on.\n\nFor example show Blind for Disorient on your Rogue but as Fear on your Priest.\n\nThe list below will update depending on what class you are logged into.",
+                                desc = "When enabled, the list below becomes class-specific for your current class. It still includes all default icons so you wont see an immediate change, you must manually change any you want to customize.",
                                 type = "toggle",
                                 disabled = function(info) return not info.handler.db.profile.drStaticIcons end,
                                 get = function(info) return info.handler.db.profile.drStaticIconsPerClass end,
