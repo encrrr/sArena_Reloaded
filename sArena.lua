@@ -1887,6 +1887,7 @@ function sArenaFrameMixin:SetLifeState()
         self:UpdateHealPrediction()
         self:UpdateAbsorb()
         self.currentHealth = 0
+        self.SpecNameText:SetText("")
         self:ResetDR()
     elseif isFeigningDeath then
         self.HealthBar:SetAlpha(0.70)
