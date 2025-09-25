@@ -1626,7 +1626,7 @@ function sArenaFrameMixin:SetMysteryPlayer(forceUpdate)
     pp:SetMinMaxValues(0, 100)
     pp:SetValue(100)
 
-    if self.parent.db.profile.colorMysteryGray then
+    if self.parent.db and self.parent.db.profile.colorMysteryGray then -- TODO: Figure out cleaner fix, why db is nil here.
         hp:SetStatusBarColor(0.5, 0.5, 0.5)
         pp:SetStatusBarColor(0.5, 0.5, 0.5)
     else
@@ -1634,7 +1634,7 @@ function sArenaFrameMixin:SetMysteryPlayer(forceUpdate)
         local color = class and RAID_CLASS_COLORS[class]
         local alpha = forceUpdate and 1 or 0.75 -- Full color in spawn, faded on stealth
 
-        if color and self.parent.db.profile.classColors then
+        if color and self.parent.db and self.parent.db.profile.classColors then
             hp:SetStatusBarColor(color.r, color.g, color.b, alpha)
         else
             hp:SetStatusBarColor(0, 1.0, 0, alpha)
