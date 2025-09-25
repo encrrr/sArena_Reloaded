@@ -12,6 +12,7 @@ This version comes packed with many new features such as:
 *   Put a unique texture on Healers specifically, or only when there is Class Stacking.
 *   Show shields and overshields on healthbars.
 *   Hunter's Feign Death does not show up as dead but instead gets faded out a little bit.
+*   Frames are now class colored by default in starting room.
 *   Castbars immediately hide for easier interrupts.
 
 Other improvements:
@@ -21,6 +22,7 @@ Other improvements:
 *   Decimals on default CD Timer below 6 seconds.
 *   Color Trinket setting to display Trinket CD as a flat Green/Red texture.
 *   Option to display DR status as Text.
+*   Black DR Border option.
 *   Spec text on frames.
 *   Static DR setting with optional per class setting.
 
