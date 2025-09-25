@@ -1436,14 +1436,14 @@ if C_AddOns.IsAddOnLoaded("sArena_Updated2_by_sammers") then
         args = {
             oldConvert = {
                 order = 1,
-                name = "Old sArena",
-                desc = "Converter for old sArena",
+                name = "Other sArena",
+                desc = "Converter for other sArena",
                 type = "group",
                 args = {
                     description = {
                         order = 1,
                         type = "description",
-                        name = "|A:services-icon-warning:16:16|aOld sArena is enabled|A:services-icon-warning:16:16|a\n\nIf you want to copy over your old settings to sArena |cffff8000Reloaded|r |T135884:13:13|t click the button below.",
+                        name = "|A:services-icon-warning:16:16|aA different sArena is enabled|A:services-icon-warning:16:16|a\n\nIf you want to copy over your settings from the other sArena to sArena |cffff8000Reloaded|r |T135884:13:13|t click the button below.",
                         fontSize = "medium",
                     },
                     convertButton = {
@@ -2010,14 +2010,14 @@ else
             },
             oldConvert = {
                 order = 7,
-                name = "Old sArena",
-                desc = "Converter for old sArena",
+                name = "Other sArena",
+                desc = "Converter for other sArena",
                 type = "group",
                 args = {
                     description = {
                         order = 1,
                         type = "description",
-                        name = "This will import your old sArena settings into the new sArena |cffff8000Reloaded|r |T135884:13:13|t version.\n\nMake sure both addons are enabled, then click the button below.",
+                        name = "This will import your other sArena settings into the new sArena |cffff8000Reloaded|r |T135884:13:13|t version.\n\nMake sure both addons are enabled, then click the button below.",
                         fontSize = "medium",
                     },
                     convertButton = {

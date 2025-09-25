@@ -160,7 +160,7 @@ function sArenaMixin:OldConvert()
     local oldDB = sArena3DB or sArena2DB or sArenaDB
 
     if not oldDB or not oldDB.profileKeys or not oldDB.profiles then
-        sArenaMixin.conversionStatusText = "|cffFF0000No old sArena found. Are you sure it's enabled?|r"
+        sArenaMixin.conversionStatusText = "|cffFF0000No other sArena found. Are you sure it's enabled?|r"
         LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
         return
     end
