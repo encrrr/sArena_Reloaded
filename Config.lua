@@ -1723,15 +1723,15 @@ else
                                             end
                                         end,
                                     },
-                                    skipMysteryGray = {
+                                    colorMysteryGray = {
                                         order = 8,
-                                        name = "Skip Mystery Gray",
+                                        name = "Color Non-Visible Frames Gray",
                                         type = "toggle",
                                         width = "full",
-                                        desc = "Prevents mystery players from having gray status bars. Mystery players are unseen players, aka before gates open and stealthed ones.",
-                                        get = function(info) return info.handler.db.profile.skipMysteryGray end,
+                                        desc = "Colors mystery players with gray status bars instead of their class colors. Mystery players are unseen players, aka before gates open and stealthed ones.",
+                                        get = function(info) return info.handler.db.profile.colorMysteryGray end,
                                         set = function(info, val)
-                                            info.handler.db.profile.skipMysteryGray = val
+                                            info.handler.db.profile.colorMysteryGray = val
                                         end,
                                     },
 

@@ -44,6 +44,21 @@ local healerSpecNames = {
     ["Preservation"] = true,
 }
 
+local classPowerType = {
+    WARRIOR = "RAGE",
+    ROGUE = "ENERGY",
+    DRUID = "MANA",
+    PALADIN = "MANA",
+    HUNTER = "FOCUS",
+    DEATHKNIGHT = "RUNIC_POWER",
+    SHAMAN = "MANA",
+    MAGE = "MANA",
+    WARLOCK = "MANA",
+    PRIEST = "MANA",
+    DEMONHUNTER = "FURY",
+    EVOKER = "ESSENCE",
+}
+
 function sArenaMixin:Print(fmt, ...)
     local prefix = "|cffff8000[sArena]:|r"
     print(prefix, string.format(fmt, ...))
@@ -1364,7 +1379,7 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
         self.currentClassIconTexture = nil
         self.currentClassIconStartTime = 0
         self:UpdateVisible()
-        self:UpdatePlayer()
+        self:UpdatePlayer(nil, true)
         self:ResetTrinket()
         self:ResetRacial()
         self:ResetDR()
@@ -1550,15 +1565,15 @@ function sArenaFrameMixin:UpdateNameColor()
     end
 end
 
-function sArenaFrameMixin:UpdatePlayer(unitEvent)
+function sArenaFrameMixin:UpdatePlayer(unitEvent, forceUpdate)
     local unit = self.unit
 
     self:GetClass()
     sArenaMixin:CheckClassStacking()
     self:FindAura()
 
-    if ((unitEvent and unitEvent ~= "seen") or (UnitGUID(self.unit) == nil)) then
-        self:SetMysteryPlayer()
+    if ((unitEvent and unitEvent ~= "seen") or (UnitGUID(self.unit) == nil)) or forceUpdate then
+        self:SetMysteryPlayer(forceUpdate)
         return
     end
 
@@ -1602,7 +1617,7 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent)
     end
 end
 
-function sArenaFrameMixin:SetMysteryPlayer()
+function sArenaFrameMixin:SetMysteryPlayer(forceUpdate)
     local hp = self.HealthBar
     hp:SetMinMaxValues(0, 100)
     hp:SetValue(100)
@@ -1611,9 +1626,47 @@ function sArenaFrameMixin:SetMysteryPlayer()
     pp:SetMinMaxValues(0, 100)
     pp:SetValue(100)
 
-    if not self.parent.db.profile.skipMysteryGray then
+    if self.parent.db.profile.colorMysteryGray then
         hp:SetStatusBarColor(0.5, 0.5, 0.5)
         pp:SetStatusBarColor(0.5, 0.5, 0.5)
+    else
+        local class = self.class or self.tempClass
+        local color = class and RAID_CLASS_COLORS[class]
+        local alpha = forceUpdate and 1 or 0.75 -- Full color in spawn, faded on stealth
+
+        if color and self.parent.db.profile.classColors then
+            hp:SetStatusBarColor(color.r, color.g, color.b, alpha)
+        else
+            hp:SetStatusBarColor(0, 1.0, 0, alpha)
+        end
+
+        local powerType
+        if class == "DRUID" then
+            local specName = self.specName
+            if specName == "Feral" then
+                powerType = "ENERGY"
+            elseif specName == "Guardian" then
+                powerType = "RAGE"
+            else
+                powerType = "MANA"
+            end
+        elseif class == "MONK" then
+            local specName = self.specName
+            if specName == "Mistweaver" then
+                powerType = "MANA"
+            else
+                powerType = "ENERGY"
+            end
+        else
+            powerType = class and classPowerType[class] or "MANA"
+        end
+
+        local powerColor = PowerBarColor[powerType]
+        if powerColor then
+            pp:SetStatusBarColor(powerColor.r, powerColor.g, powerColor.b)
+        else
+            pp:SetStatusBarColor(0, 0, 1.0, alpha)
+        end
     end
 
     self.hideStatusText = true
@@ -2228,21 +2281,6 @@ local function Shuffle()
     return chosen
 end
 
-
-
-local classPowerType = {
-    WARRIOR = "RAGE",
-    ROGUE = "ENERGY",
-    DRUID = "ENERGY",
-    PALADIN = "MANA",
-    HUNTER = "FOCUS",
-    DEATHKNIGHT = "RUNIC_POWER",
-    SHAMAN = "MANA",
-    MAGE = "MANA",
-    WARLOCK = "MANA",
-    PRIEST = "MANA",
-}
-
 function sArenaMixin:Test()
     local _, instanceType = IsInInstance()
     if (InCombatLockdown() or instanceType == "arena") then return end
@@ -2384,7 +2422,17 @@ function sArenaMixin:Test()
             frame.HealthBar:SetStatusBarColor(0, 1, 0, 1)
         end
 
-        local powerType = data.specName == "Restoration" and "MANA" or classPowerType[data.class] or "MANA"
+        local powerType
+        if data.class == "DRUID" then
+            -- Check if druid is feral/guardian (energy) or balance/restoration (mana)
+            if data.specName == "Feral" or data.specName == "Guardian" then
+                powerType = "ENERGY"
+            else
+                powerType = "MANA"
+            end
+        else
+            powerType = classPowerType[data.class] or "MANA"
+        end
         local powerColor = PowerBarColor[powerType] or { r = 0, g = 0, b = 1 }
 
         frame.PowerBar:SetStatusBarColor(powerColor.r, powerColor.g, powerColor.b)
@@ -2423,24 +2471,26 @@ function sArenaMixin:Test()
                 
                 if (n == 1) then
                     local borderColor = blackDRBorder and {0, 0, 0, 1} or {1, 0, 0, 1}
+                    local pixelBorderColor = blackDRBorder and {0, 0, 0, 1} or {1, 0, 0, 1}
                     drFrame.Border:SetVertexColor(unpack(borderColor))
                     if frame.PixelBorder then
-                        frame.PixelBorder:SetVertexColor(1, 0, 0, 1)
+                        frame.PixelBorder:SetVertexColor(unpack(pixelBorderColor))
                     end
                     drFrame.DRTextFrame.DRText:SetText("%")
-                    drFrame.DRTextFrame.DRText:SetTextColor(1, 0, 0) -- red
+                    drFrame.DRTextFrame.DRText:SetTextColor(1, 0, 0)
                     if drFrame.__MSQ_New_Normal then
                         drFrame.__MSQ_New_Normal:SetDesaturated(true)
                         drFrame.__MSQ_New_Normal:SetVertexColor(1, 0, 0, 1)
                     end
                 else
                     local borderColor = blackDRBorder and {0, 0, 0, 1} or {0, 1, 0, 1}
+                    local pixelBorderColor = blackDRBorder and {0, 0, 0, 1} or {0, 1, 0, 1}
                     drFrame.Border:SetVertexColor(unpack(borderColor))
                     if frame.PixelBorder then
-                        frame.PixelBorder:SetVertexColor(0, 1, 0, 1)
+                        frame.PixelBorder:SetVertexColor(unpack(pixelBorderColor))
                     end
                     drFrame.DRTextFrame.DRText:SetText("½")
-                    drFrame.DRTextFrame.DRText:SetTextColor(0, 1, 0) -- green
+                    drFrame.DRTextFrame.DRText:SetTextColor(0, 1, 0)
                     if drFrame.__MSQ_New_Normal then
                         drFrame.__MSQ_New_Normal:SetDesaturated(true)
                         drFrame.__MSQ_New_Normal:SetVertexColor(0, 1, 0, 1)
