@@ -625,7 +625,13 @@ function sArenaFrameMixin:FindDR(combatEvent, spellID)
 	end
 
 	frame.Icon:SetTexture(textureID)
-	frame.Border:SetVertexColor(unpack(severityColor[frame.severity]))
+	
+	-- Check if black DR borders are enabled
+	local layout = self.parent.db.profile.layoutSettings[self.parent.db.profile.currentLayout]
+	local blackDRBorder = layout.dr and layout.dr.blackDRBorder
+	local borderColor = blackDRBorder and {0, 0, 0, 1} or severityColor[frame.severity]
+	
+	frame.Border:SetVertexColor(unpack(borderColor))
     if frame.PixelBorder then
         frame.PixelBorder:SetVertexColor(unpack(severityColor[frame.severity]))
     end

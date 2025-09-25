@@ -837,6 +837,23 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         self:UpdateDRSettings(info.handler.db.profile.layoutSettings[layoutName].dr, info, val)
                     end,
                 },
+                blackDRBorder = {
+                    order = 0.5,
+                    name  = "Black DR Border",
+                    type  = "toggle",
+                    width = "full",
+                    desc  = "Makes DR borders black. Combine this with Global Settings -> Show DR Text",
+                    get = function(info)
+                        return info.handler.db.profile.layoutSettings[layoutName].dr.blackDRBorder
+                    end,
+                    set = function(info, val)
+                        local db = info.handler.db.profile.layoutSettings[layoutName].dr
+                        db.blackDRBorder = val
+                        self:UpdateDRSettings(info.handler.db.profile.layoutSettings[layoutName].dr, info, val)
+                        info.handler:RefreshConfig()
+                        info.handler:Test()
+                    end,
+                },
                 positioning = {
                     order = 1,
                     name = "Positioning",

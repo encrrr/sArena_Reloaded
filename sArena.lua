@@ -2418,8 +2418,12 @@ function sArenaMixin:Test()
                 drFrame:Show()
                 drFrame.Cooldown:SetCooldown(currTime, math.random(12, 25))
 
+                local layout = self.db.profile.layoutSettings[self.db.profile.currentLayout]
+                local blackDRBorder = layout.dr and layout.dr.blackDRBorder
+                
                 if (n == 1) then
-                    drFrame.Border:SetVertexColor(1, 0, 0, 1)
+                    local borderColor = blackDRBorder and {0, 0, 0, 1} or {1, 0, 0, 1}
+                    drFrame.Border:SetVertexColor(unpack(borderColor))
                     if frame.PixelBorder then
                         frame.PixelBorder:SetVertexColor(1, 0, 0, 1)
                     end
@@ -2430,7 +2434,8 @@ function sArenaMixin:Test()
                         drFrame.__MSQ_New_Normal:SetVertexColor(1, 0, 0, 1)
                     end
                 else
-                    drFrame.Border:SetVertexColor(0, 1, 0, 1)
+                    local borderColor = blackDRBorder and {0, 0, 0, 1} or {0, 1, 0, 1}
+                    drFrame.Border:SetVertexColor(unpack(borderColor))
                     if frame.PixelBorder then
                         frame.PixelBorder:SetVertexColor(0, 1, 0, 1)
                     end
