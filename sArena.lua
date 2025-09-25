@@ -738,14 +738,14 @@ function sArenaMixin:OnEvent(event, ...)
                 end
             end
 
-            if mopTrinket[spellID] and not isRetail and event == "SPELL_CAST_SUCCESS" then -- Dont think this is needed due to OnEvent?
-                for i = 1, sArenaMixin.maxArenaOpponents do
-                    if (sourceGUID == UnitGUID("arena" .. i)) then
-                        local ArenaFrame = self["arena" .. i]
-                        ArenaFrame:FindTrinket()
-                    end
-                end
-            end
+            -- if mopTrinket[spellID] and not isRetail and combatEvent == "SPELL_CAST_SUCCESS" then -- Dont think this is needed due to OnEvent?
+            --     for i = 1, sArenaMixin.maxArenaOpponents do
+            --         if (sourceGUID == UnitGUID("arena" .. i)) then
+            --             local ArenaFrame = self["arena" .. i]
+            --             ArenaFrame:FindTrinket()
+            --         end
+            --     end
+            -- end
         end
 
         -- DRs
@@ -761,7 +761,7 @@ function sArenaMixin:OnEvent(event, ...)
 
         -- Interrupts
         if sArenaMixin.interruptList[spellID] then
-            if event == "SPELL_INTERRUPT" or event == "SPELL_CAST_SUCCESS" then
+            if combatEvent == "SPELL_INTERRUPT" or combatEvent == "SPELL_CAST_SUCCESS" then
                 for i = 1, sArenaMixin.maxArenaOpponents do
                     if (destGUID == UnitGUID("arena" .. i)) then
                         local ArenaFrame = self["arena" .. i]

@@ -22,6 +22,7 @@ Other improvements:
 *   Color Trinket setting to display Trinket CD as a flat Green/Red texture.
 *   Option to display DR status as Text.
 *   Spec text on frames.
+*   Static DR setting with optional per class setting.
 
 And everything else you'd expect from Arena Frames.
 
