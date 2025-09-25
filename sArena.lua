@@ -2303,8 +2303,9 @@ function sArenaMixin:Test()
     local keepDefaultModernTextures = db.profile.layoutSettings[db.profile.currentLayout].castBar.keepDefaultModernTextures
 
     local topFrame
+    local numUnits = math.min(sArenaMixin.testUnits or sArenaMixin.maxArenaOpponents, sArenaMixin.maxArenaOpponents)
 
-    for i = 1, (sArenaMixin.testUnits or sArenaMixin.maxArenaOpponents) do
+    for i = 1, numUnits do
         local frame = self["arena" .. i]
         local data = shuffledPlayers[i]
 
