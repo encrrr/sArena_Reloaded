@@ -1,5 +1,6 @@
 2.0.1
 - Add /sarena test1-5 command.
+- Change wording related to other sArena's. Reminder that this version is made based on the original one by Stako with their blessing: "Others are free to submit updates or upload their own versions".
 
 2.0.0
 - This sArena version has now also launched as a Retail version! Everything below is for both versions (but MoP needs some more data for the non-duration auras)
