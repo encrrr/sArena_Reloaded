@@ -1,4 +1,5 @@
 # sArena Reloaded
+
 New and updated sArena Frames with tons of new great features. Fork of sArena addon made by Stako, and maintained by many in the PvP community.
 
 This is a further improvement of my sArena MoP Classic addon and it also brings it to Retail. This version will work on both Retail and MoP. This version will let you import settings from both sArena MoP and sArena Updated 2 by sammers.
@@ -16,6 +17,7 @@ This version comes packed with many new features such as:
 *   Castbars immediately hide for easier interrupts.
 
 Other improvements:
+
 *   Interrupts take interrupt duration reduction auras into account
 *   Healer Icon Replacement option
 *   Bright DR setting to more easily destinguish DR amount.
@@ -32,6 +34,22 @@ Type /sarena to open config.
 
 Ctrl+Shift+Click to drag stuff
 
-![sarenass](https://github.com/user-attachments/assets/ee726b98-c989-4b2c-b822-7b2ba322ad5b)
+### Import from other sArena (updated by sammers)
 
-![Pixelated](https://github.com/user-attachments/assets/39acce3d-e826-41f6-b89f-0c069be6b689)
+You can easily import your other sArena (sammers version) just by launching both addons at the same time and typing `/sarena` will open open a "Convert Settings" window. There will be some lua errors popping up when you launch both addons at the same time due to both addons trying to do things with the "sArena" name, these are expected and safe to ignore. "Convert Settings" will also automatically disable the other version.
+
+## New layouts:
+
+![sArenaNew](https://github.com/user-attachments/assets/3e9b03f0-de58-4862-b866-5b8f2c246164)
+
+## Old layouts:
+
+![sArenaOld](https://github.com/user-attachments/assets/2fd50212-41ee-4446-837c-1667abc1caf1)
+
+### Settings:
+
+![sArenaSettings](https://github.com/user-attachments/assets/2f0e6716-ee7e-4a2f-a638-921ba344b0a2)
+
+### Healer Texture when Class Stacking (optional)
+
+![healerStacking](https://github.com/user-attachments/assets/1f239ae9-73f1-4a46-a15c-17b772139c8f)
