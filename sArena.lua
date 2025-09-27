@@ -74,6 +74,14 @@ function sArenaMixin:FontValues()
     return t
 end
 
+function sArenaMixin:FontOutlineValues()
+    return {
+        [""] = "No outline",
+        ["OUTLINE"] = "Outline",
+        ["THICKOUTLINE"] = "Thick outline"
+    }
+end
+
 sArenaMixin.classIcons = {
     ["DRUID"] = 625999,
     ["HUNTER"] = 135495, -- 626000
@@ -373,7 +381,10 @@ function sArenaMixin:UpdateFonts()
     local cdFontPath    = cdKey   and LSM:Fetch(LSM.MediaType.FONT, cdKey)   or nil
 
     local size    = fontCfg.size or 10
-    local outline = "OUTLINE"
+    local outline = fontCfg.fontOutline
+    if outline == nil then
+        outline = "OUTLINE"
+    end
 
     local function setFont(fs, path)
         if fs and path and fs.SetFont then

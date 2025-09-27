@@ -150,6 +150,13 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
     local function getSetting(info)
         return LDB(info)[info[#info]]
     end
+    local function getFontOutlineSetting(info)
+        local value = LDB(info)[info[#info]]
+        if value == nil then
+            return "OUTLINE"
+        end
+        return value
+    end
     local function setSetting(info, val)
         local db = LDB(info)
         db[info[#info]] = val
@@ -277,6 +284,18 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             dialogControl = "LSM30_Font",
                             values = sArenaMixin.FontValues,
                             get    = getSetting,
+                            set    = setSetting,
+                            disabled = function(info)
+                                return not info.handler.db.profile.layoutSettings[layoutName].changeFont
+                            end,
+                        },
+                        fontOutline = {
+                            order = 3, type = "select",
+                            name  = "Font Outline",
+                            desc  = "Choose font outline style for all text elements.",
+                            style = "dropdown",
+                            values = sArenaMixin.FontOutlineValues,
+                            get    = getFontOutlineSetting,
                             set    = setSetting,
                             disabled = function(info)
                                 return not info.handler.db.profile.layoutSettings[layoutName].changeFont
