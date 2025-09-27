@@ -848,6 +848,8 @@ local function ChatCommand(input)
         LibStub("AceConfigDialog-3.0"):Open("sArena")
     elseif cmd == "convert" then
         sArenaMixin:OldConvert()
+    elseif cmd == "ver" or cmd == "version" then
+        sArenaMixin:Print("sArena |cffff8000Reloaded|r Version " .. C_AddOns.GetAddOnMetadata("sArena_Reloaded", "Version"))
     elseif cmd:match("^test%s*[1-5]$") then
         sArenaMixin.testUnits = tonumber(cmd:match("(%d)"))
         input = "test"
