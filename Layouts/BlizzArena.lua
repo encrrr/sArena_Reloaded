@@ -158,6 +158,9 @@ function layout:Initialize(frame)
     frame.PowerText:SetPoint("CENTER", frame.PowerBar)
     frame.PowerText:SetShadowOffset(0, 0)
 
+    frame.AuraStacks:SetPoint("BOTTOMLEFT", frame.ClassIcon, "BOTTOMLEFT", 1, -4)
+    frame.AuraStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 11, "THICKOUTLINE")
+
     -- Health bar underlay
     if not frame.hpUnderlay then
         frame.hpUnderlay = frame:CreateTexture(nil, "BACKGROUND", nil, 1)

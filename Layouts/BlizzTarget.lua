@@ -118,6 +118,9 @@ function layout:Initialize(frame)
     frame.Trinket:SetSize(22, 22)
     frame.Racial:SetSize(22, 22)
 
+    frame.AuraStacks:SetPoint("BOTTOMLEFT", frame.ClassIcon, "BOTTOMLEFT", 6, -1)
+    frame.AuraStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 18, "THICKOUTLINE")
+
     if not frame.NameBackground then
         local bg = frame:CreateTexture(nil, "BACKGROUND", nil, 2)
         bg:SetTexture(137017)

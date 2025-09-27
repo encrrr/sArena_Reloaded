@@ -70,7 +70,7 @@
             <Frame parentKey="DRTextFrame" frameStrata="HIGH" setAllPoints="true">
                 <Layers>
                     <Layer level="OVERLAY">
-                        <FontString parentKey="DRText" font="Fonts\ARIALN.ttf" justifyH="RIGHT" justifyV="BOTTOM" outline="NORMAL">
+                        <FontString parentKey="DRText" font="Interface\AddOns\sArena_Reloaded\Textures\arialn.ttf" justifyH="RIGHT" justifyV="BOTTOM" outline="NORMAL">
                             <FontHeight>
                                 <AbsValue val="14"/>
                             </FontHeight>
@@ -195,10 +195,11 @@
                 <Texture parentKey="totalAbsorbBarOverlay" inherits="TotalAbsorbBarOverlayTemplate"/>
             </Layer>
 
-            <Layer level="OVERLAY" textureSubLevel="2">
+            <Layer level="OVERLAY" textureSubLevel="7">
                 <Texture parentKey="DeathIcon" atlas="DeathIcon" hidden="true">
                     <TexCoords left="0" right="1" top="0" bottom="0.5"/>
                 </Texture>
+                <FontString parentKey="AuraStacks" inherits="SystemFont_Shadow_Small2"/>
             </Layer>
         </Layers>
 

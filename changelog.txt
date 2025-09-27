@@ -1,3 +1,9 @@
+2.0.2
+- Add new aura stacks indicator in bottom left corner of Class/Aura Icon.
+- Fix stealthed units transparency and tweak the amount
+- Fix Class Icon Swipe going the wrong way by default after introducing new settings for it.
+- Fix frames being bugged after reload while in an arena.
+
 2.0.1
 - Add /sarena test1-5 command.
 - Fix Black DR Border not working during test mode for Pixelated layout.

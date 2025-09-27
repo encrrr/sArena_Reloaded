@@ -28,14 +28,15 @@ sArenaMixin.isRetail = isRetail
 sArenaMixin.playerClass = select(2, UnitClass("player"))
 sArenaMixin.maxArenaOpponents = (isRetail and 3) or 5
 sArenaMixin.trinketTexture = (isRetail and 1322720) or 133453
-sArenaMixin.pFont = "Interface\\AddOns\\sArena_Reloaded\\Prototype.ttf"
+sArenaMixin.pFont = "Interface\\AddOns\\sArena_Reloaded\\Textures\\Prototype.ttf"
 local LSM = LibStub("LibSharedMedia-3.0")
 LSM:Register("statusbar", "Blizzard RetailBar", [[Interface\AddOns\sArena_Reloaded\Textures\BlizzardRetailBar]])
 LSM:Register("statusbar", "sArena Default", [[Interface\AddOns\sArena_Reloaded\Textures\sArenaDefault]])
 LSM:Register("statusbar", "sArena Stripes", [[Interface\AddOns\sArena_Reloaded\Textures\sArenaHealer]])
 LSM:Register("statusbar", "sArena Stripes 2", [[Interface\AddOns\sArena_Reloaded\Textures\sArenaRetailHealer]])
-LSM:Register("font", "Prototype", [[Interface\AddOns\sArena_Reloaded\Prototype.ttf]])
+LSM:Register("font", "Prototype", [[Interface\AddOns\sArena_Reloaded\Textures\Prototype.ttf]])
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture
+local stealthAlpha = 0.4
 
 local healerSpecNames = {
     ["Discipline"] = true,
@@ -684,6 +685,12 @@ function sArenaMixin:HandleArenaStart()
             frame:UpdatePlayer("seen")
         end
     end
+    for i = 1, sArenaMixin.maxArenaOpponents do
+        local frame = self["arena" .. i]
+        if not UnitIsVisible("arena"..i) then
+            frame:SetAlpha(stealthAlpha)
+        end
+    end
 end
 
 local matchStartedMessages = {
@@ -1287,6 +1294,10 @@ function sArenaFrameMixin:OnLoad()
     self.overHealAbsorbGlow:SetPoint("BOTTOMRIGHT", self.healthbar, "BOTTOMLEFT", 7, 0)
     self.overHealAbsorbGlow:SetPoint("TOPRIGHT", self.healthbar, "TOPLEFT", 7, 0)
 
+    self.AuraStacks:SetTextColor(1,1,1,1)
+    self.AuraStacks:SetJustifyH("LEFT")
+    self.AuraStacks:SetJustifyV("BOTTOM")
+
     self.TexturePool = CreateTexturePool(self, "ARTWORK", nil, nil, ResetTexture)
 end
 
@@ -1338,8 +1349,10 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
                 self.DeathIcon:SetShown(false)
                 self.hideStatusText = false
                 self.currentHealth = currentHealth
-                self.HealthBar:SetAlpha(1)
-                self.isFeigningDeath = nil
+                if self.isFeigningDeath then
+                    self.HealthBar:SetAlpha(1)
+                    self.isFeigningDeath = nil
+                end
             else
                 self:SetLifeState()
             end
@@ -1385,13 +1398,19 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
         self.currentClassIconTexture = nil
         self.currentClassIconStartTime = 0
         self:UpdateVisible()
-        self:UpdatePlayer(nil, true)
         self:ResetTrinket()
         self:ResetRacial()
         self:ResetDR()
         self:UpdateHealPrediction()
         self:UpdateAbsorb()
         self:UpdateFrameTexture()
+        if UnitExists(self.unit) then
+            self:UpdatePlayer("seen")
+        else
+            self:UpdatePlayer(nil)
+        end
+        self:SetAlpha(1)
+        self.HealthBar:SetAlpha(1)
     elseif (event == "PLAYER_REGEN_ENABLED") then
         self:UnregisterEvent("PLAYER_REGEN_ENABLED")
         self:UpdateVisible()
@@ -1578,8 +1597,8 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent, forceUpdate)
     sArenaMixin:CheckClassStacking()
     self:FindAura()
 
-    if ((unitEvent and unitEvent ~= "seen") or (UnitGUID(self.unit) == nil)) or forceUpdate then
-        self:SetMysteryPlayer(forceUpdate)
+    if (unitEvent and unitEvent ~= "seen") or (UnitGUID(self.unit) == nil) then
+        self:SetMysteryPlayer()
         return
     end
 
@@ -1621,9 +1640,10 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent, forceUpdate)
     else
         self.HealthBar:SetStatusBarColor(0, 1.0, 0, 1.0)
     end
+    self:SetAlpha(1)
 end
 
-function sArenaFrameMixin:SetMysteryPlayer(forceUpdate)
+function sArenaFrameMixin:SetMysteryPlayer(unitEvent)
     local hp = self.HealthBar
     hp:SetMinMaxValues(0, 100)
     hp:SetValue(100)
@@ -1638,12 +1658,11 @@ function sArenaFrameMixin:SetMysteryPlayer(forceUpdate)
     else
         local class = self.class or self.tempClass
         local color = class and RAID_CLASS_COLORS[class]
-        local alpha = forceUpdate and 1 or 0.75 -- Full color in spawn, faded on stealth
 
         if color and self.parent.db and self.parent.db.profile.classColors then
-            hp:SetStatusBarColor(color.r, color.g, color.b, alpha)
+            hp:SetStatusBarColor(color.r, color.g, color.b)
         else
-            hp:SetStatusBarColor(0, 1.0, 0, alpha)
+            hp:SetStatusBarColor(0, 1.0, 0)
         end
 
         local powerType
@@ -1671,8 +1690,10 @@ function sArenaFrameMixin:SetMysteryPlayer(forceUpdate)
         if powerColor then
             pp:SetStatusBarColor(powerColor.r, powerColor.g, powerColor.b)
         else
-            pp:SetStatusBarColor(0, 0, 1.0, alpha)
+            pp:SetStatusBarColor(0, 0, 1.0)
         end
+
+        self:SetAlpha(stealthAlpha)
     end
 
     self.hideStatusText = true
@@ -1846,6 +1867,8 @@ function sArenaFrameMixin:ResetLayout()
 
     self.ClassIconCooldown:SetUseCircularEdge(false)
     self.ClassIconCooldown:SetSwipeTexture(1)
+    self.AuraStacks:SetPoint("BOTTOMLEFT", self.ClassIcon, "BOTTOMLEFT", 2, 0)
+    self.AuraStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 15, "THICKOUTLINE")
 
     self.ClassIcon:RemoveMaskTexture(self.ClassIconMask)
     self.ClassIcon:SetDrawLayer("BORDER", 1)
@@ -1974,7 +1997,7 @@ function sArenaFrameMixin:SetLifeState()
         self.SpecNameText:SetText("")
         self:ResetDR()
     elseif isFeigningDeath then
-        self.HealthBar:SetAlpha(0.70)
+        self.HealthBar:SetAlpha(stealthAlpha)
         self.isFeigningDeath = true
     end
 end
@@ -2332,6 +2355,7 @@ function sArenaMixin:Test()
 
         frame:Show()
         frame:SetAlpha(1)
+        frame.HealthBar:SetAlpha(1)
         if frame.PixelBorders and not frame.PixelBorders.hide then
             frame.PixelBorders.trinket:Show()
             frame.PixelBorders.racial:Show()

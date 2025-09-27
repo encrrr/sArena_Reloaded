@@ -110,6 +110,9 @@ function layout:Initialize(frame)
     frame.Trinket:SetSize(25, 25)
     frame.Racial:SetSize(25, 25)
 
+    frame.AuraStacks:SetPoint("BOTTOMLEFT", frame.ClassIcon, "BOTTOMLEFT", 1, -2)
+    frame.AuraStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 14, "THICKOUTLINE")
+
     local hp = frame.HealthBar
     hp:SetSize(87, 23)
     hp:SetStatusBarTexture("Interface\\RaidFrame\\Raid-Bar-Hp-Fill")

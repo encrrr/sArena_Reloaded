@@ -1099,7 +1099,7 @@ function sArenaFrameMixin:FindAura()
     local unit = self.unit
     local auraList = sArenaMixin.auraList
 
-    local currentSpellID, currentDuration, currentExpirationTime, currentTexture
+    local currentSpellID, currentDuration, currentExpirationTime, currentTexture, currentApplications
     local currentPriority, currentRemaining = 0, 0
 
     if self.currentInterruptSpellID then
@@ -1109,6 +1109,7 @@ function sArenaFrameMixin:FindAura()
         currentTexture = self.currentInterruptTexture
         currentPriority = 5.9 -- Below Silence, need to clean list
         currentRemaining = currentExpirationTime - GetTime()
+        currentApplications = nil
     end
 
     for i = 1, 2 do
@@ -1119,13 +1120,15 @@ function sArenaFrameMixin:FindAura()
             if not aura then break end
 
             local spellID = aura.spellId
-            local duration = aura.duration or 0
-            local expirationTime = aura.expirationTime or 0
-            local texture = aura.icon
-
             local priority = auraList[spellID]
 
             if priority then
+
+                local duration = aura.duration or 0
+                local expirationTime = aura.expirationTime or 0
+                local texture = aura.icon
+                local applications = aura.applications or 0
+
                 -- -- Icebound Fortitude, Check if it's glyphed to be immune to CC
                 if spellID == 51271 and not isRetail then
                     if AuraTooltipContains(unit, n, filter, "70%%") then
@@ -1154,6 +1157,7 @@ function sArenaFrameMixin:FindAura()
                     currentTexture = texture
                     currentPriority = priority
                     currentRemaining = remaining
+                    currentApplications = applications
                 end
             end
         end
@@ -1164,12 +1168,23 @@ function sArenaFrameMixin:FindAura()
         self.currentAuraStartTime = currentExpirationTime - currentDuration
         self.currentAuraDuration = currentDuration
         self.currentAuraTexture = currentTexture
+        self.currentAuraApplications = currentApplications
+        self:UpdateAuraStacks()
     else
         self.currentAuraSpellID = nil
         self.currentAuraStartTime = 0
         self.currentAuraDuration = 0
         self.currentAuraTexture = nil
+        self.currentAuraApplications = nil
     end
 
     self:UpdateClassIcon()
+end
+
+function sArenaFrameMixin:UpdateAuraStacks()
+    if self.currentAuraApplications and self.currentAuraApplications >= 2 then
+        self.AuraStacks:SetText(self.currentAuraApplications)
+    else
+        self.AuraStacks:SetText("")
+    end
 end
