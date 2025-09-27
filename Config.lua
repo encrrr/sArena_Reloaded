@@ -1449,7 +1449,8 @@ if C_AddOns.IsAddOnLoaded("sArena_Updated2_by_sammers") then
                     convertButton = {
                         order = 2,
                         type = "execute",
-                        name = "Convert Settings",
+                        name = "Import settings",
+                        desc = "Import your settings from the other sArena version.",
                         func = sArenaMixin.OldConvert,
                         width = "normal",
                     },
@@ -2023,7 +2024,8 @@ else
                     convertButton = {
                         order = 2,
                         type = "execute",
-                        name = "Convert Settings",
+                        name = "Import settings",
+                        desc = "Import your settings from the other sArena version.",
                         func = sArenaMixin.OldConvert,
                         width = "normal",
                         disabled = function() return sArenaMixin.conversionInProgress end,
