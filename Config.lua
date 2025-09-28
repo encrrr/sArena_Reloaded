@@ -791,7 +791,6 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                     order = 0,
                     name  = "Bright DR Border",
                     type  = "toggle",
-                    width = "full",
                     get = function(info)
                         return info.handler.db.profile.layoutSettings[layoutName].dr.brightDRBorder
                     end,
@@ -805,8 +804,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                     order = 0.5,
                     name  = "Black DR Border",
                     type  = "toggle",
-                    width = "full",
-                    desc  = "Makes DR borders black. Combine this with Global Settings -> Show DR Text",
+                    desc  = "Makes DR borders black. Combine this with Global Settings -> DR -> Show DR Text",
                     get = function(info)
                         return info.handler.db.profile.layoutSettings[layoutName].dr.blackDRBorder
                     end,

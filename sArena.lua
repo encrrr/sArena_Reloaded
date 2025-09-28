@@ -2501,9 +2501,7 @@ function sArenaMixin:Test()
                 [5] = 458230,  -- Silence
             }
 
-            local drs = i == 1 and 4 or i == 2 and 3 or math.random(2, 4)
-
-            for n = 1, drs do
+            for n = 1, 4 do
                 local drFrame = frame[drCategoryOrder[n]]
                 local textureID = drCategoryTextures[n]
                 drFrame.Icon:SetTexture(textureID)
@@ -2512,7 +2510,7 @@ function sArenaMixin:Test()
 
                 local layout = self.db.profile.layoutSettings[self.db.profile.currentLayout]
                 local blackDRBorder = layout.dr and layout.dr.blackDRBorder
-                
+
                 if (n == 1) then
                     local borderColor = blackDRBorder and {0, 0, 0, 1} or {1, 0, 0, 1}
                     local pixelBorderColor = blackDRBorder and {0, 0, 0, 1} or {1, 0, 0, 1}
