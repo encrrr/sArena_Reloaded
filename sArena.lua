@@ -346,7 +346,6 @@ local function applyFont(fs, fontTbl)
 end
 
 function sArenaMixin:UpdateFonts()
-    print("Updating Fonts")
     local fontCfg  = db.profile.layoutSettings[db.profile.currentLayout]
     if not fontCfg.changeFont then
         local og = sArenaMixin.ogFonts

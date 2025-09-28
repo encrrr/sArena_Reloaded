@@ -61,25 +61,9 @@ layout.defaultSettings = {
     mirrored = true,
     showSpecManaText = true,
     hideNameBackground = (BetterBlizzFramesDB and BetterBlizzFramesDB.hideUnitFrameShadow) or nil,
-    
-    -- text settings defaults
+
     textSettings = {
-        nameAnchor = "CENTER",
-        nameSize = 1.0,
-        nameOffsetX = 0,
-        nameOffsetY = 0,
-        healthAnchor = "CENTER",
-        healthSize = 1.0,
-        healthOffsetX = 0,
-        healthOffsetY = 0,
-        specNameAnchor = "CENTER",
         specNameSize = 0.85,
-        specNameOffsetX = 0,
-        specNameOffsetY = 0,
-        castbarAnchor = "CENTER",
-        castbarSize = 1.0,
-        castbarOffsetX = 0,
-        castbarOffsetY = 0,
     },
 }
 
@@ -359,49 +343,49 @@ function layout:UpdateOrientation(frame)
         local txt = self.db.textSettings
         local modernCastbar = self.db.castBar.useModernCastbars
 
-        name:SetScale(txt.nameSize)
-        healthText:SetScale(txt.healthSize)
-        specName:SetScale(txt.specNameSize)
-        castbarText:SetScale(txt.castbarSize)
+        name:SetScale(txt.nameSize or 1.0)
+        healthText:SetScale(txt.healthSize or 1.0)
+        specName:SetScale(txt.specNameSize or 1.0)
+        castbarText:SetScale(txt.castbarSize or 1.0)
 
         -- Name
         name:ClearAllPoints()
-        if txt.nameAnchor == "LEFT" then
-            name:SetPoint("BOTTOMLEFT", frame.HealthBar, "TOPLEFT", 3 + txt.nameOffsetX, 1.5 + txt.nameOffsetY)
-        elseif txt.nameAnchor == "RIGHT" then
-            name:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", -3 + txt.nameOffsetX, 1.5 + txt.nameOffsetY)
+        if (txt.nameAnchor or "CENTER") == "LEFT" then
+            name:SetPoint("BOTTOMLEFT", frame.HealthBar, "TOPLEFT", 3 + (txt.nameOffsetX or 0), 1.5 + (txt.nameOffsetY or 0))
+        elseif (txt.nameAnchor or "CENTER") == "RIGHT" then
+            name:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", -3 + (txt.nameOffsetX or 0), 1.5 + (txt.nameOffsetY or 0))
         else
-            name:SetPoint("BOTTOM", frame.HealthBar, "TOP", -1 + txt.nameOffsetX, 1.5 + txt.nameOffsetY)
+            name:SetPoint("BOTTOM", frame.HealthBar, "TOP", -1 + (txt.nameOffsetX or 0), 1.5 + (txt.nameOffsetY or 0))
         end
 
         -- Health Text
         healthText:ClearAllPoints()
-        if txt.healthAnchor == "LEFT" then
-            healthText:SetPoint("LEFT", healthBar, "LEFT", 4 + txt.healthOffsetX, txt.healthOffsetY)
-        elseif txt.healthAnchor == "RIGHT" then
-            healthText:SetPoint("RIGHT", healthBar, "RIGHT", -3 + txt.healthOffsetX, txt.healthOffsetY)
+        if (txt.healthAnchor or "CENTER") == "LEFT" then
+            healthText:SetPoint("LEFT", healthBar, "LEFT", 4 + (txt.healthOffsetX or 0), (txt.healthOffsetY or 0))
+        elseif (txt.healthAnchor or "CENTER") == "RIGHT" then
+            healthText:SetPoint("RIGHT", healthBar, "RIGHT", -3 + (txt.healthOffsetX or 0), (txt.healthOffsetY or 0))
         else
-            healthText:SetPoint("CENTER", healthBar, "CENTER", -1 +txt.healthOffsetX, txt.healthOffsetY)
+            healthText:SetPoint("CENTER", healthBar, "CENTER", -1 + (txt.healthOffsetX or 0), (txt.healthOffsetY or 0))
         end
 
         -- Spec Text
         specName:ClearAllPoints()
-        if txt.specNameAnchor == "LEFT" then
-            specName:SetPoint("LEFT", healthBar, "LEFT", 4 + txt.specNameOffsetX, -19.5 + txt.specNameOffsetY)
-        elseif txt.specNameAnchor == "RIGHT" then
-            specName:SetPoint("RIGHT", healthBar, "RIGHT", -3 + txt.specNameOffsetX, -19.5 +txt.specNameOffsetY)
+        if (txt.specNameAnchor or "CENTER") == "LEFT" then
+            specName:SetPoint("LEFT", healthBar, "LEFT", 4 + (txt.specNameOffsetX or 0), -19.5 + (txt.specNameOffsetY or 0))
+        elseif (txt.specNameAnchor or "CENTER") == "RIGHT" then
+            specName:SetPoint("RIGHT", healthBar, "RIGHT", -3 + (txt.specNameOffsetX or 0), -19.5 + (txt.specNameOffsetY or 0))
         else
-            specName:SetPoint("CENTER", healthBar, "CENTER", -1 + txt.specNameOffsetX, -19.5 + txt.specNameOffsetY)
+            specName:SetPoint("CENTER", healthBar, "CENTER", -1 + (txt.specNameOffsetX or 0), -19.5 + (txt.specNameOffsetY or 0))
         end
 
         -- Castbar Text
         castbarText:ClearAllPoints()
-        if txt.castbarAnchor == "LEFT" then
-            castbarText:SetPoint("LEFT", frame.CastBar, "LEFT", 3 + txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
-        elseif txt.castbarAnchor == "RIGHT" then
-            castbarText:SetPoint("RIGHT", frame.CastBar, "RIGHT", -3 + txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
+        if (txt.castbarAnchor or "CENTER") == "LEFT" then
+            castbarText:SetPoint("LEFT", frame.CastBar, "LEFT", 3 + (txt.castbarOffsetX or 0), (modernCastbar and -11 or 0) + (txt.castbarOffsetY or 0))
+        elseif (txt.castbarAnchor or "CENTER") == "RIGHT" then
+            castbarText:SetPoint("RIGHT", frame.CastBar, "RIGHT", -3 + (txt.castbarOffsetX or 0), (modernCastbar and -11 or 0) + (txt.castbarOffsetY or 0))
         else
-            castbarText:SetPoint("CENTER", frame.CastBar, "CENTER", txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
+            castbarText:SetPoint("CENTER", frame.CastBar, "CENTER", (txt.castbarOffsetX or 0), (modernCastbar and -11 or 0) + (txt.castbarOffsetY or 0))
         end
     end
 
