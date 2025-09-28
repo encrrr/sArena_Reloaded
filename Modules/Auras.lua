@@ -196,6 +196,7 @@ if isRetail then
         [378464] = 7, -- Evoker: Nullifying Shroud
         [31821] = 7,  -- Aura Mastery
         [206803] = 7, -- Rain from Above
+        [131558] = 7, -- Shaman: Spiritwalker's Aegis
 
         -- Interrupts
         [1766] = 6,   -- Kick (Rogue)
@@ -350,6 +351,7 @@ if isRetail then
         [375087] = 3, -- Evoker: Dragonrage
         [370553] = 3, -- Evoker: Tip the Scales
         [10060] = 3,  -- Priest: Power Infusion
+        [360952] = 3, -- Hunter: Coordinated Assault
 
         -- Defensive Buffs
         [199450] = 2.6, -- Ultimate Sacrifice

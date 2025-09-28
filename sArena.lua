@@ -743,7 +743,7 @@ local mopTrinket = {
 
 function sArenaMixin:OnEvent(event, ...)
     if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
-        local _, combatEvent, _, sourceGUID, _, _, _, destGUID, _, _, _, spellID, _, _, auraType = CombatLogGetCurrentEventInfo()
+        local _, combatEvent, _, sourceGUID, sourceName, _, _, destGUID, _, _, _, spellID, _, _, auraType = CombatLogGetCurrentEventInfo()
         if not combatEvents[combatEvent] then return end
 
         if combatEvent == "SPELL_CAST_SUCCESS" or combatEvent == "SPELL_AURA_APPLIED" then
@@ -773,14 +773,6 @@ function sArenaMixin:OnEvent(event, ...)
                 end
             end
 
-            -- if mopTrinket[spellID] and not isRetail and combatEvent == "SPELL_CAST_SUCCESS" then -- Dont think this is needed due to OnEvent?
-            --     for i = 1, sArenaMixin.maxArenaOpponents do
-            --         if (sourceGUID == UnitGUID("arena" .. i)) then
-            --             local ArenaFrame = self["arena" .. i]
-            --             ArenaFrame:FindTrinket()
-            --         end
-            --     end
-            -- end
         end
 
         -- DRs
@@ -801,6 +793,27 @@ function sArenaMixin:OnEvent(event, ...)
                     if (destGUID == UnitGUID("arena" .. i)) then
                         local ArenaFrame = self["arena" .. i]
                         ArenaFrame:FindInterrupt(combatEvent, spellID)
+                        local castBar = ArenaFrame.CastBar
+
+                        if sourceName then
+                            local name, server = strsplit("-", sourceName)
+                            local colorStr = "ffFFFFFF"
+
+                            if C_PlayerInfo.GUIDIsPlayer(sourceGUID) then
+                                local _, englishClass = GetPlayerInfoByGUID(sourceGUID)
+                                if englishClass then
+                                    colorStr = RAID_CLASS_COLORS[englishClass].colorStr
+                                end
+                            end
+
+                            local interruptedByName = string.format("|c%s[%s]|r", colorStr, name)
+                            castBar.interruptedBy = interruptedByName
+                            castBar.Text:SetText(interruptedByName)
+                            castBar:Show()
+                            C_Timer.After(1, function()
+                                castBar.interruptedBy = nil
+                            end)
+                        end
                         break
                     end
                 end
@@ -1275,16 +1288,19 @@ function sArenaFrameMixin:OnLoad()
 
     local CastStopEvents  = {
         UNIT_SPELLCAST_STOP                = true,
-        UNIT_SPELLCAST_FAILED              = true,
-        UNIT_SPELLCAST_FAILED_QUIET        = true,
-        UNIT_SPELLCAST_INTERRUPTED         = true,
         UNIT_SPELLCAST_CHANNEL_STOP        = true,
-        UNIT_SPELLCAST_CHANNEL_INTERRUPTED = true,
+        UNIT_SPELLCAST_INTERRUPTED         = true,
+        UNIT_SPELLCAST_EMPOWER_STOP        = true,
     }
+
     self.CastBar:HookScript("OnEvent", function(castBar, event, eventUnit)
         if CastStopEvents[event] and eventUnit == unit then
-            if not UnitCastingInfo(unit) and not UnitChannelInfo(unit) then
-                castBar:Hide()
+            if castBar.interruptedBy then
+                castBar:Show()
+            else
+                if not UnitCastingInfo(unit) and not UnitChannelInfo(unit) then
+                    castBar:Hide()
+                end
             end
         end
     end)
