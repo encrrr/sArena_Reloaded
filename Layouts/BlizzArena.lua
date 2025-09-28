@@ -147,6 +147,7 @@ function layout:Initialize(frame)
     f:SetPoint("BOTTOMLEFT", healthBar, "TOPLEFT", 2, 2)
     f:SetPoint("BOTTOMRIGHT", healthBar, "TOPRIGHT", -2, 2)
     f:SetHeight(12)
+    f:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
 
     f = frame.CastBar
     f:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
@@ -219,11 +220,11 @@ function layout:UpdateOrientation(frame)
         -- Name
         name:ClearAllPoints()
         if (txt.nameAnchor or "CENTER") == "LEFT" then
-            name:SetPoint("BOTTOMLEFT", frame.HealthBar, "TOPLEFT", 3 + (txt.nameOffsetX or 0), 4 + (txt.nameOffsetY or 0))
+            name:SetPoint("BOTTOMLEFT", frame.HealthBar, "TOPLEFT", 3 + (txt.nameOffsetX or 0), 3 + (txt.nameOffsetY or 0))
         elseif (txt.nameAnchor or "CENTER") == "RIGHT" then
-            name:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", -3 + (txt.nameOffsetX or 0), 4 + (txt.nameOffsetY or 0))
+            name:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", -3 + (txt.nameOffsetX or 0), 3 + (txt.nameOffsetY or 0))
         else
-            name:SetPoint("BOTTOM", frame.HealthBar, "TOP", (txt.nameOffsetX or 0), 4 + (txt.nameOffsetY or 0))
+            name:SetPoint("BOTTOM", frame.HealthBar, "TOP", (txt.nameOffsetX or 0), 3 + (txt.nameOffsetY or 0))
         end
 
         -- Health Text

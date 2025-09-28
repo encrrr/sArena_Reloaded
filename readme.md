@@ -9,7 +9,7 @@ This version comes packed with many new features such as:
 *   Three new layouts and one updated one.
 *   Import/Export feature for Profile Sharing.
 *   A smarter aura priority system
-*   Many new customisation options such as Texture, Font, Dark Mode, Icon Crop, Modern Castbars, Masque support, etc.
+*   Many new customisation options such as Texture, Font, Dark Mode, Icon Crop, Modern Castbars, Masque support, Text Positions, etc.
 *   Put a unique texture on Healers specifically, or only when there is Class Stacking.
 *   Show shields and overshields on healthbars.
 *   Hunter's Feign Death does not show up as dead but instead gets faded out a little bit.
@@ -26,6 +26,7 @@ Other improvements:
 *   Option to display DR status as Text.
 *   Black DR Border option.
 *   Spec text on frames.
+*   Class color names
 *   Static DR setting with optional per class setting.
 
 And everything else you'd expect from Arena Frames.

@@ -164,6 +164,7 @@ function layout:Initialize(frame)
     --f:SetPoint("BOTTOMLEFT", healthBar, "TOPLEFT", 2, 4)
     --f:SetPoint("BOTTOMRIGHT", healthBar, "TOPRIGHT", -2, 4)
     f:SetHeight(12)
+    f:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
 
     f = frame.CastBar
     f:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
