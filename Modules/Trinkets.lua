@@ -66,7 +66,9 @@ function sArenaFrameMixin:UpdateTrinket()
             end
         end
         if (startTime ~= 0 and duration ~= 0 and self.Trinket.spellID) then
-            self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, duration / 1000.0)
+            if self.Trinket.Texture:GetTexture() then
+                self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, duration / 1000.0)
+            end
             if self.parent.db.profile.colorTrinket then
                 self.Trinket.Texture:SetColorTexture(1,0,0)
             else

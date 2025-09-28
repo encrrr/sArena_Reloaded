@@ -197,7 +197,9 @@ if isRetail then
 				local sharedCD = self:GetSharedCD()
 
 				if sharedCD and remainingCD < sharedCD then
-					self.Trinket.Cooldown:SetCooldown(currTime, sharedCD)
+					if self.Trinket.Texture:GetTexture() then
+						self.Trinket.Cooldown:SetCooldown(currTime, sharedCD)
+					end
 					if self.parent.db.profile.colorTrinket then
 						self.Trinket.Texture:SetColorTexture(1, 0, 0)
 					else
