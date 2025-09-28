@@ -1,8 +1,10 @@
 2.0.2
 - Add new aura stacks indicator in bottom left corner of Class/Aura Icon.
+- Add new text settings that lets you move and resize name, health, etc.
 - Fix stealthed units transparency and tweak the amount
 - Fix Class Icon Swipe going the wrong way by default after introducing new settings for it.
 - Fix frames being bugged after reload while in an arena.
+- Fix missing library for SharedMedia causing addon not to load for some people.
 
 2.0.1
 - Add /sarena test1-5 command.

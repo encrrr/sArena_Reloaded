@@ -248,61 +248,6 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         },
                     },
                 },
-                fonts = {
-                    order  = 0.2,
-                    name   = "Fonts",
-                    type   = "group",
-                    inline = true,
-                    args   = {
-                        changeFont = {
-                            order = 0,
-                            type = "toggle",
-                            name  = "Change Font",
-                            desc  = "Change the fonts used by sArena",
-                            width = "full",
-                            get   = getSetting,
-                            set   = setSetting,
-                        },
-                        frameFont = {
-                            order = 1, type = "select",
-                            name  = "Frame Font",
-                            desc  = "Used for labels like name, health/power values, cast text, etc.",
-                            style = "dropdown",
-                            dialogControl = "LSM30_Font",
-                            values = sArenaMixin.FontValues,
-                            get    = getSetting,
-                            set    = setSetting,
-                            disabled = function(info)
-                                return not info.handler.db.profile.layoutSettings[layoutName].changeFont
-                            end,
-                        },
-                        cdFont = {
-                            order = 2, type = "select",
-                            name  = "Cooldown Font",
-                            desc  = "Used for cooldown numbers (trinket, DRs, racials, etc.).",
-                            style = "dropdown",
-                            dialogControl = "LSM30_Font",
-                            values = sArenaMixin.FontValues,
-                            get    = getSetting,
-                            set    = setSetting,
-                            disabled = function(info)
-                                return not info.handler.db.profile.layoutSettings[layoutName].changeFont
-                            end,
-                        },
-                        fontOutline = {
-                            order = 3, type = "select",
-                            name  = "Font Outline",
-                            desc  = "Choose font outline style for all text elements.",
-                            style = "dropdown",
-                            values = sArenaMixin.FontOutlineValues,
-                            get    = getFontOutlineSetting,
-                            set    = setSetting,
-                            disabled = function(info)
-                                return not info.handler.db.profile.layoutSettings[layoutName].changeFont
-                            end,
-                        },
-                    },
-                },
                 other = {
                     order  = 0.5,
                     name   = "Options",
@@ -1008,7 +953,528 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
         }
     end
 
-
+    -- Text Settings options
+    optionsTable.textSettings = {
+        order = 1.1,
+        name = "Text Settings",
+        type = "group",
+        args = {
+            fonts = {
+                order  = 0,
+                name   = "Fonts",
+                type   = "group",
+                inline = true,
+                args   = {
+                    changeFont = {
+                        order = 0,
+                        type = "toggle",
+                        name  = "Change Font",
+                        desc  = "Change the fonts used by sArena",
+                        width = "full",
+                        get   = getSetting,
+                        set   = setSetting,
+                    },
+                    frameFont = {
+                        order = 1, type = "select",
+                        name  = "Frame Font",
+                        desc  = "Used for labels like name, health/power values, cast text, etc.",
+                        style = "dropdown",
+                        width = 0.7,
+                        dialogControl = "LSM30_Font",
+                        values = sArenaMixin.FontValues,
+                        get    = getSetting,
+                        set    = setSetting,
+                        disabled = function(info)
+                            return not info.handler.db.profile.layoutSettings[layoutName].changeFont
+                        end,
+                    },
+                    cdFont = {
+                        order = 2, type = "select",
+                        name  = "Cooldown Font",
+                        desc  = "Used for cooldown numbers (trinket, DRs, racials, etc.).",
+                        style = "dropdown",
+                        width = 0.7,
+                        dialogControl = "LSM30_Font",
+                        values = sArenaMixin.FontValues,
+                        get    = getSetting,
+                        set    = setSetting,
+                        disabled = function(info)
+                            return not info.handler.db.profile.layoutSettings[layoutName].changeFont
+                        end,
+                    },
+                    fontOutline = {
+                        order = 3, type = "select",
+                        name  = "Font Outline",
+                        desc  = "Choose font outline style for all text elements.",
+                        style = "dropdown",
+                        width = 0.7,
+                        values = sArenaMixin.FontOutlineValues,
+                        get    = getFontOutlineSetting,
+                        set    = setSetting,
+                        disabled = function(info)
+                            return not info.handler.db.profile.layoutSettings[layoutName].changeFont
+                        end,
+                    },
+                },
+            },
+            nameText = {
+                order = 1,
+                name = "Name Text",
+                type = "group",
+                inline = true,
+                args = {
+                    nameAnchor = {
+                        order = 1,
+                        name = "Anchor Point",
+                        type = "select",
+                        style = "dropdown",
+                        width = 0.5,
+                        values = {
+                            ["LEFT"] = "Left",
+                            ["CENTER"] = "Center",
+                            ["RIGHT"] = "Right",
+                        },
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.nameAnchor or "CENTER"
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.nameAnchor = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    nameSize = {
+                        order = 2,
+                        name = "Size",
+                        type = "range",
+                        min = 0.5,
+                        max = 1.7,
+                        step = 0.01,
+                        width = 0.8,
+                        isPercent = true,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.nameSize or 1.0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.nameSize = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    nameOffsetX = {
+                        order = 3,
+                        name = "Horizontal",
+                        type = "range",
+                        min = -200,
+                        max = 200,
+                        softMax = 50,
+                        softMin = -50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.nameOffsetX or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.nameOffsetX = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    nameOffsetY = {
+                        order = 4,
+                        name = "Vertical",
+                        type = "range",
+                        min = -200,
+                        max = 200,
+                        softMax = 50,
+                        softMin = -50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.nameOffsetY or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.nameOffsetY = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    resetNameText = {
+                        order = 5,
+                        name = "Reset",
+                        width = 0.4,
+                        type = "execute",
+                        func = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            local currentLayout = info.handler.layouts[layoutName]
+                            local defaults = currentLayout.defaultSettings.textSettings
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.nameAnchor = defaults.nameAnchor
+                            layout.textSettings.nameSize = defaults.nameSize
+                            layout.textSettings.nameOffsetX = defaults.nameOffsetX
+                            layout.textSettings.nameOffsetY = defaults.nameOffsetY
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, nil)
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
+                        end,
+                    },
+                },
+            },
+            healthText = {
+                order = 2,
+                name = "Health Text",
+                type = "group",
+                inline = true,
+                args = {
+                    healthAnchor = {
+                        order = 1,
+                        name = "Anchor Point",
+                        type = "select",
+                        style = "dropdown",
+                        width = 0.5,
+                        values = {
+                            ["LEFT"] = "Left",
+                            ["CENTER"] = "Center",
+                            ["RIGHT"] = "Right",
+                        },
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.healthAnchor or "CENTER"
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.healthAnchor = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    healthSize = {
+                        order = 2,
+                        name = "Size",
+                        type = "range",
+                        min = 0.5,
+                        max = 1.7,
+                        step = 0.01,
+                        width = 0.8,
+                        isPercent = true,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.healthSize or 1.0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.healthSize = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    healthOffsetX = {
+                        order = 3,
+                        name = "Horizontal",
+                        type = "range",
+                        min = -200,
+                        max = 200,
+                        softMax = 50,
+                        softMin = -50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.healthOffsetX or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.healthOffsetX = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    healthOffsetY = {
+                        order = 4,
+                        name = "Vertical",
+                        type = "range",
+                        min = -200,
+                        max = 200,
+                        softMax = 50,
+                        softMin = -50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.healthOffsetY or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.healthOffsetY = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    resetHealthText = {
+                        order = 5,
+                        name = "Reset",
+                        width = 0.4,
+                        type = "execute",
+                        func = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            local currentLayout = info.handler.layouts[layoutName]
+                            local defaults = currentLayout.defaultSettings.textSettings
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.healthAnchor = defaults.healthAnchor
+                            layout.textSettings.healthSize = defaults.healthSize
+                            layout.textSettings.healthOffsetX = defaults.healthOffsetX
+                            layout.textSettings.healthOffsetY = defaults.healthOffsetY
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, nil)
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
+                        end,
+                    },
+                },
+            },
+            specNameText = {
+                order = 3,
+                name = "Spec Name Text",
+                type = "group",
+                inline = true,
+                args = {
+                    specNameAnchor = {
+                        order = 1,
+                        name = "Anchor Point",
+                        type = "select",
+                        style = "dropdown",
+                        width = 0.5,
+                        values = {
+                            ["LEFT"] = "Left",
+                            ["CENTER"] = "Center",
+                            ["RIGHT"] = "Right",
+                        },
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.specNameAnchor or "CENTER"
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.specNameAnchor = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    specNameSize = {
+                        order = 2,
+                        name = "Size",
+                        type = "range",
+                        min = 0.5,
+                        max = 1.7,
+                        step = 0.01,
+                        width = 0.8,
+                        isPercent = true,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.specNameSize or 1.0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.specNameSize = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    specNameOffsetX = {
+                        order = 3,
+                        name = "Horizontal",
+                        type = "range",
+                        min = -200,
+                        max = 200,
+                        softMax = 50,
+                        softMin = -50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.specNameOffsetX or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.specNameOffsetX = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    specNameOffsetY = {
+                        order = 4,
+                        name = "Vertical",
+                        type = "range",
+                        min = -200,
+                        max = 200,
+                        softMax = 50,
+                        softMin = -50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.specNameOffsetY or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.specNameOffsetY = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    resetSpecNameText = {
+                        order = 5,
+                        name = "Reset",
+                        width = 0.4,
+                        type = "execute",
+                        func = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            local currentLayout = info.handler.layouts[layoutName]
+                            local defaults = currentLayout.defaultSettings.textSettings
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.specNameAnchor = defaults.specNameAnchor
+                            layout.textSettings.specNameSize = defaults.specNameSize
+                            layout.textSettings.specNameOffsetX = defaults.specNameOffsetX
+                            layout.textSettings.specNameOffsetY = defaults.specNameOffsetY
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, nil)
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
+                        end,
+                    },
+                },
+            },
+            castbarText = {
+                order = 4,
+                name = "Castbar Text",
+                type = "group",
+                inline = true,
+                args = {
+                    castbarAnchor = {
+                        order = 1,
+                        name = "Anchor Point",
+                        type = "select",
+                        style = "dropdown",
+                        width = 0.5,
+                        values = {
+                            ["LEFT"] = "Left",
+                            ["CENTER"] = "Center",
+                            ["RIGHT"] = "Right",
+                        },
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.castbarAnchor or "CENTER"
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.castbarAnchor = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    castbarSize = {
+                        order = 2,
+                        name = "Size",
+                        type = "range",
+                        min = 0.5,
+                        max = 1.7,
+                        step = 0.01,
+                        width = 0.8,
+                        isPercent = true,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.castbarSize or 1.0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.castbarSize = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    castbarOffsetX = {
+                        order = 3,
+                        name = "Horizontal",
+                        type = "range",
+                        min = -200,
+                        max = 200,
+                        softMax = 50,
+                        softMin = -50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.castbarOffsetX or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.castbarOffsetX = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    castbarOffsetY = {
+                        order = 4,
+                        name = "Vertical",
+                        type = "range",
+                        min = -200,
+                        max = 200,
+                        softMax = 50,
+                        softMin = -50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.castbarOffsetY or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.castbarOffsetY = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    resetCastbarText = {
+                        order = 5,
+                        name = "Reset",
+                        width = 0.4,
+                        type = "execute",
+                        func = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            local currentLayout = info.handler.layouts[layoutName]
+                            local defaults = currentLayout.defaultSettings.textSettings
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.castbarAnchor = defaults.castbarAnchor
+                            layout.textSettings.castbarSize = defaults.castbarSize
+                            layout.textSettings.castbarOffsetX = defaults.castbarOffsetX
+                            layout.textSettings.castbarOffsetY = defaults.castbarOffsetY
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, nil)
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
+                        end,
+                    },
+                },
+            },
+        },
+    }
 
     return optionsTable
 end
@@ -1288,6 +1754,18 @@ function sArenaMixin:UpdateRacialSettings(db, info, val)
             fontToUse = LSM:Fetch(LSM.MediaType.FONT, self.layoutdb.cdFont)
         end
         text:SetFont(fontToUse, db.fontSize, "OUTLINE")
+    end
+end
+
+function sArenaMixin:UpdateTextPositions(db, info, val)
+    -- Refresh all arena frames with the current layout
+    for i = 1, sArenaMixin.maxArenaOpponents do
+        local frame = info.handler["arena" .. i]
+        local layout = info.handler.layouts[info.handler.db.profile.currentLayout]
+        
+        if frame and layout and layout.UpdateOrientation then
+            layout:UpdateOrientation(frame)
+        end
     end
 end
 

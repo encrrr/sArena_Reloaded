@@ -55,6 +55,25 @@ layout.defaultSettings = {
     frameFont = "Prototype",
     cdFont  = "Prototype",
     mirrored = true,
+
+     textSettings = {
+        nameAnchor = "RIGHT",
+        nameSize = 1.0,
+        nameOffsetX = 0,
+        nameOffsetY = 0,
+        healthAnchor = "CENTER",
+        healthSize = 1.0,
+        healthOffsetX = 0,
+        healthOffsetY = 0,
+        specNameAnchor = "CENTER",
+        specNameSize = 1.0,
+        specNameOffsetX = 0,
+        specNameOffsetY = 0,
+        castbarAnchor = "CENTER",
+        castbarSize = 1.0,
+        castbarOffsetX = 0,
+        castbarOffsetY = 0,
+    },
 }
 
 local function getSetting(info)
@@ -149,10 +168,10 @@ function layout:Initialize(frame)
     f:SetSize(32, 32)
 
     frame.HealthText:SetPoint("CENTER", frame.HealthBar)
-    frame.HealthText:SetShadowOffset(0, 0)
+    --frame.HealthText:SetShadowOffset(0, 0)
 
     frame.PowerText:SetPoint("CENTER", frame.PowerBar)
-    frame.PowerText:SetShadowOffset(0, 0)
+    --frame.PowerText:SetShadowOffset(0, 0)
     frame.PowerBar:SetHeight(10)
 
     local underlay = frame.TexturePool:Acquire()
@@ -203,12 +222,65 @@ function layout:UpdateOrientation(frame)
     local classIcon = frame.ClassIcon
     local classIconMask = frame.ClassIconMask
     local name = frame.Name
+    local specName = frame.SpecNameText
+    local healthText = frame.HealthText
+    local castbarText = frame.CastBar.Text
 
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
     classIcon:ClearAllPoints()
     classIconMask:ClearAllPoints()
     name:ClearAllPoints()
+
+    if self.db.textSettings then
+        local txt = self.db.textSettings
+        local modernCastbar = self.db.castBar.useModernCastbars
+
+        name:SetScale(txt.nameSize)
+        healthText:SetScale(txt.healthSize)
+        specName:SetScale(txt.specNameSize)
+        castbarText:SetScale(txt.castbarSize)
+
+        -- Name
+        name:ClearAllPoints()
+        if txt.nameAnchor == "LEFT" then
+            name:SetPoint("BOTTOMLEFT", frame.HealthBar, "TOPLEFT", 3 + txt.nameOffsetX, 5.5 + txt.nameOffsetY)
+        elseif txt.nameAnchor == "RIGHT" then
+            name:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", -3 + txt.nameOffsetX, 5.5 + txt.nameOffsetY)
+        else
+            name:SetPoint("BOTTOM", frame.HealthBar, "TOP", txt.nameOffsetX, 5.5 + txt.nameOffsetY)
+        end
+
+        -- Health Text
+        healthText:ClearAllPoints()
+        if txt.healthAnchor == "LEFT" then
+            healthText:SetPoint("LEFT", healthBar, "LEFT", txt.healthOffsetX, txt.healthOffsetY)
+        elseif txt.healthAnchor == "RIGHT" then
+            healthText:SetPoint("RIGHT", healthBar, "RIGHT", txt.healthOffsetX, txt.healthOffsetY)
+        else
+            healthText:SetPoint("CENTER", healthBar, "CENTER", txt.healthOffsetX, txt.healthOffsetY)
+        end
+
+        -- Spec Text
+        specName:ClearAllPoints()
+        if txt.specNameAnchor == "LEFT" then
+            specName:SetPoint("LEFT", frame.PowerBar, "LEFT", txt.specNameOffsetX, txt.specNameOffsetY)
+        elseif txt.specNameAnchor == "RIGHT" then
+            specName:SetPoint("RIGHT", frame.PowerBar, "RIGHT", txt.specNameOffsetX, txt.specNameOffsetY)
+        else
+            specName:SetPoint("CENTER", frame.PowerBar, "CENTER", txt.specNameOffsetX, txt.specNameOffsetY)
+        end
+
+        -- Castbar Text
+        castbarText:ClearAllPoints()
+        if txt.castbarAnchor == "LEFT" then
+            castbarText:SetPoint("LEFT", frame.CastBar, "LEFT", 3 + txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
+        elseif txt.castbarAnchor == "RIGHT" then
+            castbarText:SetPoint("RIGHT", frame.CastBar, "RIGHT", -3 + txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
+        else
+            castbarText:SetPoint("CENTER", frame.CastBar, "CENTER", txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
+        end
+    end
 
     if (self.db.mirrored) then
         frameTexture:SetTexCoord(1, 0, 0, 1)
@@ -219,7 +291,7 @@ function layout:UpdateOrientation(frame)
         classIcon:SetPoint("TOPRIGHT", -2, -2)
         classIconMask:SetPoint("TOPRIGHT", -2, -2)
 
-        name:SetJustifyH("RIGHT")
+        --name:SetJustifyH("RIGHT")
     else
         frameTexture:SetTexCoord(0, 1, 0, 1)
         frameTexture:SetPoint("TOPLEFT", frame, "TOPLEFT", -7, 6)
@@ -229,12 +301,12 @@ function layout:UpdateOrientation(frame)
         classIcon:SetPoint("TOPLEFT", 3, -2)
         classIconMask:SetPoint("TOPLEFT", 3, -2)
 
-        name:SetJustifyH("LEFT")
+        --name:SetJustifyH("LEFT")
     end
 
     name:SetJustifyV("BOTTOM")
-    name:SetPoint("BOTTOMLEFT", frame.HealthBar, "TOPLEFT", 5, 5)
-    name:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", -5, 5)
+    --name:SetPoint("BOTTOMLEFT", frame.HealthBar, "TOPLEFT", 5, 5)
+    --name:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", -5, 5)
     name:SetHeight(12)
 end
 

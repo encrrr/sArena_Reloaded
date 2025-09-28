@@ -61,6 +61,26 @@ layout.defaultSettings = {
     mirrored = true,
     showSpecManaText = true,
     hideNameBackground = (BetterBlizzFramesDB and BetterBlizzFramesDB.hideUnitFrameShadow) or nil,
+    
+    -- text settings defaults
+    textSettings = {
+        nameAnchor = "CENTER",
+        nameSize = 1.0,
+        nameOffsetX = 0,
+        nameOffsetY = 0,
+        healthAnchor = "CENTER",
+        healthSize = 1.0,
+        healthOffsetX = 0,
+        healthOffsetY = 0,
+        specNameAnchor = "CENTER",
+        specNameSize = 0.85,
+        specNameOffsetX = 0,
+        specNameOffsetY = 0,
+        castbarAnchor = "CENTER",
+        castbarSize = 1.0,
+        castbarOffsetX = 0,
+        castbarOffsetY = 0,
+    },
 }
 
 local function getSetting(info)
@@ -133,13 +153,13 @@ function layout:Initialize(frame)
     local healthText = frame.HealthText
     healthText:SetJustifyH("CENTER")
     healthText:SetPoint("CENTER", healthBar, "CENTER", 0, 0)
-    healthText:SetShadowOffset(0, 0)
+    --healthText:SetShadowOffset(0, 0)
     healthText:SetDrawLayer("OVERLAY", 4)
 
     local powerText = frame.PowerText
     powerText:SetJustifyH("CENTER")
     powerText:SetPoint("CENTER", healthBar, "CENTER", -1, -16.5)
-    powerText:SetShadowOffset(0, 0)
+    --powerText:SetShadowOffset(0, 0)
     powerText:SetDrawLayer("OVERLAY", 4)
 
     local playerName = frame.Name
@@ -266,7 +286,7 @@ function layout:Initialize(frame)
     --specBorder:Hide()
 
     frame.SpecNameText:SetTextColor(1,1,1)
-    frame.SpecNameText:SetScale(0.85)
+    --frame.SpecNameText:SetScale(0.85)
     frame.PowerText:SetAlpha(0)
 
     f = frame.CastBar
@@ -324,15 +344,66 @@ function layout:UpdateOrientation(frame)
     local healthBar = frame.HealthBar
     local powerBar = frame.PowerBar
     local classIcon = frame.ClassIcon
+    local name = frame.Name
     local specName = frame.SpecNameText
     local healthText = frame.HealthText
-    local playerName = frame.Name
+    local castbarText = frame.CastBar.Text
 
-    playerName:ClearAllPoints()
+    name:ClearAllPoints()
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
     classIcon:ClearAllPoints()
     specName:ClearAllPoints()
+
+    if self.db.textSettings then
+        local txt = self.db.textSettings
+        local modernCastbar = self.db.castBar.useModernCastbars
+
+        name:SetScale(txt.nameSize)
+        healthText:SetScale(txt.healthSize)
+        specName:SetScale(txt.specNameSize)
+        castbarText:SetScale(txt.castbarSize)
+
+        -- Name
+        name:ClearAllPoints()
+        if txt.nameAnchor == "LEFT" then
+            name:SetPoint("BOTTOMLEFT", frame.HealthBar, "TOPLEFT", 3 + txt.nameOffsetX, 1.5 + txt.nameOffsetY)
+        elseif txt.nameAnchor == "RIGHT" then
+            name:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", -3 + txt.nameOffsetX, 1.5 + txt.nameOffsetY)
+        else
+            name:SetPoint("BOTTOM", frame.HealthBar, "TOP", -1 + txt.nameOffsetX, 1.5 + txt.nameOffsetY)
+        end
+
+        -- Health Text
+        healthText:ClearAllPoints()
+        if txt.healthAnchor == "LEFT" then
+            healthText:SetPoint("LEFT", healthBar, "LEFT", 4 + txt.healthOffsetX, txt.healthOffsetY)
+        elseif txt.healthAnchor == "RIGHT" then
+            healthText:SetPoint("RIGHT", healthBar, "RIGHT", -3 + txt.healthOffsetX, txt.healthOffsetY)
+        else
+            healthText:SetPoint("CENTER", healthBar, "CENTER", -1 +txt.healthOffsetX, txt.healthOffsetY)
+        end
+
+        -- Spec Text
+        specName:ClearAllPoints()
+        if txt.specNameAnchor == "LEFT" then
+            specName:SetPoint("LEFT", healthBar, "LEFT", 4 + txt.specNameOffsetX, -19.5 + txt.specNameOffsetY)
+        elseif txt.specNameAnchor == "RIGHT" then
+            specName:SetPoint("RIGHT", healthBar, "RIGHT", -3 + txt.specNameOffsetX, -19.5 +txt.specNameOffsetY)
+        else
+            specName:SetPoint("CENTER", healthBar, "CENTER", -1 + txt.specNameOffsetX, -19.5 + txt.specNameOffsetY)
+        end
+
+        -- Castbar Text
+        castbarText:ClearAllPoints()
+        if txt.castbarAnchor == "LEFT" then
+            castbarText:SetPoint("LEFT", frame.CastBar, "LEFT", 3 + txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
+        elseif txt.castbarAnchor == "RIGHT" then
+            castbarText:SetPoint("RIGHT", frame.CastBar, "RIGHT", -3 + txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
+        else
+            castbarText:SetPoint("CENTER", frame.CastBar, "CENTER", txt.castbarOffsetX, (modernCastbar and -11 or 0) + txt.castbarOffsetY)
+        end
+    end
 
     if (self.db.mirrored) then
     	frameTexture:SetTexCoord(1, 0, 0, 1)
@@ -342,9 +413,9 @@ function layout:UpdateOrientation(frame)
         powerBar:SetSize(136, 11)
         powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", -8, 0)
         classIcon:SetPoint("TOPLEFT", 8, -4)
-        specName:SetPoint("CENTER", healthBar, "CENTER", -1, -19.5)
-        healthText:SetPoint("CENTER", healthBar, "CENTER", 0, 0)
-        playerName:SetPoint("BOTTOM", healthBar, "TOP", -1, 1.5)
+        --specName:SetPoint("CENTER", healthBar, "CENTER", -1, -19.5)
+        --healthText:SetPoint("CENTER", healthBar, "CENTER", 0, 0)
+        --name:SetPoint("BOTTOM", healthBar, "TOP", -1, 1.5)
     else
     	frameTexture:SetTexCoord(0, 1, 0, 1)
     	healthBar:SetSize(128, 21)
@@ -353,9 +424,9 @@ function layout:UpdateOrientation(frame)
     	powerBar:SetSize(137, 11)
     	powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, 0)
     	classIcon:SetPoint("TOPRIGHT", -8, -4)
-        specName:SetPoint("CENTER", healthBar, "CENTER", 1, -19.5)
-        healthText:SetPoint("CENTER", healthBar, "CENTER", 1.5, 0)
-        playerName:SetPoint("BOTTOM", healthBar, "TOP", 1, 1.5)
+        --specName:SetPoint("CENTER", healthBar, "CENTER", 1, -19.5)
+        --healthText:SetPoint("CENTER", healthBar, "CENTER", 1.5, 0)
+        --name:SetPoint("BOTTOM", healthBar, "TOP", 1, 1.5)
     end
 end
 

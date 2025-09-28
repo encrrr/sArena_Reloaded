@@ -64,12 +64,12 @@ if isRetail then
         if bar.UpdateDisplayType then bar:UpdateDisplayType() end
 
         if style == "modern" then
-            bar.Text:ClearAllPoints()
-            bar.Text:SetPoint("BOTTOM", bar, 0, -14)
+            -- bar.Text:ClearAllPoints()
+            -- bar.Text:SetPoint("BOTTOM", bar, 0, -14)
             bar:SetHeight(9)
         else
-            bar.Text:ClearAllPoints()
-            bar.Text:SetPoint("CENTER", bar, "CENTER", 0, 0)
+            -- bar.Text:ClearAllPoints()
+            -- bar.Text:SetPoint("CENTER", bar, "CENTER", 0, 0)
             bar:SetHeight(16)
         end
 
@@ -290,8 +290,8 @@ else
         bar.MaskTexture:Show()
         castTexture:AddMaskTexture(bar.MaskTexture)
 
-        bar.Text:ClearAllPoints()
-        bar.Text:SetPoint("BOTTOM", bar, 0, -10.5)
+        -- bar.Text:ClearAllPoints()
+        -- bar.Text:SetPoint("BOTTOM", bar, 0, -10.5)
         bar:SetHeight(12)
         if bar.Icon then bar.Icon:SetSize(21, 21) end
 

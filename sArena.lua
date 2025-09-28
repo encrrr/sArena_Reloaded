@@ -346,6 +346,7 @@ local function applyFont(fs, fontTbl)
 end
 
 function sArenaMixin:UpdateFonts()
+    print("Updating Fonts")
     local fontCfg  = db.profile.layoutSettings[db.profile.currentLayout]
     if not fontCfg.changeFont then
         local og = sArenaMixin.ogFonts
@@ -891,7 +892,7 @@ function sArenaMixin:Initialize()
     self.optionsTable.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(db)
     LibStub("AceConfig-3.0"):RegisterOptionsTable("sArena", self.optionsTable)
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions("sArena", "sArena |cffff8000Reloaded|r |T135884:13:13|t")
-    LibStub("AceConfigDialog-3.0"):SetDefaultSize("sArena", 850, 690)
+    LibStub("AceConfigDialog-3.0"):SetDefaultSize("sArena", 860, 690)
     LibStub("AceConsole-3.0"):RegisterChatCommand("sarena", ChatCommand)
 
     self:SetLayout(_, db.profile.currentLayout)
@@ -2681,4 +2682,16 @@ function sArenaMixin:ModernOrClassicCastbar()
             frame.CastBar.Text:SetFont(fontName, s, "THINOUTLINE")
         end
     end
+
+    -- Update text positioning after castbar changes
+    local currentLayout = self.layouts[db.profile.currentLayout]
+    if currentLayout and currentLayout.UpdateOrientation then
+        for i = 1, sArenaMixin.maxArenaOpponents do
+            local frame = _G["sArenaEnemyFrame" .. i]
+            if frame then
+                currentLayout:UpdateOrientation(frame)
+            end
+        end
+    end
+
 end
