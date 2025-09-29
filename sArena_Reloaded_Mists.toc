@@ -1,5 +1,5 @@
 ## Interface: 50500
-## Title: sArena |cffff8000Reloaded|r
+## Title: sArena |cffff8000Reloaded|r |T135884:16:16|t
 ## IconTexture: 135884
 ## Notes: Enhanced Arena Frames
 ## Author: Stako, "reloaded" by Bodify

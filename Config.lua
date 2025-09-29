@@ -2491,16 +2491,43 @@ else
                         order = 3,
                         name = "Racials",
                         type = "group",
-                        args = {
-                            categories = {
-                                order = 1,
-                                name = "Categories",
-                                type = "multiselect",
-                                get = function(info, key) return info.handler.db.profile.racialCategories[key] end,
-                                set = function(info, key, val) info.handler.db.profile.racialCategories[key] = val end,
-                                values = racialCategories,
-                            },
-                        },
+                        args = (function()
+                            local args = {
+                                categories = {
+                                    order = 1,
+                                    name = "Categories",
+                                    type = "multiselect",
+                                    get = function(info, key) return info.handler.db.profile.racialCategories[key] end,
+                                    set = function(info, key, val) info.handler.db.profile.racialCategories[key] = val end,
+                                    values = racialCategories,
+                                },
+                            }
+
+                            -- Add racialOptions only if not retail
+                            if not isRetail then
+                                args.racialOptions = {
+                                    order = 2,
+                                    type = "group",
+                                    name = "Options",
+                                    inline = true,
+                                    args = {
+                                        swapHumanTrinket = {
+                                            order = 1,
+                                            name = "Swap Trinket with Human Racial",
+                                            desc = "Swap the Trinket texture with Human Racial for Humans and hide the original Racial Icon.",
+                                            type = "toggle",
+                                            width = "full",
+                                            get = function(info) return info.handler.db.profile.swapHumanTrinket end,
+                                            set = function(info, val)
+                                                info.handler.db.profile.swapHumanTrinket = val
+                                            end,
+                                        },
+                                    }
+                                }
+                            end
+
+                            return args
+                        end)(),
                     },
                 },
             },
