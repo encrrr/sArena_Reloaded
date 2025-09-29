@@ -1,3 +1,6 @@
+2.0.4
+- Add back missing "Swap human racial with trinket" setting for the MoP version where it fints.
+
 2.0.3
 - Interrupted castbars no longer instantly hide but instead show who interrupted and fades the castbar out slowly.
 - Fix some hide castbar events
