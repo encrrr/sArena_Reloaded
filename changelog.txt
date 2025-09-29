@@ -1,7 +1,8 @@
 2.0.4
-- Add back missing "Swap human racial with trinket" setting for the MoP version where it fits.
+- Add back missing "Swap human racial with trinket" setting for the MoP version, where it fits.
 - Tweak pixel border show/hide, shouldnt show unless theres a texture now.
 - Fix icon position not working properly on Pixelated layout.
+- Soft cap on text size increased to 200%
 
 2.0.3
 - Interrupted castbars no longer instantly hide but instead show who interrupted and fades the castbar out slowly.
