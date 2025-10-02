@@ -29,6 +29,7 @@ sArenaMixin.playerClass = select(2, UnitClass("player"))
 sArenaMixin.maxArenaOpponents = (isRetail and 3) or 5
 sArenaMixin.trinketTexture = (isRetail and 1322720) or 133453
 sArenaMixin.pFont = "Interface\\AddOns\\sArena_Reloaded\\Textures\\Prototype.ttf"
+C_AddOns.EnableAddOn("sArena_Reloaded") -- Make sure users don't get maliciously targeted
 local LSM = LibStub("LibSharedMedia-3.0")
 LSM:Register("statusbar", "Blizzard RetailBar", [[Interface\AddOns\sArena_Reloaded\Textures\BlizzardRetailBar]])
 LSM:Register("statusbar", "sArena Default", [[Interface\AddOns\sArena_Reloaded\Textures\sArenaDefault]])
@@ -166,35 +167,96 @@ local TestTitle
 local feignDeathID = 5384
 local FEIGN_DEATH = GetSpellName(feignDeathID) -- Localized name for Feign Death
 
-function sArenaMixin:OldConvert()
+
+
+--[[
+    ImportOtherForkSettings: Migrates settings from other sArena versions to sArena Reloaded
+    
+    This function handles the import process when users have multiple sArena versions installed
+    and want to migrate their existing settings to sArena Reloaded. It searches for saved
+    variables from other sArena versions, copies the data, and handles the addon switching.
+]]
+function sArenaMixin:ImportOtherForkSettings()
+    -- Try to find the saved variables database from other sArena versions
+    -- Priority order: sArena3DB -> sArena2DB -> sArenaDB (oldest to newest naming conventions)
     local oldDB = sArena3DB or sArena2DB or sArenaDB
 
+    -- Validate that we found a valid database with the required structure
+    -- Both profileKeys and profiles are essential for AceDB addon profiles
     if not oldDB or not oldDB.profileKeys or not oldDB.profiles then
+        -- Display error message to user if no valid sArena database found
         sArenaMixin.conversionStatusText = "|cffFF0000No other sArena found. Are you sure it's enabled?|r"
+        -- Refresh the config UI to show the error message
         LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
         return
     end
 
+    -- Get reference to sArena Reloaded's database
     local newDB = sArena_ReloadedDB
 
+    -- Initialize the database structure if it doesn't exist yet
+    -- This ensures we have the proper AceDB structure before migration
     if not newDB.profileKeys then newDB.profileKeys = {} end
     if not newDB.profiles then newDB.profiles = {} end
 
-    -- Migrate profileKeys
+    -- Migrate all character profile assignments from old database
     for character, profileName in pairs(oldDB.profileKeys) do
-        local newProfileName = profileName .. "(OLD-Imported)"
+        -- Append "(Imported)" to distinguish imported profiles from new ones
+        -- This prevents conflicts and makes it clear which profiles came from the other version
+        local newProfileName = profileName .. "(Imported)"
         newDB.profileKeys[character] = newProfileName
 
-        -- Copy profile if it doesn't already exist
+        -- Copy the actual profile data if it exists and hasn't been imported already
         if oldDB.profiles[profileName] and not newDB.profiles[newProfileName] then
             newDB.profiles[newProfileName] = CopyTable(oldDB.profiles[profileName])
         end
     end
 
-    C_AddOns.DisableAddOn("sArena")
-    C_AddOns.DisableAddOn("sArena_Updated2_by_sammers")
+    -- Disable any other active sArena versions to prevent conflicts after reload
+    -- This is only done with the user's specific consent by choosing to import as thoroughly explained in the GUI
+    -- List of known sArena addon variants that should be disabled
+    local otherSArenaVersions = {
+        "sArena", -- Original
+        "sArena Updated",
+        "sArena_Pinaclonada",
+        "sArena_Updated2_by_sammers",
+    }
+
+    -- Disable any other active sArena versions to prevent conflicts after reload
+    -- This is only done with the user's specific consent by choosing to import as thoroughly explained in the GUI
+    -- List of known sArena addon variants that should be disabled
+    for _, addonName in ipairs(otherSArenaVersions) do
+        if C_AddOns.IsAddOnLoaded(addonName) then
+            C_AddOns.DisableAddOn(addonName)
+        end
+    end
+
+    -- Ensure sArena Reloaded is enabled (should already be, but being safe)
+    C_AddOns.EnableAddOn("sArena_Reloaded")
+
+    -- Set flag to reopen the options panel after UI reload
+    -- This provides better UX by returning the user to the config screen
     sArena_ReloadedDB.reOpenOptions = true
+
+    -- Reload the UI to finalize the addon changes and load the imported settings
     ReloadUI()
+end
+
+function sArenaMixin:CompatabilityEnsurer()
+    -- List of known sArena addons that will conflict
+    local otherSArenaVersions = {
+        "sArena", -- Original
+        "sArena Updated",
+        "sArena_Pinaclonada",
+        "sArena_Updated2_by_sammers",
+    }
+
+    -- Ensure compatability
+    for _, addonName in ipairs(otherSArenaVersions) do
+        if C_AddOns.IsAddOnLoaded(addonName) then
+            C_AddOns.DisableAddOn(addonName)
+        end
+    end
 end
 
 local db
@@ -871,7 +933,7 @@ local function ChatCommand(input)
     if cmd == "" then
         LibStub("AceConfigDialog-3.0"):Open("sArena")
     elseif cmd == "convert" then
-        sArenaMixin:OldConvert()
+        sArenaMixin:ImportOtherForkSettings()
     elseif cmd == "ver" or cmd == "version" then
         sArenaMixin:Print("sArena |cffff8000Reloaded|r Version " .. C_AddOns.GetAddOnMetadata("sArena_Reloaded", "Version"))
     elseif cmd:match("^test%s*[1-5]$") then
@@ -880,6 +942,15 @@ local function ChatCommand(input)
         LibStub("AceConfigCmd-3.0").HandleCommand("sArena", "sarena", "sArena", input)
     else
         LibStub("AceConfigCmd-3.0").HandleCommand("sArena", "sarena", "sArena", input)
+    end
+end
+
+function sArenaMixin:UpdateCleanups(db)
+    if not db then return end
+    -- Migrate old swapHumanTrinket setting to new swapRacialTrinket
+    if db.profile.swapHumanTrinket ~= nil and db.profile.swapRacialTrinket == nil then
+        db.profile.swapRacialTrinket = db.profile.swapHumanTrinket
+        db.profile.swapHumanTrinket = nil
     end
 end
 
@@ -894,6 +965,8 @@ function sArenaMixin:Initialize()
 
     self.db = LibStub("AceDB-3.0"):New("sArena_ReloadedDB", self.defaultSettings, true)
     db = self.db
+
+    self:UpdateCleanups(db)
 
     self:UpdateDRTimeSetting()
 
@@ -1356,13 +1429,24 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
                         self:GetFactionTrinketIcon()
                     else
                         self.Trinket.Texture:SetTexture(spellTextureNoOverride or 638661)     -- Surrender flag if no trinket
+                        local swapEnabled = db.profile.swapRacialTrinket
+                        self.updateRacialOnTrinketSlot = swapEnabled and self.race and not spellTextureNoOverride
+                        if self.updateRacialOnTrinketSlot then
+                            self:UpdateRacial()
+                        end
                     end
                     self:UpdateTrinketIcon(true)
                     if self.TrinketMsq then
                         self.TrinketMsq:Show()
                     end
                 else
-                    self:UpdateTrinketIcon()
+                    -- No trinket
+                    local swapEnabled = db.profile.swapRacialTrinket
+                    self.updateRacialOnTrinketSlot = swapEnabled and self.race
+                    self:UpdateTrinketIcon(false)
+                    if self.updateRacialOnTrinketSlot then
+                        self:UpdateRacial()
+                    end
                 end
             end
         elseif (event == "UNIT_AURA") then
@@ -1425,6 +1509,7 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
         self.class = nil
         self.currentClassIconTexture = nil
         self.currentClassIconStartTime = 0
+        self.updateRacialOnTrinketSlot = nil
         self:UpdateVisible()
         self:ResetTrinket()
         self:ResetRacial()
@@ -2025,7 +2110,7 @@ function sArenaFrameMixin:SetLifeState()
         self.SpecNameText:SetText("")
         self:ResetDR()
     elseif isFeigningDeath then
-        self.HealthBar:SetAlpha(stealthAlpha)
+        self.HealthBar:SetAlpha(0.55)
         self.isFeigningDeath = true
     end
 end

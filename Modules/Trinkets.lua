@@ -30,7 +30,13 @@ function sArenaFrameMixin:UpdateTrinketIcon(available)
         if self.parent.db.profile.colorTrinket then
             self.Trinket.Texture:SetColorTexture(1,0,0)
         else
-            self.Trinket.Texture:SetDesaturated(true)
+            local desaturate
+            if self.updateRacialOnTrinketSlot then
+                desaturate = false
+            else
+                desaturate = true
+            end
+            self.Trinket.Texture:SetDesaturated(desaturate)
         end
     end
 end
@@ -51,11 +57,30 @@ function sArenaFrameMixin:UpdateTrinket()
     if (spellID) then
         if (spellID ~= self.Trinket.spellID) then
             local _, spellTextureNoOverride = GetSpellTexture(spellID)
+
+            -- Check if we had racial on trinket slot before
+            local wasRacialOnTrinketSlot = self.updateRacialOnTrinketSlot
+
             self.Trinket.spellID = spellID
             if spellTextureNoOverride and not isRetail then
                 self:GetFactionTrinketIcon()
             else
                 self.Trinket.Texture:SetTexture(spellTextureNoOverride or 638661) -- Surrender flag if no trinket
+
+                -- Determine if we should put racial on trinket slot
+                local swapEnabled = self.parent.db.profile.swapRacialTrinket or self.parent.db.profile.swapHumanTrinket
+                local shouldPutRacialOnTrinket = swapEnabled and self.race and not spellTextureNoOverride
+
+                -- If we found a real trinket and had racial on trinket slot, restore racial to its proper place
+                if spellTextureNoOverride and wasRacialOnTrinketSlot then
+                    self.updateRacialOnTrinketSlot = nil
+                    self:UpdateRacial()
+                else
+                    self.updateRacialOnTrinketSlot = shouldPutRacialOnTrinket
+                    if self.updateRacialOnTrinketSlot then
+                        self:UpdateRacial()
+                    end
+                end
             end
             self:UpdateTrinketIcon(true)
             if self.TrinketMsq then
@@ -64,12 +89,19 @@ function sArenaFrameMixin:UpdateTrinket()
         end
         if (startTime ~= 0 and duration ~= 0 and self.Trinket.spellID) then
             if self.Trinket.Texture:GetTexture() then
-                self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, duration / 1000.0)
+                if self.updateRacialOnTrinketSlot then
+                    local racialDuration = self:GetRacialDuration()
+                    self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, racialDuration)
+                else
+                    self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, duration / 1000.0)
+                end
             end
             if self.parent.db.profile.colorTrinket then
                 self.Trinket.Texture:SetColorTexture(1,0,0)
             else
-                self.Trinket.Texture:SetDesaturated(true)
+                if not self.updateRacialOnTrinketSlot then
+                    self.Trinket.Texture:SetDesaturated(true)
+                end
             end
         else
             self.Trinket.Cooldown:Clear()
@@ -83,6 +115,12 @@ function sArenaFrameMixin:UpdateTrinket()
 end
 
 function sArenaFrameMixin:ResetTrinket()
+    -- If racial was on trinket slot, move it back to racial slot
+    if self.updateRacialOnTrinketSlot then
+        self.updateRacialOnTrinketSlot = nil
+        self:UpdateRacial()
+    end
+
     self.Trinket.spellID = nil
     self.Trinket.Texture:SetTexture(nil)
     self.Trinket.Cooldown:Clear()

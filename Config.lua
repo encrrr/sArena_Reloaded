@@ -1923,43 +1923,111 @@ local function setDRIcons()
 end
 
 
-if C_AddOns.IsAddOnLoaded("sArena_Updated2_by_sammers") then
+local function CompatabilityIssueExists()
+    -- List of known sArena addon variants that will conflict
+    local otherSArenaVersions = {
+        "sArena", -- Original
+        "sArena Updated",
+        "sArena_Pinaclonada",
+        "sArena_Updated2_by_sammers",
+    }
+
+    -- Check each known version to see if it's loaded
+    for _, addonName in ipairs(otherSArenaVersions) do
+        if C_AddOns.IsAddOnLoaded(addonName) then
+            return true, addonName  -- Return true and the name of the first conflicting addon found
+        end
+    end
+
+    return false, nil  -- No conflicts found
+end
+
+
+if CompatabilityIssueExists() then
     sArenaMixin.optionsTable = {
         type = "group",
         childGroups = "tab",
         validate = validateCombat,
         args = {
-            oldConvert = {
+            ImportOtherForkSettings = {
                 order = 1,
-                name = "Other sArena",
-                desc = "Converter for other sArena",
+                name = "Addon Conflict",
+                desc = "Multiple sArena versions detected",
                 type = "group",
                 args = {
-                    description = {
+                    warningTitle = {
                         order = 1,
                         type = "description",
-                        name = "|A:services-icon-warning:16:16|aA different sArena is enabled|A:services-icon-warning:16:16|a\n\nIf you want to copy over your settings from the other sArena to sArena |cffff8000Reloaded|r |T135884:13:13|t click the button below.",
+                        name = "|A:services-icon-warning:20:20|a |cffff4444Two different versions of sArena are enabled|r |A:services-icon-warning:20:20|a",
+                        fontSize = "large",
+                    },
+                    spacer1 = {
+                        order = 1.1,
+                        type = "description",
+                        name = " ",
+                    },
+                    explanation = {
+                        order = 1.2,
+                        type = "description",
+                        name = "|cffffffffTwo different versions of sArena cannot function properly together.\nYou will have to use only one. You have 3 options:|r",
                         fontSize = "medium",
                     },
-                    convertButton = {
+                    spacer2 = {
+                        order = 1.3,
+                        type = "description",
+                        name = " ",
+                    },
+                    option1 = {
                         order = 2,
                         type = "execute",
-                        name = "Import settings",
-                        desc = "Import your settings from the other sArena version.",
-                        func = sArenaMixin.OldConvert,
-                        width = "normal",
+                        name = "|cffffffffUse other sArena|r",
+                        desc = "This will disable |cffffffffsArena |cffff8000Reloaded|r |T135884:13:13|t and instead use your other sArena and reload your UI.",
+                        func = function()
+                            C_AddOns.DisableAddOn("sArena_Reloaded")
+                            ReloadUI()
+                        end,
+                        width = "full",
+                        confirm = true,
+                        confirmText = "This will disable |cffffffffsArena |cffff8000Reloaded|r |T135884:13:13|t and use the other sArena instead and reload your UI.\n\nContinue?",
+                    },
+                    option2 = {
+                        order = 3,
+                        type = "execute",
+                        name = "|cffffffffUse sArena |cffff8000Reloaded|r |T135884:13:13|t: Import other settings",
+                        desc = "This will copy your existing settings from the other sArena, disable the other sArena for compatibility, and reload your UI so you can start using sArena |cffff8000Reloaded|r |T135884:13:13|t",
+                        func = function()
+                            if sArenaMixin.ImportOtherForkSettings then
+                                sArenaMixin:ImportOtherForkSettings()
+                            end
+                        end,
+                        width = "full",
+                        confirm = true,
+                        confirmText = "This will copy your existing settings from the other sArena, disable the other sArena for compatibility, and reload your UI so you can start using sArena |cffff8000Reloaded|r |T135884:13:13|t\n\nContinue?",
+                    },
+                    option3 = {
+                        order = 4,
+                        type = "execute",
+                        name = "|cffffffffUse sArena |cffff8000Reloaded|r |T135884:13:13|t: Don't import other settings",
+                        desc = "This will disable the other sArena for compatibility and reload your UI so you can start using sArena |cffff8000Reloaded|r |T135884:13:13|t without your other settings.",
+                        func = function()
+                            sArenaMixin:CompatabilityEnsurer()
+                            ReloadUI()
+                        end,
+                        width = "full",
+                        confirm = true,
+                        confirmText = "This will disable the other sArena for compatibility and reload your UI so you can start using sArena |cffff8000Reloaded|r |T135884:13:13|t without your other settings.\n\nContinue?",
+                    },
+                    spacer3 = {
+                        order = 4.5,
+                        type = "description",
+                        name = " ",
                     },
                     conversionStatus = {
-                        order = 1.5,
+                        order = 5,
                         type = "description",
                         name = function() return sArenaMixin.conversionStatusText or "" end,
                         fontSize = "large",
                         hidden = function() return not sArenaMixin.conversionStatusText end,
-                    },
-                    banner = {
-                        order = 3,
-                        type = "description",
-                        name = "|A:accountupgradebanner-classic:240:420|a",
                     },
                 },
             },
@@ -2503,35 +2571,33 @@ else
                                 },
                             }
 
-                            -- Add racialOptions only if not retail
-                            if not isRetail then
-                                args.racialOptions = {
-                                    order = 2,
-                                    type = "group",
-                                    name = "Options",
-                                    inline = true,
-                                    args = {
-                                        swapHumanTrinket = {
-                                            order = 1,
-                                            name = "Swap Trinket with Human Racial",
-                                            desc = "Swap the Trinket texture with Human Racial for Humans and hide the original Racial Icon.",
-                                            type = "toggle",
-                                            width = "full",
-                                            get = function(info) return info.handler.db.profile.swapHumanTrinket end,
-                                            set = function(info, val)
-                                                info.handler.db.profile.swapHumanTrinket = val
-                                            end,
-                                        },
-                                    }
+                            -- Add racialOptions for both retail and non-retail
+                            args.racialOptions = {
+                                order = 2,
+                                type = "group",
+                                name = "Options",
+                                inline = true,
+                                args = {
+                                    swapRacialTrinket = {
+                                        order = 1,
+                                        name = "Swap Trinket with Racial",
+                                        desc = isRetail and "Swap the Trinket texture with the Racial ability if they don't have a Trinket equipped." or "Swap the Trinket texture with Racial for all races and hide the original Racial Icon.",
+                                        type = "toggle",
+                                        width = "full",
+                                        get = function(info) return info.handler.db.profile.swapRacialTrinket end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.swapRacialTrinket = val
+                                        end,
+                                    },
                                 }
-                            end
+                            }
 
                             return args
                         end)(),
                     },
                 },
             },
-            oldConvert = {
+            ImportOtherForkSettings = {
                 order = 7,
                 name = "Other sArena",
                 desc = "Converter for other sArena",
@@ -2548,7 +2614,7 @@ else
                         type = "execute",
                         name = "Import settings",
                         desc = "Import your settings from the other sArena version.",
-                        func = sArenaMixin.OldConvert,
+                        func = sArenaMixin.ImportOtherForkSettings,
                         width = "normal",
                         disabled = function() return sArenaMixin.conversionInProgress end,
                     },

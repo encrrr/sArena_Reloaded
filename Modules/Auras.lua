@@ -1171,7 +1171,6 @@ function sArenaFrameMixin:FindAura()
         self.currentAuraDuration = currentDuration
         self.currentAuraTexture = currentTexture
         self.currentAuraApplications = currentApplications
-        self:UpdateAuraStacks()
     else
         self.currentAuraSpellID = nil
         self.currentAuraStartTime = 0
@@ -1180,6 +1179,7 @@ function sArenaFrameMixin:FindAura()
         self.currentAuraApplications = nil
     end
 
+    self:UpdateAuraStacks()
     self:UpdateClassIcon()
 end
 

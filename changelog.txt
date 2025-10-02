@@ -1,3 +1,7 @@
+2.0.5
+- Change "Swap Human Racial" setting to instead be "Swap Missing Trinket with Racial". This will move all racials over to trinket spot if they don't have a trinket equipped. (This change is currently only uploaded for Retail due to more testing needed on MoP first)
+- Tweak hunter feign alpha to be a bit more visible
+
 2.0.4
 - Add back missing "Swap human racial with trinket" setting for the MoP version, where it fits.
 - Tweak pixel border show/hide, shouldnt show unless theres a texture now.
