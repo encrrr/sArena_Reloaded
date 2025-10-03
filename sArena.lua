@@ -16,6 +16,7 @@ sArenaMixin.defaultSettings = {
         statusText = {
             usePercentage = false,
             alwaysShow = true,
+            formatNumbers = true,
         },
         skipMysteryGray = false,
         layoutSettings = {},
@@ -2131,6 +2132,18 @@ function sArenaFrameMixin:SetLifeState()
     end
 end
 
+local function FormatLargeNumbers(value)
+    if value >= 1000000 then
+        -- For millions, show 2 decimal places (e.g., 1.80M)
+        return string.format("%.2f M", value / 1000000)
+    elseif value >= 1000 then
+        -- For thousands, show no decimals (e.g., 392K)
+        return string.format("%d K", value / 1000)
+    else
+        return tostring(value)
+    end
+end
+
 function sArenaFrameMixin:SetStatusText(unit)
     if (self.hideStatusText) then
         self.HealthText:SetFontObject("Game10Font_o1")
@@ -2158,8 +2171,13 @@ function sArenaFrameMixin:SetStatusText(unit)
         self.HealthText:SetText(hpPercent .. "%")
         self.PowerText:SetText(ppPercent .. "%")
     else
-        self.HealthText:SetText(AbbreviateLargeNumbers(hp))
-        self.PowerText:SetText(AbbreviateLargeNumbers(pp))
+        if db.profile.statusText.formatNumbers then
+            self.HealthText:SetText(FormatLargeNumbers(hp))
+            self.PowerText:SetText(FormatLargeNumbers(pp))
+        else
+            self.HealthText:SetText(AbbreviateLargeNumbers(hp))
+            self.PowerText:SetText(AbbreviateLargeNumbers(pp))
+        end
     end
 end
 
@@ -2703,7 +2721,32 @@ function sArenaMixin:Test()
         end
 
         frame.hideStatusText = false
-        frame:SetStatusText("player")
+
+        local playerHpMax = UnitHealthMax("player")
+        local playerPpMax = UnitPowerMax("player")
+
+        local hpPercent = 100
+        if i == 2 then
+            hpPercent = 75
+        elseif i == 3 then
+            hpPercent = 45
+        end
+
+        local testHp = math.floor((playerHpMax * hpPercent) / 100)
+
+        if (db.profile.statusText.usePercentage) then
+            frame.HealthText:SetText(hpPercent .. "%")
+            frame.PowerText:SetText("100%")
+        else
+            if db.profile.statusText.formatNumbers then
+                frame.HealthText:SetText(FormatLargeNumbers(testHp))
+                frame.PowerText:SetText(FormatLargeNumbers(playerPpMax))
+            else
+                frame.HealthText:SetText(AbbreviateLargeNumbers(testHp))
+                frame.PowerText:SetText(AbbreviateLargeNumbers(playerPpMax))
+            end
+        end
+
         frame:UpdateStatusTextVisible()
 
         if masqueOn and not db.profile.enableMasque and frame.FrameMsq then

@@ -2154,7 +2154,28 @@ else
                                         get = function(info) return info.handler.db.profile.statusText.usePercentage end,
                                         set = function(info, val)
                                             info.handler.db.profile.statusText.usePercentage = val
+                                            if val then
+                                                info.handler.db.profile.statusText.formatNumbers = false
+                                            end
 
+                                            local _, instanceType = IsInInstance()
+                                            if (instanceType ~= "arena" and info.handler.arena1:IsShown()) then
+                                                info.handler:Test()
+                                            end
+                                        end,
+                                    },
+                                    formatNumbers = {
+                                        order = 3,
+                                        name = "Format Numbers",
+                                        desc = "Format large numbers with K/M suffixes (e.g., 392K, 1.80M)",
+                                        type = "toggle",
+                                        get = function(info) return info.handler.db.profile.statusText.formatNumbers end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.statusText.formatNumbers = val
+                                            if val then
+                                                info.handler.db.profile.statusText.usePercentage = false
+                                            end
+                                            
                                             local _, instanceType = IsInInstance()
                                             if (instanceType ~= "arena" and info.handler.arena1:IsShown()) then
                                                 info.handler:Test()
