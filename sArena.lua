@@ -788,11 +788,6 @@ local combatEvents = {
     ["SPELL_AURA_REFRESH"] = true,
 }
 
-local mopTrinket = {
-    [42292] = true,
-    [59752] = true,
-}
-
 function sArenaMixin:OnEvent(event, ...)
     if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
         local _, combatEvent, _, sourceGUID, sourceName, _, _, destGUID, _, _, _, spellID, _, _, auraType = CombatLogGetCurrentEventInfo()
@@ -820,7 +815,7 @@ function sArenaMixin:OnEvent(event, ...)
                 for i = 1, sArenaMixin.maxArenaOpponents do
                     if (sourceGUID == UnitGUID("arena" .. i)) then
                         local ArenaFrame = self["arena" .. i]
-                        ArenaFrame:FindRacial(combatEvent, spellID)
+                        ArenaFrame:FindRacial(spellID)
                     end
                 end
             end
@@ -1440,39 +1435,66 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
             -- arg1 == spellID
             if (arg1 ~= self.Trinket.spellID) then
                 if arg1 ~= 0 then
-                    self.Trinket.spellID = arg1
                     local _, spellTextureNoOverride = GetSpellTexture(arg1)
 
+                    -- Check if we had racial on trinket slot before
+                    local wasRacialOnTrinketSlot = self.updateRacialOnTrinketSlot
+
+                    self.Trinket.spellID = arg1
+
+                    -- Determine if we should put racial on trinket slot
+                    local swapEnabled = db.profile.swapRacialTrinket or db.profile.swapHumanTrinket
+                    local shouldPutRacialOnTrinket = swapEnabled and self.race and not spellTextureNoOverride
+
+                    -- Set the trinket texture
                     local trinketTexture
                     if spellTextureNoOverride then
                         if isRetail then
-                            trinketTexture = self:GetFactionTrinketIcon()
-                        else
                             trinketTexture = spellTextureNoOverride
+                        else
+                            trinketTexture = self:GetFactionTrinketIcon()
                         end
                     else
                         trinketTexture = 638661     -- Surrender flag if no trinket
                     end
 
-                    self.Trinket.Texture:SetTexture(trinketTexture)
-                    local swapEnabled = db.profile.swapRacialTrinket
-                    self.updateRacialOnTrinketSlot = swapEnabled and self.race and not spellTextureNoOverride
-                    if self.updateRacialOnTrinketSlot then
+                    -- Handle racial updates based on trinket state (same logic as UpdateTrinket)
+                    if spellTextureNoOverride and wasRacialOnTrinketSlot then
+                        -- We found a real trinket and had racial on trinket slot, restore racial to its proper place
+                        self.updateRacialOnTrinketSlot = nil
+                        self.Trinket.Texture:SetTexture(trinketTexture)
                         self:UpdateRacial()
+                    elseif shouldPutRacialOnTrinket then
+                        -- We should put racial on trinket slot (no real trinket found)
+                        self.updateRacialOnTrinketSlot = true
+                        -- Don't set trinket texture yet - let UpdateRacial handle it for racial display
+                        self:UpdateRacial()
+                    else
+                        -- Normal case: set trinket texture and clear racial from trinket slot
+                        self.updateRacialOnTrinketSlot = nil
+                        self.Trinket.Texture:SetTexture(trinketTexture)
+                        -- Update racial to ensure it shows in racial slot if needed
+                        if wasRacialOnTrinketSlot then
+                            self:UpdateRacial()
+                        end
                     end
 
                     self:UpdateTrinketIcon(true)
-                    if self.TrinketMsq then
-                        self.TrinketMsq:Show()
-                    end
                 else
-                    -- No trinket
-                    local swapEnabled = db.profile.swapRacialTrinket
-                    self.updateRacialOnTrinketSlot = swapEnabled and self.race
-                    self:UpdateTrinketIcon(false)
-                    if self.updateRacialOnTrinketSlot then
+                    -- No trinket - check if we should put racial on trinket slot
+                    local swapEnabled = db.profile.swapRacialTrinket or db.profile.swapHumanTrinket
+                    local shouldPutRacialOnTrinket = swapEnabled and self.race
+
+                    if shouldPutRacialOnTrinket then
+                        self.updateRacialOnTrinketSlot = true
+                        self:UpdateRacial()
+                    else
+                        self.updateRacialOnTrinketSlot = nil
+                        -- Ensure racial shows in racial slot if it was on trinket before
                         self:UpdateRacial()
                     end
+
+                    self:UpdateTrinketIcon(false)
                 end
             end
         elseif (event == "UNIT_AURA") then
@@ -1697,6 +1719,40 @@ function sArenaMixin:AddMasqueSupport()
         MsqSkinIcon(frame.CastBar, sArenaCastbarIcon)
 
         frame.CastBar.MSQ:SetFrameStrata("DIALOG")
+
+        -- Add MasqueBorderHook for Trinket
+        if not frame.Trinket.MasqueBorderHook then
+            hooksecurefunc(frame.Trinket.Texture, "SetTexture", function(self, t)
+                if t == nil or t == "" or t == 0 or t == "nil" then
+                    if frame.TrinketMsq then
+                        frame.TrinketMsq:Hide()
+                    end
+                else
+                    if frame.TrinketMsq and self.db.profile.enableMasque then
+                        frame.TrinketMsq:Hide()
+                        frame.TrinketMsq:Show()
+                    end
+                end
+            end)
+            frame.Trinket.MasqueBorderHook = true
+        end
+
+        -- Add MasqueBorderHook for Racial
+        if not frame.Racial.MasqueBorderHook then
+            hooksecurefunc(frame.Racial.Texture, "SetTexture", function(self, t)
+                if t == nil or t == "" or t == 0 or t == "nil" then
+                    if frame.RacialMsq then
+                        frame.RacialMsq:Hide()
+                    end
+                else
+                    if frame.RacialMsq and self.db.profile.enableMasque then
+                        frame.RacialMsq:Hide()
+                        frame.RacialMsq:Show()
+                    end
+                end
+            end)
+            frame.Racial.MasqueBorderHook = true
+        end
 
         -- DR frames
         for _, category in ipairs(self.drCategories) do
@@ -2498,8 +2554,6 @@ function sArenaMixin:Test()
             frame.FrameMsq:Show()
             frame.ClassIconMsq:Show()
             frame.SpecIconMsq:Show()
-            frame.TrinketMsq:Show()
-            frame.RacialMsq:Show()
             frame.CastBarMsq:Show()
         end
 
@@ -2587,16 +2641,10 @@ function sArenaMixin:Test()
             frame.Trinket.Texture:SetTexture(sArenaMixin.trinketTexture)
             frame.Trinket.Texture:SetDesaturated(false)
         end
-        if frame.TrinketMsq then
-            frame.TrinketMsq:Show()
-        end
 
         -- Racial
         frame.Racial.Texture:SetTexture(data.racial or 132089)
         frame.Racial.Cooldown:SetCooldown(currTime, math.random(5, 35))
-        if frame.RacialMsq then
-            frame.RacialMsq:Show()
-        end
 
         -- Colors
         local color = RAID_CLASS_COLORS[data.class]
@@ -2762,8 +2810,6 @@ function sArenaMixin:Test()
             frame.FrameMsq:Hide()
             frame.ClassIconMsq:Hide()
             frame.SpecIconMsq:Hide()
-            frame.TrinketMsq:Hide()
-            frame.RacialMsq:Hide()
             frame.CastBarMsq:Hide()
             frame.masqueHidden = true
         end

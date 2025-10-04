@@ -59,37 +59,44 @@ function sArenaFrameMixin:UpdateTrinket()
 
             self.Trinket.spellID = spellID
 
-            local trinketTexture
-            if spellTextureNoOverride then
-                if isRetail then
-                    trinketTexture = self:GetFactionTrinketIcon()
-                else
-                    trinketTexture = spellTextureNoOverride
-                end
-            else
-                trinketTexture = 638661     -- Surrender flag if no trinket
-            end
-            self.Trinket.Texture:SetTexture(trinketTexture)
-
             -- Determine if we should put racial on trinket slot
             local swapEnabled = self.parent.db.profile.swapRacialTrinket or self.parent.db.profile.swapHumanTrinket
             local shouldPutRacialOnTrinket = swapEnabled and self.race and not spellTextureNoOverride
 
-            -- If we found a real trinket and had racial on trinket slot, restore racial to its proper place
+            -- Set the trinket texture AFTER determining racial placement but BEFORE updating racial
+            local trinketTexture
+            if spellTextureNoOverride then
+                if isRetail then
+                    trinketTexture = spellTextureNoOverride
+                else
+                    trinketTexture = self:GetFactionTrinketIcon()
+                end
+            else
+                trinketTexture = 638661     -- Surrender flag if no trinket
+            end
+
+            -- Handle racial updates based on trinket state
             if spellTextureNoOverride and wasRacialOnTrinketSlot then
+                -- We found a real trinket and had racial on trinket slot, restore racial to its proper place
                 self.updateRacialOnTrinketSlot = nil
+                self.Trinket.Texture:SetTexture(trinketTexture)
+                self:UpdateRacial()
+            elseif shouldPutRacialOnTrinket then
+                -- We should put racial on trinket slot (no real trinket found)
+                self.updateRacialOnTrinketSlot = true
+                -- Don't set trinket texture yet - let UpdateRacial handle it for racial display
                 self:UpdateRacial()
             else
-                self.updateRacialOnTrinketSlot = shouldPutRacialOnTrinket
-                if self.updateRacialOnTrinketSlot then
+                -- Normal case: set trinket texture and clear racial from trinket slot
+                self.updateRacialOnTrinketSlot = nil
+                self.Trinket.Texture:SetTexture(trinketTexture)
+                -- Update racial to ensure it shows in racial slot if needed
+                if wasRacialOnTrinketSlot then
                     self:UpdateRacial()
                 end
             end
 
             self:UpdateTrinketIcon(true)
-            if self.TrinketMsq then
-                self.TrinketMsq:Show()
-            end
         end
         if (startTime ~= 0 and duration ~= 0 and self.Trinket.spellID) then
             if self.Trinket.Texture:GetTexture() then
@@ -129,7 +136,4 @@ function sArenaFrameMixin:ResetTrinket()
     self.Trinket.Texture:SetTexture(nil)
     self.Trinket.Cooldown:Clear()
     self.Trinket.Texture:SetDesaturated(false)
-    if self.TrinketMsq then
-        self.TrinketMsq:Hide()
-    end
 end

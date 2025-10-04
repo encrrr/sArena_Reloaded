@@ -1048,8 +1048,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         order = 2,
                         name = "Size",
                         type = "range",
-                        min = 0.5,
-                        max = 2,
+                        min = 0.2,
+                        max = 3,
+                        softMin = 0.05,
+                        softMax = 5,
                         step = 0.01,
                         width = 0.8,
                         isPercent = true,
@@ -1071,8 +1073,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         type = "range",
                         min = -200,
                         max = 200,
-                        softMax = 50,
-                        softMin = -50,
+                        softMin = -2000,
+                        softMax = 2000,
                         step = 0.5,
                         width = 0.8,
                         get = function(info)
@@ -1093,8 +1095,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         type = "range",
                         min = -200,
                         max = 200,
-                        softMax = 50,
-                        softMin = -50,
+                        softMin = -2000,
+                        softMax = 2000,
                         step = 0.5,
                         width = 0.8,
                         get = function(info)
@@ -1162,8 +1164,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         order = 2,
                         name = "Size",
                         type = "range",
-                        min = 0.5,
-                        max = 2,
+                        min = 0.05,
+                        max = 5,
                         step = 0.01,
                         width = 0.8,
                         isPercent = true,
@@ -1185,8 +1187,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         type = "range",
                         min = -200,
                         max = 200,
-                        softMax = 50,
-                        softMin = -50,
+                        softMin = -2000,
+                        softMax = 2000,
                         step = 0.5,
                         width = 0.8,
                         get = function(info)
@@ -1207,8 +1209,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         type = "range",
                         min = -200,
                         max = 200,
-                        softMax = 50,
-                        softMin = -50,
+                        softMin = -2000,
+                        softMax = 2000,
                         step = 0.5,
                         width = 0.8,
                         get = function(info)
@@ -1276,8 +1278,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         order = 2,
                         name = "Size",
                         type = "range",
-                        min = 0.5,
-                        max = 2,
+                        min = 0.05,
+                        max = 5,
                         step = 0.01,
                         width = 0.8,
                         isPercent = true,
@@ -1299,8 +1301,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         type = "range",
                         min = -200,
                         max = 200,
-                        softMax = 50,
-                        softMin = -50,
+                        softMin = -2000,
+                        softMax = 2000,
                         step = 0.5,
                         width = 0.8,
                         get = function(info)
@@ -1321,8 +1323,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         type = "range",
                         min = -200,
                         max = 200,
-                        softMax = 50,
-                        softMin = -50,
+                        softMin = -2000,
+                        softMax = 2000,
                         step = 0.5,
                         width = 0.8,
                         get = function(info)
@@ -1390,8 +1392,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         order = 2,
                         name = "Size",
                         type = "range",
-                        min = 0.5,
-                        max = 2,
+                        min = 0.05,
+                        max = 5,
                         step = 0.01,
                         width = 0.8,
                         isPercent = true,
@@ -1413,8 +1415,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         type = "range",
                         min = -200,
                         max = 200,
-                        softMax = 50,
-                        softMin = -50,
+                        softMin = -2000,
+                        softMax = 2000,
                         step = 0.5,
                         width = 0.8,
                         get = function(info)
@@ -1435,8 +1437,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         type = "range",
                         min = -200,
                         max = 200,
-                        softMax = 50,
-                        softMin = -50,
+                        softMin = -2000,
+                        softMax = 2000,
                         step = 0.5,
                         width = 0.8,
                         get = function(info)
@@ -1672,6 +1674,7 @@ function sArenaMixin:UpdateGlobalDRSettings()
 
     local drSwipeOff = self.db.profile.drSwipeOff
     local drTextOn = self.db.profile.drTextOn
+    local disableSwipeEdge = self.db.profile.disableSwipeEdge
 
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena" .. i]
@@ -1685,7 +1688,7 @@ function sArenaMixin:UpdateGlobalDRSettings()
                 dr.Cooldown:SetDrawEdge(false)
             else
                 dr.Cooldown:SetDrawSwipe(true)
-                dr.Cooldown:SetDrawEdge(true)
+                dr.Cooldown:SetDrawEdge(not disableSwipeEdge)
             end
 
             if drTextOn then
@@ -1760,7 +1763,7 @@ function sArenaMixin:UpdateTextPositions(db, info, val)
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = info.handler["arena" .. i]
         local layout = info.handler.layouts[info.handler.db.profile.currentLayout]
-        
+
         if frame and layout and layout.UpdateOrientation then
             layout:UpdateOrientation(frame)
         end
@@ -1769,30 +1772,21 @@ end
 
 function sArenaFrameMixin:UpdateClassIconCooldownReverse()
     local reverse = self.parent.db.profile.invertClassIconCooldown
-    
-    -- Update Class Icon cooldown reverse
-    if self.ClassIconCooldown then
-        self.ClassIconCooldown:SetReverse(reverse)
-    end
+
+    self.ClassIconCooldown:SetReverse(reverse)
 end
 
 function sArenaFrameMixin:UpdateTrinketRacialCooldownReverse()
     local reverse = self.parent.db.profile.invertTrinketRacialCooldown
-    
-    -- Update Trinket cooldown reverse
-    if self.Trinket and self.Trinket.Cooldown then
-        self.Trinket.Cooldown:SetReverse(reverse)
-    end
-    
-    -- Update Racial cooldown reverse
-    if self.Racial and self.Racial.Cooldown then
-        self.Racial.Cooldown:SetReverse(reverse)
-    end
+
+    self.Trinket.Cooldown:SetReverse(reverse)
+    self.Racial.Cooldown:SetReverse(reverse)
 end
 
 function sArenaFrameMixin:UpdateClassIconSwipeSettings()
     local disableSwipe = self.parent.db.profile.disableClassIconSwipe
-    
+    local disableSwipeEdge = self.parent.db.profile.disableSwipeEdge
+
     -- Update Class Icon swipe settings
     if self.ClassIconCooldown then
         if disableSwipe then
@@ -1800,14 +1794,15 @@ function sArenaFrameMixin:UpdateClassIconSwipeSettings()
             self.ClassIconCooldown:SetDrawEdge(false)
         else
             self.ClassIconCooldown:SetDrawSwipe(true)
-            self.ClassIconCooldown:SetDrawEdge(true)
+            self.ClassIconCooldown:SetDrawEdge(not disableSwipeEdge)
         end
     end
 end
 
 function sArenaFrameMixin:UpdateTrinketRacialSwipeSettings()
     local disableSwipe = self.parent.db.profile.disableTrinketRacialSwipe
-    
+    local disableSwipeEdge = self.parent.db.profile.disableSwipeEdge
+
     -- Update Trinket swipe settings
     if self.Trinket and self.Trinket.Cooldown then
         if disableSwipe then
@@ -1815,10 +1810,10 @@ function sArenaFrameMixin:UpdateTrinketRacialSwipeSettings()
             self.Trinket.Cooldown:SetDrawEdge(false)
         else
             self.Trinket.Cooldown:SetDrawSwipe(true)
-            self.Trinket.Cooldown:SetDrawEdge(true)
+            self.Trinket.Cooldown:SetDrawEdge(not disableSwipeEdge)
         end
     end
-    
+
     -- Update Racial swipe settings
     if self.Racial and self.Racial.Cooldown then
         if disableSwipe then
@@ -1826,9 +1821,17 @@ function sArenaFrameMixin:UpdateTrinketRacialSwipeSettings()
             self.Racial.Cooldown:SetDrawEdge(false)
         else
             self.Racial.Cooldown:SetDrawSwipe(true)
-            self.Racial.Cooldown:SetDrawEdge(true)
+            self.Racial.Cooldown:SetDrawEdge(not disableSwipeEdge)
         end
     end
+end
+
+function sArenaFrameMixin:UpdateSwipeEdgeSettings()
+    local disableEdge = self.parent.db.profile.disableSwipeEdge
+
+    self.ClassIconCooldown:SetDrawEdge(not disableEdge)
+    self.Trinket.Cooldown:SetDrawEdge(not disableEdge)
+    self.Racial.Cooldown:SetDrawEdge(not disableEdge)
 end
 
 local function setDRIcons()
@@ -2382,6 +2385,21 @@ else
                                 type = "group",
                                 inline = true,
                                 args = {
+                                    disableSwipeEdge = {
+                                        order = 0,
+                                        name = "Disable Cooldown Swipe Edge",
+                                        type = "toggle",
+                                        width = "full",
+                                        desc = "Disables the bright edge on cooldown spirals for all icons.",
+                                        get = function(info) return info.handler.db.profile.disableSwipeEdge end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.disableSwipeEdge = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                info.handler["arena" .. i]:UpdateSwipeEdgeSettings()
+                                            end
+                                            info.handler:UpdateGlobalDRSettings()
+                                        end,
+                                    },
                                     disableClassIconSwipe = {
                                         order = 1,
                                         name = "Disable Class Icon Swipe",
