@@ -2526,7 +2526,7 @@ else
                                     removeUnequippedTrinketTexture = {
                                         order = 2,
                                         name = "Remove Un-Equipped Trinket Texture",
-                                        desc = "Enable this setting to hide the Trinket entirely when not equipped instead of the default White Flag showing on sArena Reloaded.",
+                                        desc = "Enable this setting to hide the Trinket entirely when the enemy does have a one equipped, instead of showing the default White Flag indicating no Trinket.",
                                         type = "toggle",
                                         width = "full",
                                         get = function(info) return info.handler.db.profile.removeUnequippedTrinketTexture end,
