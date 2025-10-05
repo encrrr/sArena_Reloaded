@@ -14,7 +14,7 @@ This version comes packed with many new features such as:
 *   Show shields and overshields on healthbars.
 *   Hunter's Feign Death does not show up as dead but instead gets faded out a little bit.
 *   Frames are now class colored by default in starting room.
-*   Castbars immediately hide for easier interrupts.
+*   Castbars immediately hide for easier interrupts and only lingers if an interrupt lands and it will also say who interrupted on the castbar.
 
 Other improvements:
 
@@ -27,7 +27,8 @@ Other improvements:
 *   Black DR Border option.
 *   Spec text on frames.
 *   Class color names
-*   Static DR setting with optional per class setting.
+*   Static DR setting with optional per class & per spec settings.
+*   DR Categories: Per class & per spec settings.
 
 And everything else you'd expect from Arena Frames.
 
