@@ -1,3 +1,8 @@
+2.0.7
+- Add option to disable White Flag no trinket texture. (Global -> Arena Frames -> Misc at bottom)
+- Fix shared racial/trinket cooldown showing on White Flag (no trinket texture) unintentionally.
+- Tweak options to display class and spec on the per class/per spec options for better clarity.
+
 2.0.6
 - New Format Numbers setting which is on by default. 18888 K -> 18.88 M
 - New adjustable decimal threshold, default still 6 seconds. Only for non-OmniCC users, configurate your OmniCC instead if you are using that.

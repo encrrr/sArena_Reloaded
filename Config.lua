@@ -2204,7 +2204,7 @@ else
                             },
                             misc = {
                                 order = 6,
-                                name = "Miscellaneous",
+                                name = "Options",
                                 type = "group",
                                 inline = true,
                                 args = {
@@ -2506,7 +2506,7 @@ else
                             },
                             masque = {
                                 order = 8,
-                                name = "Masque",
+                                name = "Miscellaneous",
                                 type = "group",
                                 inline = true,
                                 args = {
@@ -2521,6 +2521,22 @@ else
                                             info.handler.db.profile.enableMasque = val
                                             info.handler:AddMasqueSupport()
                                             info.handler:Test()
+                                        end
+                                    },
+                                    removeUnequippedTrinketTexture = {
+                                        order = 2,
+                                        name = "Remove Un-Equipped Trinket Texture",
+                                        desc = "Enable this setting to hide the Trinket entirely when not equipped instead of the default White Flag showing on sArena Reloaded.",
+                                        type = "toggle",
+                                        width = "full",
+                                        get = function(info) return info.handler.db.profile.removeUnequippedTrinketTexture end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.removeUnequippedTrinketTexture = val
+                                            if val then
+                                                sArenaMixin.noTrinketTexture = nil
+                                            else
+                                                sArenaMixin.noTrinketTexture = 638661
+                                            end
                                         end
                                     },
                                 },
