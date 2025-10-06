@@ -2226,7 +2226,7 @@ else
                                             for i = 1, sArenaMixin.maxArenaOpponents do
                                                 local frame = info.handler["arena"..i]
                                                 if frame then
-                                                    frame:DarkModeFrame()
+                                                    frame:UpdateFrameColors()
                                                 end
                                             end
                                         end,
@@ -2249,7 +2249,7 @@ else
                                             for i = 1, sArenaMixin.maxArenaOpponents do
                                                 local frame = info.handler["arena"..i]
                                                 if frame then
-                                                    frame:DarkModeFrame()
+                                                    frame:UpdateFrameColors()
                                                 end
                                             end
                                         end,
@@ -2264,7 +2264,7 @@ else
                                 args = {
                                     classColors = {
                                         order = 1,
-                                        name = "Class Color Frames",
+                                        name = "Class Color Healthbars",
                                         desc = "When disabled, health bars will be green",
                                         type = "toggle",
                                         width = "full",
@@ -2282,6 +2282,23 @@ else
                                                     frame.HealthBar:SetStatusBarColor(color.r, color.g, color.b, 1)
                                                 else
                                                     frame.HealthBar:SetStatusBarColor(0, 1, 0, 1)
+                                                end
+                                            end
+                                        end,
+                                    },
+                                    classColorFrameTexture = {
+                                        order = 1.05,
+                                        name = "Class Color FrameTexture",
+                                        desc = "Apply class colors to frame textures (Borders)",
+                                        type = "toggle",
+                                        width = "full",
+                                        get = function(info) return info.handler.db.profile.classColorFrameTexture end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.classColorFrameTexture = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                local frame = info.handler["arena"..i]
+                                                if frame then
+                                                    frame:UpdateFrameColors()
                                                 end
                                             end
                                         end,

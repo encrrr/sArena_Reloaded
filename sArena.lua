@@ -7,6 +7,7 @@ sArenaMixin.defaultSettings = {
     profile = {
         currentLayout = "Gladiuish",
         classColors = true,
+        classColorFrameTexture = (BetterBlizzFramesDB and BetterBlizzFramesDB.classColorFrameTexture) or nil,
         showNames = true,
         showArenaNumber = false,
         showDecimalsDR = true,
@@ -1226,6 +1227,80 @@ function sArenaFrameMixin:DarkModeFrame()
 
 end
 
+function sArenaFrameMixin:ClassColorFrameTexture()
+    if not db.profile.classColorFrameTexture then return end
+
+    -- Check for real class first, then fallback to tempClass
+    local class = self.class or self.tempClass
+    local color = RAID_CLASS_COLORS[class]
+
+    if not color then return end
+
+    local frameTexture = self.frameTexture
+    local specBorder = self.SpecIcon.Border
+    local trinketBorder = self.Trinket.Border
+    local racialBorder = self.Racial.Border
+    local castBorder = self.CastBar.Border
+
+    if frameTexture then
+        frameTexture:SetDesaturated(true)
+        frameTexture:SetVertexColor(color.r, color.g, color.b)
+    end
+    if specBorder then
+        specBorder:SetDesaturated(true)
+        specBorder:SetVertexColor(color.r, color.g, color.b)
+    end
+    if castBorder then
+        castBorder:SetDesaturated(true)
+        castBorder:SetVertexColor(color.r, color.g, color.b)
+    end
+    if trinketBorder then
+        trinketBorder:SetDesaturated(true)
+        local lighter_r = math.min(1, color.r + 0.2)
+        local lighter_g = math.min(1, color.g + 0.2)
+        local lighter_b = math.min(1, color.b + 0.2)
+        trinketBorder:SetVertexColor(lighter_r, lighter_g, lighter_b)
+    end
+    if racialBorder then
+        racialBorder:SetDesaturated(true)
+        local lighter_r = math.min(1, color.r + 0.2)
+        local lighter_g = math.min(1, color.g + 0.2)
+        local lighter_b = math.min(1, color.b + 0.2)
+        racialBorder:SetVertexColor(lighter_r, lighter_g, lighter_b)
+    end
+end
+
+function sArenaFrameMixin:UpdateFrameColors()
+    -- Priority: Class Color Frame Texture > Dark Mode > Default
+    if db.profile.classColorFrameTexture then
+        self:ClassColorFrameTexture()
+    elseif sArenaMixin:DarkMode() then
+        self:DarkModeFrame()
+    else
+        -- Reset to default colors
+        if self.frameTexture then
+            self.frameTexture:SetDesaturated(false)
+            self.frameTexture:SetVertexColor(1, 1, 1)
+        end
+        if self.SpecIcon.Border then
+            self.SpecIcon.Border:SetDesaturated(false)
+            self.SpecIcon.Border:SetVertexColor(1, 1, 1)
+        end
+        if self.CastBar.Border then
+            self.CastBar.Border:SetDesaturated(false)
+            self.CastBar.Border:SetVertexColor(1, 1, 1)
+        end
+        if self.Trinket.Border then
+            self.Trinket.Border:SetDesaturated(false)
+            self.Trinket.Border:SetVertexColor(1, 1, 1)
+        end
+        if self.Racial.Border then
+            self.Racial.Border:SetDesaturated(false)
+            self.Racial.Border:SetVertexColor(1, 1, 1)
+        end
+    end
+end
+
 function sArenaMixin:SetLayout(_, layout)
     if (InCombatLockdown()) then return end
 
@@ -1259,7 +1334,7 @@ function sArenaMixin:SetLayout(_, layout)
         frame:UpdateTrinketRacialCooldownReverse()
         frame:UpdateClassIconSwipeSettings()
         frame:UpdateTrinketRacialSwipeSettings()
-        frame:DarkModeFrame()
+        frame:UpdateFrameColors()
         frame:UpdateNameColor()
     end
 
@@ -1843,6 +1918,8 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent, forceUpdate)
     else
         self.HealthBar:SetStatusBarColor(0, 1.0, 0, 1.0)
     end
+
+    self:UpdateFrameColors()
     self:SetAlpha(1)
 end
 
@@ -2704,7 +2781,7 @@ function sArenaMixin:Test()
 
         frame.PowerBar:SetStatusBarColor(powerColor.r, powerColor.g, powerColor.b)
 
-        frame:DarkModeFrame()
+        frame:UpdateFrameColors()
 
         -- DR Frames
         local drsEnabled = #self.drCategories
