@@ -14,7 +14,8 @@ This version comes packed with many new features such as:
 *   Show shields and overshields on healthbars.
 *   Hunter's Feign Death does not show up as dead but instead gets faded out a little bit.
 *   Frames are now class colored by default in starting room.
-*   Castbars immediately hide for easier interrupts and only lingers if an interrupt lands and it will also say who interrupted on the castbar.
+*   Castbars immediately hide for easier interrupts and only lingers if an interrupt lands and it will also say who interrupted it on the castbar for a short while.
+*   Shows duration on auras that don't have durations implemented by default from Blizzard (Smoke Bomb, Earthen Wall, Barrier, etc)
 
 Other improvements:
 
@@ -36,9 +37,9 @@ Type /sarena to open config.
 
 Ctrl+Shift+Click to drag stuff
 
-### Import from other sArena (updated by sammers)
+### Import from other sArena versions
 
-You can easily import your other sArena (sammers version) just by launching both addons at the same time and typing `/sarena` will open open a "Convert Settings" window. There will be some lua errors popping up when you launch both addons at the same time due to both addons trying to do things with the "sArena" name, these are expected and safe to ignore. "Convert Settings" will also automatically disable the other version.
+You can easily import your other sArena versions just by launching both addons at the same time and typing `/sarena` will open open a "Import Settings" window. From there you can chose which option you want to go with. There will be some lua errors popping up when you launch both addons at the same time due to both addons trying to do things with the "sArena" name, these are expected and safe to ignore. When you chose "Import Settings" it will also disable the other addon.
 
 ## New layouts:
 

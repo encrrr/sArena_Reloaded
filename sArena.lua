@@ -1170,7 +1170,11 @@ function sArenaMixin:SetDRBorderShownStatus()
 end
 
 function sArenaMixin:DarkMode()
-    if (BetterBlizzFramesDB and BetterBlizzFramesDB.darkModeUi) or db.profile.darkMode then
+    if db.profile.darkMode == false then
+        return false
+    end
+
+    if (BetterBlizzFramesDB and BetterBlizzFramesDB.darkModeUi) or C_AddOns.IsAddOnLoaded("FrameColor") or db.profile.darkMode then
         return true
     end
 end
