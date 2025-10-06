@@ -21,6 +21,7 @@ Other improvements:
 
 *   Interrupts take interrupt duration reduction auras into account
 *   Healer Icon Replacement option
+*   Class Color FrameTexture option
 *   Bright DR setting to more easily destinguish DR amount.
 *   Decimals on default CD Timer below 6 seconds.
 *   Color Trinket setting to display Trinket CD as a flat Green/Red texture.
