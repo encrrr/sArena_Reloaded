@@ -24,7 +24,11 @@ function sArenaFrameMixin:UpdateTrinketIcon(available)
         end
     else
         if self.parent.db.profile.colorTrinket then
-            self.Trinket.Texture:SetColorTexture(1,0,0)
+            if not self.Trinket.spellID then
+                self.Trinket.Texture:SetTexture(nil)
+            else
+                self.Trinket.Texture:SetColorTexture(1,0,0)
+            end
         else
             local desaturate
             if self.updateRacialOnTrinketSlot then
@@ -99,8 +103,7 @@ function sArenaFrameMixin:UpdateTrinket()
             self:UpdateTrinketIcon(true)
         end
         if (startTime ~= 0 and duration ~= 0 and self.Trinket.spellID) then
-            local currentTexture = self.Trinket.Texture:GetTexture()
-            if currentTexture and currentTexture ~= sArenaMixin.noTrinketTexture then
+            if self.Trinket.spellID then
                 if self.updateRacialOnTrinketSlot then
                     local racialDuration = self:GetRacialDuration()
                     self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, racialDuration)

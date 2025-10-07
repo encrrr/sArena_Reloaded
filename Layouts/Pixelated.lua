@@ -417,12 +417,47 @@ function layout:Initialize(frame)
 
     if not frame.Trinket.TrinketPixelBorderHook then
         hooksecurefunc(frame.Trinket.Texture, "SetTexture", function(self, t)
-            if t == nil or t == "" or t == 0 or t == "nil" or frame.parent.db.profile.currentLayout ~= layoutName then
+            if frame.parent.db.profile.currentLayout ~= layoutName then
+                frame.PixelBorders.trinket:Hide()
+                return
+            end
+
+            if frame.parent.db.profile.colorTrinket then
+                if frame.Trinket.spellID == nil then
+                    frame.PixelBorders.trinket:Hide()
+                    return
+                end
+                return
+            end
+
+            if t == nil or t == "" or t == 0 or t == "nil" then
                 frame.PixelBorders.trinket:Hide()
             else
                 frame.PixelBorders.trinket:Show()
             end
         end)
+
+        hooksecurefunc(frame.Trinket.Texture, "SetColorTexture", function(self, r, g, b, a)
+            if frame.parent.db.profile.currentLayout ~= layoutName then
+                frame.PixelBorders.trinket:Hide()
+                return
+            end
+
+            if not frame.parent.db.profile.colorTrinket then
+                return
+            end
+
+            if r ~= nil and g ~= nil and b ~= nil then
+                if (r == 1 and g == 0 and b == 0) or (r == 0 and g == 1 and b == 0) then
+                    frame.PixelBorders.trinket:Show()
+                else
+                    frame.PixelBorders.trinket:Hide()
+                end
+            else
+                frame.PixelBorders.trinket:Hide()
+            end
+        end)
+
         frame.Trinket.TrinketPixelBorderHook = true
     end
 
