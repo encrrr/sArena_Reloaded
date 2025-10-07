@@ -70,7 +70,7 @@ local classPowerType = {
 }
 
 function sArenaMixin:Print(fmt, ...)
-    local prefix = "|cffff8000[sArena]:|r"
+    local prefix = "|cffffffffsArena |cffff8000Reloaded|r |T135884:13:13|t:"
     print(prefix, string.format(fmt, ...))
 end
 
