@@ -1,6 +1,7 @@
 2.0.9
 - New setting: Class Color FrameTexture. Color the border on frames class colored.
 - Dark Mode Color Value now adjustable (if BetterBlizzFrames is enabled it still gets its value from there to be consistent)
+- Minor tweaks around in the GUI
 
 2.0.8
 - Mists of Pandaria: Add Monk's Tigereye Brew as offensive prio and Mana Tea as very low prio. Also shows percentage. Feedback on this appreciated.
