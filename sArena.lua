@@ -1871,8 +1871,11 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent, forceUpdate)
     local unit = self.unit
 
     self:GetClass()
-    sArenaMixin:CheckClassStacking()
     self:FindAura()
+
+    if sArenaMixin:CheckClassStacking() then
+        sArenaMixin:UpdateTextures()
+    end
 
     if (unitEvent and unitEvent ~= "seen") or (UnitGUID(self.unit) == nil) then
         self:SetMysteryPlayer()
