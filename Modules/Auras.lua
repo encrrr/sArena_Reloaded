@@ -31,6 +31,9 @@ if isRetail then
 
     sArenaMixin.auraList = {
         -- Spell ID = Priority
+        -- Immunity
+        [378441] = 9.1, -- Time Stop
+        [1221107] = 9.1, -- Overpowered Prismatic Barrier Immunity (Mage)
         -- CCs
         [33786] = 9,  -- Cyclone (Disorient)
         [5211] = 9,   -- Mighty Bash (Stun)
@@ -156,7 +159,6 @@ if isRetail then
         -- Immunities
         [456499] = 8, -- Absolute Serenity
         [473909] = 8, -- Ancient of Lore
-        [378441] = 8, -- Time Stop
         [354610] = 8, -- Demon Hunter: Glimpse
         [642] = 8,    -- Divine Shield
         [186265] = 8, -- Aspect of the Turtle
@@ -318,6 +320,7 @@ if isRetail then
         -- [260402] = 3, -- Hunter: Double Tap
         [365362] = 3, -- Mage: Arcane Surge
         [190319] = 3, -- Mage: Combustion
+        [205025] = 3, -- Mage: Presence of Mind
         [324220] = 3, -- Mage: Deathborne
         [198144] = 3, -- Mage: Ice Form
         [12472] = 3,  -- Mage: Icy Veins
@@ -386,6 +389,7 @@ if isRetail then
         [198111] = 2.5, -- Mage: Temporal Shield
         [342246] = 2.5, -- Mage: Alter Time (Arcane)
         [110909] = 2.5, -- Mage: Alter Time (Fire, Frost)
+        [1221106] = 2.4, -- Mage: Overpowered Prismatic Barrier (Use Blink to activate full dmg immunity)
 
         [125174] = 2.5, -- Monk: Touch of Karma
         [209584] = 2.5, -- Zen Focus Tea
@@ -804,6 +808,7 @@ else
         [48792]  = 4.5, -- Icebound Fortitude
         [122783] = 4.5, -- Diffuse Magic
         [122470] = 4.5, -- Touch of Karma
+        [110909] = 4.5, -- Alter Time
         --[378081] = 4.5, -- Natures's Swiftness --not mop
 
         -- Roots
@@ -948,6 +953,8 @@ else
 
         [76577] = 1.8, -- Smoke Bomb
         [88611] = 1.8, -- Smoke Bomb
+
+        [126084] = 1.7, -- Fingers of Frost
 
         -- Freedoms
         [96268] = 1.4, -- Deaths Advance

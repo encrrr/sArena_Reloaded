@@ -107,8 +107,10 @@ function sArenaFrameMixin:UpdateTrinket()
                 if self.updateRacialOnTrinketSlot then
                     local racialDuration = self:GetRacialDuration()
                     self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, racialDuration)
+                    --print("Set Trinket CD 1", self.Trinket.spellID)
                 else
                     self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, duration / 1000.0)
+                    --print("Set Trinket CD 2", self.Trinket.spellID)
                 end
             end
             if self.parent.db.profile.colorTrinket then

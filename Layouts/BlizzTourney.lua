@@ -26,6 +26,12 @@ layout.defaultSettings = {
         scale = 1,
         fontSize = 12,
     },
+    dispel = {
+        posX = 74,
+        posY = 12,
+        scale = 1,
+        fontSize = 12,
+    },
     castBar = {
         posX = -100,
         posY = -18,
@@ -103,6 +109,7 @@ function layout:Initialize(frame)
         frame.parent:UpdateSpecIconSettings(self.db.specIcon)
         frame.parent:UpdateTrinketSettings(self.db.trinket)
         frame.parent:UpdateRacialSettings(self.db.racial)
+        frame.parent:UpdateDispelSettings(self.db.dispel)
     end
 
     frame.ClassIconCooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
@@ -113,6 +120,7 @@ function layout:Initialize(frame)
     frame.SpecIcon.Texture:AddMaskTexture(frame.SpecIcon.Mask)
     frame.Trinket:SetSize(25, 25)
     frame.Racial:SetSize(25, 25)
+    frame.Dispel:SetSize(25, 25)
 
     frame.AuraStacks:SetPoint("BOTTOMLEFT", frame.ClassIcon, "BOTTOMLEFT", 1, -2)
     frame.AuraStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 14, "THICKOUTLINE")

@@ -25,6 +25,12 @@ layout.defaultSettings = {
         scale = 0.7,
         fontSize = 14,
     },
+    dispel = {
+        posX = 247,
+        posY = 0,
+        scale = 0.7,
+        fontSize = 14,
+    },
     castBar = {
         posX = 12,
         posY = -27,
@@ -150,12 +156,14 @@ function layout:Initialize(frame)
         frame.parent:UpdateSpecIconSettings(self.db.specIcon)
         frame.parent:UpdateTrinketSettings(self.db.trinket)
         frame.parent:UpdateRacialSettings(self.db.racial)
+        frame.parent:UpdateDispelSettings(self.db.dispel)
     end
 
     frame:SetSize(self.db.width, self.db.height)
     frame.SpecIcon:SetSize(18, 18)
     frame.Trinket:SetSize(44, 44)
     frame.Racial:SetSize(44, 44)
+    frame.Dispel:SetSize(44, 44)
 
     frame.PowerBar:SetHeight(self.db.powerBarHeight)
 

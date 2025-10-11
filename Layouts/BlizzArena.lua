@@ -26,6 +26,12 @@ layout.defaultSettings = {
         scale = 1,
         fontSize = 12,
     },
+    dispel = {
+        posX = -114,
+        posY = -1,
+        scale = 1,
+        fontSize = 12,
+    },
     castBar = {
         posX = -148,
         posY = 0,
@@ -59,6 +65,9 @@ layout.defaultSettings = {
     textSettings = {
         nameAnchor = "LEFT",
     },
+    
+    -- BlizzArena specific settings
+    trinketCircleBorder = false,
 }
 
 local function getSetting(info)
@@ -87,6 +96,15 @@ local function setupOptionsTable(self)
         set = setSetting,
     }
 
+    layout.optionsTable.arenaFrames.args.other.args.trinketCircleBorder = {
+        order = 3,
+        name = "Trinket Circle Border",
+        desc = "Enable circular border for trinket icons",
+        type = "toggle",
+        get = getSetting,
+        set = setSetting,
+    }
+
 end
 
 function layout:Initialize(frame)
@@ -103,6 +121,7 @@ function layout:Initialize(frame)
         frame.parent:UpdateSpecIconSettings(self.db.specIcon)
         frame.parent:UpdateTrinketSettings(self.db.trinket)
         frame.parent:UpdateRacialSettings(self.db.racial)
+        frame.parent:UpdateDispelSettings(self.db.dispel)
     end
 
     frame.ClassIconCooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
@@ -113,6 +132,7 @@ function layout:Initialize(frame)
     frame.SpecIcon.Texture:AddMaskTexture(frame.SpecIcon.Mask)
     frame.Trinket:SetSize(22, 22)
     frame.Racial:SetSize(22, 22)
+    frame.Dispel:SetSize(22, 22)
 
     local healthBar = frame.HealthBar
     healthBar:SetSize(69, 7)
@@ -128,6 +148,54 @@ function layout:Initialize(frame)
     f:Show()
     f:AddMaskTexture(frame.ClassIconMask)
     frame.ClassIconMask:SetAllPoints(f)
+
+    local trinket = frame.Trinket
+
+
+    if self.db.trinketCircleBorder then
+        if not trinket.Mask then
+            trinket.Mask = trinket:CreateMaskTexture()
+        end
+        trinket.Mask:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+        trinket.Mask:SetAllPoints(trinket.Texture)
+        trinket.Texture:AddMaskTexture(trinket.Mask)
+
+        trinket.Cooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
+        trinket.Cooldown:SetUseCircularEdge(true)
+
+        if not trinket.CircleBorder then
+            trinket.CircleBorder = trinket:CreateTexture(nil, "ARTWORK", nil, 3)
+        end
+
+        local trinketCircleBorder = trinket.CircleBorder
+        trinketCircleBorder:ClearAllPoints()
+        trinketCircleBorder:SetTexture("Interface\\CHARACTERFRAME\\TotemBorder")
+        trinketCircleBorder:SetPoint("TOPLEFT", trinket, "TOPLEFT", -8, 8)
+        trinketCircleBorder:SetPoint("BOTTOMRIGHT", trinket, "BOTTOMRIGHT", 8, -8)
+        trinketCircleBorder:SetDrawLayer("OVERLAY", 7)
+        trinketCircleBorder:Show()
+
+        if not trinket.TrinketCircleBorderHook then
+            hooksecurefunc(trinket.Texture, "SetTexture", function(self, t)
+                if t == nil or t == "" or t == 0 or t == "nil" or frame.parent.db.profile.currentLayout ~= layoutName then
+                    trinketCircleBorder:Hide()
+                else
+                    trinketCircleBorder:Hide()
+                    trinketCircleBorder:Show()
+                end
+            end)
+            trinket.TrinketCircleBorderHook = true
+        end
+    else
+        if trinket.Mask then
+            trinket.Texture:RemoveMaskTexture(trinket.Mask)
+        end
+        if trinket.CircleBorder then
+            trinket.CircleBorder:Hide()
+        end
+
+        trinket.Cooldown:SetUseCircularEdge(false)
+    end
 
 
     -- Spec icon border

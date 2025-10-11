@@ -1,5 +1,40 @@
 local LSM = LibStub("LibSharedMedia-3.0")
 
+local function GetSpellInfoCompat(spellID)
+    if not spellID then
+        return nil
+    end
+
+    if GetSpellInfo then
+        return GetSpellInfo(spellID)
+    end
+
+    if C_Spell and C_Spell.GetSpellInfo then
+        local spellInfo = C_Spell.GetSpellInfo(spellID)
+        if spellInfo then
+            return spellInfo.name, nil, spellInfo.iconID, spellInfo.castTime, spellInfo.minRange, spellInfo.maxRange, spellInfo.spellID, spellInfo.originalIconID
+        end
+    end
+
+    return nil
+end
+
+local function GetSpellDescriptionCompat(spellID)
+    if not spellID then
+        return ""
+    end
+
+    if GetSpellDescription then
+        return GetSpellDescription(spellID) or ""
+    end
+
+    if C_Spell and C_Spell.GetSpellDescription then
+        return C_Spell.GetSpellDescription(spellID) or ""
+    end
+
+    return ""
+end
+
 local function getLayoutTable()
     local t = {}
 
@@ -23,6 +58,7 @@ local isRetail = sArenaMixin.isRetail
 
 local drCategories
 local racialCategories
+local dispelCategories
 local drIcons
 local drCategorieslist
 
@@ -42,6 +78,13 @@ if isRetail then
             racialCategories[raceKey] = name
         end
     end
+
+    -- Load dispel categories from dispelData
+    dispelCategories = {}
+    for spellID, data in pairs(sArenaMixin.dispelData or {}) do
+        dispelCategories[spellID] = "|T" .. data.texture .. ":16|t " .. data.name .. " (" .. data.classes .. ")"
+    end
+
     drIcons = {
         ["Stun"] = 132298,
         ["Incapacitate"] = 136071,
@@ -95,6 +138,12 @@ else
         else
             racialCategories[raceKey] = name
         end
+    end
+
+    -- Load dispel categories from dispelData  
+    dispelCategories = {}
+    for spellID, data in pairs(sArenaMixin.dispelData or {}) do
+        dispelCategories[spellID] = "|T" .. (data.texture or "134400") .. ":16|t " .. data.name .. " (" .. data.classes .. ")"
     end
 
     drIcons = {
@@ -482,6 +531,79 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
             set = function(info, val)
                 self:UpdateRacialSettings(
                     info.handler.db.profile.layoutSettings[layoutName].racial, info, val)
+            end,
+            args = {
+                positioning = {
+                    order = 1,
+                    name = "Positioning",
+                    type = "group",
+                    inline = true,
+                    args = {
+                        posX = {
+                            order = 1,
+                            name = "Horizontal",
+                            type = "range",
+                            min = -500,
+                            max = 500,
+                            softMin = -200,
+                            softMax = 200,
+                            step = 0.1,
+                            bigStep = 1,
+                        },
+                        posY = {
+                            order = 2,
+                            name = "Vertical",
+                            type = "range",
+                            min = -500,
+                            max = 500,
+                            softMin = -200,
+                            softMax = 200,
+                            step = 0.1,
+                            bigStep = 1,
+                        },
+                    },
+                },
+                sizing = {
+                    order = 2,
+                    name = "Sizing",
+                    type = "group",
+                    inline = true,
+                    args = {
+                        scale = {
+                            order = 1,
+                            name = "Scale",
+                            type = "range",
+                            min = 0.1,
+                            max = 5.0,
+                            softMin = 0.5,
+                            softMax = 3.0,
+                            step = 0.001,
+                            bigStep = 0.1,
+                            isPercent = true,
+                        },
+                        fontSize = {
+                            order = 3,
+                            name = "Font Size",
+                            desc = "Only works with Blizzard cooldown count (not OmniCC)",
+                            type = "range",
+                            min = 2,
+                            max = 48,
+                            softMin = 4,
+                            softMax = 32,
+                            step = 1,
+                        },
+                    },
+                },
+            },
+        },
+        dispel = {
+            order = 4.5,
+            name = "Dispels",
+            type = "group",
+            get = function(info) return info.handler.db.profile.layoutSettings[layoutName].dispel[info[#info]] end,
+            set = function(info, val)
+                self:UpdateDispelSettings(
+                    info.handler.db.profile.layoutSettings[layoutName].dispel, info, val)
             end,
             args = {
                 positioning = {
@@ -1742,8 +1864,31 @@ function sArenaMixin:UpdateRacialSettings(db, info, val)
     end
 end
 
+function sArenaMixin:UpdateDispelSettings(db, info, val)
+    if (val ~= nil) then
+        db[info[#info]] = val
+    end
+
+    for i = 1, sArenaMixin.maxArenaOpponents do
+        local frame = self["arena" .. i]
+
+        frame.Dispel:ClearAllPoints()
+        frame.Dispel:SetPoint("CENTER", frame, "CENTER", db.posX, db.posY)
+        frame.Dispel:SetScale(db.scale)
+
+        local text = self["arena" .. i].Dispel.Cooldown.Text
+        local layoutCF = (self.layoutdb and self.layoutdb.changeFont)
+        local fontToUse = text.fontFile
+        if layoutCF then
+            fontToUse = LSM:Fetch(LSM.MediaType.FONT, self.layoutdb.cdFont)
+        end
+        text:SetFont(fontToUse, db.fontSize, "OUTLINE")
+
+        frame.Dispel:SetShown(self.db.profile.showDispels)
+    end
+end
+
 function sArenaMixin:UpdateTextPositions(db, info, val)
-    -- Refresh all arena frames with the current layout
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = info.handler["arena" .. i]
         local layout = info.handler.layouts[info.handler.db.profile.currentLayout]
@@ -1771,7 +1916,6 @@ function sArenaFrameMixin:UpdateClassIconSwipeSettings()
     local disableSwipe = self.parent.db.profile.disableClassIconSwipe
     local disableSwipeEdge = self.parent.db.profile.disableSwipeEdge
 
-    -- Update Class Icon swipe settings
     if self.ClassIconCooldown then
         if disableSwipe then
             self.ClassIconCooldown:SetDrawSwipe(false)
@@ -1787,7 +1931,6 @@ function sArenaFrameMixin:UpdateTrinketRacialSwipeSettings()
     local disableSwipe = self.parent.db.profile.disableTrinketRacialSwipe
     local disableSwipeEdge = self.parent.db.profile.disableSwipeEdge
 
-    -- Update Trinket swipe settings
     if self.Trinket and self.Trinket.Cooldown then
         if disableSwipe then
             self.Trinket.Cooldown:SetDrawSwipe(false)
@@ -1798,7 +1941,6 @@ function sArenaFrameMixin:UpdateTrinketRacialSwipeSettings()
         end
     end
 
-    -- Update Racial swipe settings
     if self.Racial and self.Racial.Cooldown then
         if disableSwipe then
             self.Racial.Cooldown:SetDrawSwipe(false)
@@ -2923,8 +3065,6 @@ else
                                     values = racialCategories,
                                 },
                             }
-
-                            -- Add racialOptions for both retail and non-retail
                             args.racialOptions = {
                                 order = 2,
                                 type = "group",
@@ -2933,8 +3073,8 @@ else
                                 args = {
                                     swapRacialTrinket = {
                                         order = 1,
-                                        name = "Swap Trinket with Racial",
-                                        desc = isRetail and "Swap the Trinket texture with the Racial ability if they don't have a Trinket equipped." or "Swap the Trinket texture with Racial for all races and hide the original Racial Icon.",
+                                        name = "Swap missing Trinket with Racial",
+                                        desc = "If the enemy doesn't have a Trinket equipped, remove the gap and show their Racial ability in the spot of the Trinket instead.",
                                         type = "toggle",
                                         width = "full",
                                         get = function(info) return info.handler.db.profile.swapRacialTrinket end,
@@ -2948,12 +3088,189 @@ else
                             return args
                         end)(),
                     },
+                    dispelGroup = {
+                        order = 4,
+                        name = "Dispels (BETA)",
+                        type = "group",
+                        args = (function()
+                            local args = {
+                                showDispels = {
+                                    order = 0,
+                                    name = "Show Dispels (BETA)",
+                                    desc = "Enable to show Dispel Cooldown on Arena Frames.",
+                                    type = "toggle",
+                                    width = "full",
+                                    get = function(info) return info.handler.db.profile.showDispels end,
+                                    set = function(info, val)
+                                        info.handler.db.profile.showDispels = val
+                                        info.handler:Test()
+                                    end,
+                                },
+                                spacer0 = {
+                                    order = 0.5,
+                                    type = "description",
+                                    name = "",
+                                    width = "full",
+                                },
+                            }
+
+                            local healerDispels = {}
+                            local dpsDispels = {}
+
+                            for spellID, data in pairs(sArenaMixin.dispelData or {}) do
+                                if data.healer or data.sharedSpecSpellID then
+                                    healerDispels[spellID] = data
+                                end
+                                if not data.healer or data.sharedSpecSpellID then
+                                    dpsDispels[spellID] = data
+                                end
+                            end
+
+                            local order = 1
+
+                            if next(healerDispels) then
+                                args["healer_dispels"] = {
+                                    order = order,
+                                    name = "Healer Dispels",
+                                    type = "group",
+                                    inline = true,
+                                    disabled = function(info) return not info.handler.db.profile.showDispels end,
+                                    args = {}
+                                }
+                                order = order + 1
+
+                                local healerOrder = 1
+                                for spellID, data in pairs(healerDispels) do
+                                    -- For MoP shared spells, use separate setting key
+                                    local settingKey = spellID
+                                    if not isRetail and data.sharedSpecSpellID then
+                                        settingKey = spellID .. "_healer"
+                                    end
+
+                                    args["healer_dispels"].args["spell_" .. spellID] = {
+                                        order = healerOrder,
+                                        name = "|T" .. data.texture .. ":16|t " .. data.name,
+                                        type = "toggle",
+                                        disabled = function(info) return not info.handler.db.profile.showDispels end,
+                                        get = function(info) return info.handler.db.profile.dispelCategories[settingKey] end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.dispelCategories[settingKey] = val
+                                            for i = 1, 3 do
+                                                local frame = info.handler["arena" .. i]
+                                                if frame then
+                                                    frame:UpdateDispel()
+                                                end
+                                            end
+                                        end,
+                                        desc = function()
+                                            local spellName = GetSpellInfoCompat(spellID)
+                                            local spellDesc = GetSpellDescriptionCompat(spellID)
+
+                                            spellName = spellName or data.name or "Unknown Spell"
+                                            local cooldownText = data.cooldown and ("Cooldown: " .. data.cooldown .. " seconds") or ""
+
+                                            local tooltipLines = {}
+                                            table.insert(tooltipLines, "|cFFFFD700" .. spellName .. "|r")
+                                            table.insert(tooltipLines, "|cFF87CEEB" .. data.classes .. "|r")
+                                            if spellDesc and spellDesc ~= "" then
+                                                table.insert(tooltipLines, spellDesc)
+                                            end
+                                            if cooldownText ~= "" then
+                                                table.insert(tooltipLines, "|cFF00FF00" .. cooldownText .. "|r")
+                                            end
+                                            table.insert(tooltipLines, "|cFF808080Spell ID: " .. spellID .. "|r")
+
+                                            return table.concat(tooltipLines, "\n\n")
+                                        end,
+                                    }
+                                    healerOrder = healerOrder + 1
+                                end
+                            end
+
+                            if next(dpsDispels) then
+                                args["dps_dispels"] = {
+                                    order = order,
+                                    name = "DPS Dispels",
+                                    type = "group",
+                                    inline = true,
+                                    disabled = function(info) return not info.handler.db.profile.showDispels end,
+                                    args = {
+                                        description = {
+                                            order = 1,
+                                            type = "description",
+                                            name = "|cFFFFFF00Note:|r DPS dispels only appear after having been used once.",
+                                            fontSize = "medium",
+                                        }
+                                    }
+                                }
+                                order = order + 1
+
+                                local dpsOrder = 2
+                                for spellID, data in pairs(dpsDispels) do
+
+                                    local settingKey = spellID
+                                    if not sArenaMixin.isRetail and data.sharedSpecSpellID then
+                                        settingKey = spellID .. "_dps"
+                                    end
+
+                                    args["dps_dispels"].args["spell_" .. spellID] = {
+                                        order = dpsOrder,
+                                        name = "|T" .. (data.texture or "134400") .. ":16|t " .. data.name,
+                                        type = "toggle",
+                                        disabled = function(info) return not info.handler.db.profile.showDispels end,
+                                        get = function(info) return info.handler.db.profile.dispelCategories[settingKey] end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.dispelCategories[settingKey] = val
+                                            for i = 1, 3 do
+                                                local frame = info.handler["arena" .. i]
+                                                if frame then
+                                                    frame:UpdateDispel()
+                                                end
+                                            end
+                                        end,
+                                        desc = function()
+                                            local spellName = GetSpellInfoCompat(spellID)
+                                            local spellDesc = GetSpellDescriptionCompat(spellID)
+
+                                            spellName = spellName or data.name or "Unknown Spell"
+                                            local cooldownText = data.cooldown and ("Cooldown: " .. data.cooldown .. " seconds") or ""
+
+                                            local tooltipLines = {}
+                                            table.insert(tooltipLines, "|cFFFFD700" .. spellName .. "|r")
+                                            table.insert(tooltipLines, "|cFF87CEEB" .. data.classes .. "|r")
+                                            if spellDesc and spellDesc ~= "" then
+                                                table.insert(tooltipLines, spellDesc)
+                                            end
+                                            if cooldownText ~= "" then
+                                                table.insert(tooltipLines, "|cFF00FF00" .. cooldownText .. "|r")
+                                            end
+                                            table.insert(tooltipLines, "|cFF808080Spell ID: " .. spellID .. "|r")
+                                            table.insert(tooltipLines, "|cFFFFA500Only shows after having been used once|r")
+
+                                            return table.concat(tooltipLines, "\n\n")
+                                        end,
+                                    }
+                                    dpsOrder = dpsOrder + 1
+                                end
+                            end
+
+                            args["betaNotice"] = {
+                                order = 999,
+                                type = "description",
+                                name = "\n|cFF808080Dispels are in BETA.\nStill need to confirm some spell ids, especially in Mists of Pandaria.\nThings still need more testing (waiting for PTR) and things may see changes along the way.\nIf you want to contribute info/feedback/spell ids please do!|r",
+                                fontSize = "medium",
+                                width = "full",
+                            }
+
+                            return args
+                        end)(),
+                    },
                 },
             },
             ImportOtherForkSettings = {
                 order = 7,
                 name = "Other sArena",
-                desc = "Converter for other sArena",
+                desc = "Import settings from another sArena",
                 type = "group",
                 args = {
                     description = {

@@ -26,6 +26,12 @@ layout.defaultSettings = {
         scale = 1.5,
         fontSize = 12,
     },
+    dispel = {
+        posX = 128,
+        posY = 0,
+        scale = 1.5,
+        fontSize = 12,
+    },
     castBar = {
         posX = -15,
         posY = -29,
@@ -109,6 +115,7 @@ function layout:Initialize(frame)
         frame.parent:UpdateSpecIconSettings(self.db.specIcon)
         frame.parent:UpdateTrinketSettings(self.db.trinket)
         frame.parent:UpdateRacialSettings(self.db.racial)
+        frame.parent:UpdateDispelSettings(self.db.dispel)
     end
 
     frame.ClassIconCooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
@@ -119,6 +126,7 @@ function layout:Initialize(frame)
     frame.SpecIcon.Texture:AddMaskTexture(frame.SpecIcon.Mask)
     frame.Trinket:SetSize(22, 22)
     frame.Racial:SetSize(22, 22)
+    frame.Dispel:SetSize(22, 22)
 
     frame.AuraStacks:SetPoint("BOTTOMLEFT", frame.ClassIcon, "BOTTOMLEFT", 6, -1)
     frame.AuraStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 18, "THICKOUTLINE")
@@ -126,8 +134,8 @@ function layout:Initialize(frame)
     if not frame.NameBackground then
         local bg = frame:CreateTexture(nil, "BACKGROUND", nil, 2)
         bg:SetTexture(137017)
-        bg:SetPoint("TOPLEFT", frame.Name, "TOPLEFT", -2, 2)
-        bg:SetPoint("BOTTOMRIGHT", frame.Name, "BOTTOMRIGHT", 2, -2)
+        bg:SetPoint("TOPLEFT", frame.HealthBar, "TOPLEFT", -1, 18.5)
+        bg:SetPoint("BOTTOMRIGHT", frame.HealthBar, "TOPRIGHT", 2, 2)
         bg:SetVertexColor(0,0,0, 0.6)
         frame.NameBackground = bg
     end
@@ -216,7 +224,7 @@ function layout:Initialize(frame)
         frameTexture:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\UI-TargetingFrame-NoLevel-Large")
     else
         healthBar:SetSize(118, 9)
-        frameTexture:SetTexture("Interface\\TARGETINGFRAME\\UI-TargetingFrame-NoLevel")
+        frameTexture:SetTexture("Interface\\TargetingFrame\\UI-FocusFrame-Large")
         frame.NameBackground:Show()
     end
 

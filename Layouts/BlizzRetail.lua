@@ -26,6 +26,12 @@ layout.defaultSettings = {
         scale = 1,
         fontSize = 15,
     },
+    dispel = {
+        posX = 192.5,
+        posY = -6,
+        scale = 1,
+        fontSize = 15,
+    },
     castBar = {
         posX = -141,
         posY = -10,
@@ -124,6 +130,7 @@ function layout:Initialize(frame)
         frame.parent:UpdateSpecIconSettings(self.db.specIcon)
         frame.parent:UpdateTrinketSettings(self.db.trinket)
         frame.parent:UpdateRacialSettings(self.db.racial)
+        frame.parent:UpdateDispelSettings(self.db.dispel)
     end
 
     frame:SetSize(195, 67)
@@ -159,7 +166,6 @@ function layout:Initialize(frame)
     frame.ClassIcon:Show()
     frame.ClassIcon:SetTexCoord(0.05, 0.95, 0.1, 0.9)
     frame.ClassIcon:AddMaskTexture(frame.ClassIconMask)
-    frame.ClassIconMask:SetAllPoints(frame.ClassIcon)
     frame.ClassIconMask:ClearAllPoints()
     frame.ClassIconMask:SetPoint("CENTER", frame.ClassIcon, 0,1)
     frame.ClassIconMask:SetSize(60, 57)
@@ -250,6 +256,50 @@ function layout:Initialize(frame)
             end
         end)
         racial.RacialBorderHook = true
+    end
+
+    -- dispel
+    local dispel = frame.Dispel
+    if not dispel.Border then
+        dispel.Border = frame:CreateTexture(nil, "ARTWORK", nil, 3)
+    end
+    local dispelBorder = dispel.Border
+    if not dispel.Mask then
+        dispel.Mask = dispel:CreateMaskTexture()
+    end
+    dispel.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+    dispel.Mask:SetAllPoints(dispel.Texture)
+
+    -- Apply the mask
+    dispel.Texture:AddMaskTexture(dispel.Mask)
+
+    dispel.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout")
+    dispel:SetSize(35, 35)
+    if not dispel.BorderParent then
+        dispel.BorderParent = CreateFrame("Frame", nil, dispel)
+        dispel.BorderParent:SetFrameStrata("HIGH")
+    end
+    dispelBorder:SetParent(dispel.BorderParent)
+    dispelBorder:SetAtlas("plunderstorm-actionbar-slot-border")
+    dispelBorder:SetPoint("TOPLEFT", dispel, "TOPLEFT", -6, 6)
+    dispelBorder:SetPoint("BOTTOMRIGHT", dispel, "BOTTOMRIGHT", 6, -6)
+    dispelBorder:SetDrawLayer("OVERLAY", 3)
+    dispelBorder:Show()
+    dispel.Border = dispelBorder
+
+    if not dispel.DispelBorderHook then
+        hooksecurefunc(dispel.Texture, "SetTexture", function(self, t)
+            if t == nil or t == "" or t == 0 or t == "nil" or frame.parent.db.profile.currentLayout ~= layoutName then
+                dispelBorder:Hide()
+            else
+                dispelBorder:Hide()
+                dispelBorder:Show()
+            end
+        end)
+        hooksecurefunc(dispel, "Hide", function()
+            dispelBorder:Hide()
+        end)
+        dispel.DispelBorderHook = true
     end
 
     -- spec icon

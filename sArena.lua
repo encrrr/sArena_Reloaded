@@ -1,7 +1,6 @@
 sArenaMixin = {}
 sArenaFrameMixin = {}
 
-
 sArenaMixin.layouts = {}
 sArenaMixin.defaultSettings = {
     profile = {
@@ -27,7 +26,6 @@ sArenaMixin.defaultSettings = {
     }
 }
 
-
 local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
 sArenaMixin.isRetail = isRetail
 sArenaMixin.playerClass = select(2, UnitClass("player"))
@@ -45,6 +43,7 @@ LSM:Register("statusbar", "sArena Stripes 2", [[Interface\AddOns\sArena_Reloaded
 LSM:Register("font", "Prototype", [[Interface\AddOns\sArena_Reloaded\Textures\Prototype.ttf]])
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture
 local stealthAlpha = 0.4
+local healerTextureChanged
 
 local healerSpecNames = {
     ["Discipline"] = true,
@@ -106,7 +105,7 @@ sArenaMixin.classIcons = {
 	["EVOKER"] = 4574311,
 }
 
-local healerSpecIDs = {
+sArenaMixin.healerSpecIDs = {
     [65] = true,    -- Holy Paladin
     [105] = true,   -- Restoration Druid
     [256] = true,   -- Discipline Priest
@@ -348,7 +347,7 @@ function sArenaFrameMixin:IsHealer(unit)
         local specID = GetArenaOpponentSpec(id)
         if specID then
             local spec = GetSpecializationInfoByID(specID)
-            if healerSpecIDs[spec] then
+            if sArenaMixin.healerSpecIDs[spec] then
                 return true
             end
         end
@@ -473,7 +472,8 @@ function sArenaMixin:UpdateFonts()
     end
 end
 
-function sArenaMixin:UpdateTextures()
+function sArenaMixin:UpdateTextures(setHealerChanged)
+    if not self.db then return end
     local layout = self.db.profile.layoutSettings[self.db.profile.currentLayout]
     local texKeys = layout.textures or {
         generalStatusBarTexture   = "sArena Default",
@@ -486,6 +486,10 @@ function sArenaMixin:UpdateTextures()
     local modernCastbars            = layout.castBar.useModernCastbars
     local keepDefaultModernTextures = layout.castBar.keepDefaultModernTextures
     local classStacking = self:CheckClassStacking()
+
+    if setHealerChanged then
+        healerTextureChanged = true
+    end
 
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena"..i]
@@ -782,6 +786,7 @@ function sArenaMixin:OnLoad()
     self:RegisterEvent("PLAYER_LOGIN")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+    self:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
 end
 
 local combatEvents = {
@@ -791,6 +796,7 @@ local combatEvents = {
     ["SPELL_AURA_REMOVED"] = true,
     ["SPELL_AURA_BROKEN"] = true,
     ["SPELL_AURA_REFRESH"] = true,
+    ["SPELL_DISPEL"] = true,
 }
 
 function sArenaMixin:OnEvent(event, ...)
@@ -825,6 +831,28 @@ function sArenaMixin:OnEvent(event, ...)
                 end
             end
 
+        end
+
+        -- Dispels
+        if combatEvent == "SPELL_DISPEL" then
+            if sArenaMixin.dispelData[spellID] and db.profile.showDispels then
+                for i = 1, sArenaMixin.maxArenaOpponents do
+                    local ArenaFrame = self["arena" .. i]
+
+                    local arenaGUID = UnitGUID("arena" .. i)
+                    local petGUID = UnitGUID("arena" .. i .. "pet")
+
+                    --print("3: Checking dispel for", ArenaFrame.unit, "sourceGUID:", sourceGUID, "arenaGUID:", arenaGUID, "petGUID:", petGUID)
+
+                    -- Check if dispel was cast by arena player or their pet
+                    if sourceGUID == arenaGUID or (sourceGUID == petGUID and spellID == 119905) then
+                        ArenaFrame:FindDispel(spellID)
+                        --print("4: Dispel registered for", ArenaFrame.unit, "spellID:", spellID)
+                        break
+                    end
+
+                end
+            end
         end
 
         -- DRs
@@ -894,6 +922,7 @@ function sArenaMixin:OnEvent(event, ...)
 
         if (instanceType == "arena") then
             self:UpdatePlayerSpec()
+            self:ResetDetectedDispels()
             if TestTitle then
                 TestTitle:Hide()
                 for i = 1, sArenaMixin.maxArenaOpponents do
@@ -907,6 +936,7 @@ function sArenaMixin:OnEvent(event, ...)
             self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
             self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         else
+            healerTextureChanged = false
             self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
             self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         end
@@ -919,6 +949,9 @@ function sArenaMixin:OnEvent(event, ...)
         end
     elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
         self:UpdatePlayerSpec()
+    elseif event == "ARENA_PREP_OPPONENT_SPECIALIZATIONS" then
+        -- Reset detected dispels when entering arena
+        self:ResetDetectedDispels()
     end
 end
 
@@ -1065,7 +1098,7 @@ function sArenaFrameMixin:SetTextureCrop(texture, crop, type)
         if crop then
             texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
         else
-            if type == "class" and (db and db.profile.currentLayout == "BlizzRetail") then -- TODO: Fix this mess
+            if type == "class" and ((db and db.profile.currentLayout == "BlizzRetail") or (db and db.profile.currentLayout == "BlizzArena")) then -- TODO: Fix this mess
                 texture:SetTexCoord(0.05, 0.95, 0.1, 0.9)
             else
                 texture:SetTexCoord(0, 1, 0, 1)
@@ -1080,6 +1113,10 @@ function sArenaMixin:SetupGrayTrinket()
         local cooldown = frame.Trinket.Cooldown
         cooldown:HookScript("OnCooldownDone", function()
             frame.Trinket.Texture:SetDesaturated(false)
+        end)
+        local dispelCooldown = frame.Dispel.Cooldown
+        dispelCooldown:HookScript("OnCooldownDone", function()
+            frame.Dispel.Texture:SetDesaturated(false)
         end)
     end
 end
@@ -1201,7 +1238,9 @@ function sArenaFrameMixin:DarkModeFrame()
     local frameTexture = self.frameTexture
     local specBorder = self.SpecIcon.Border
     local trinketBorder = self.Trinket.Border
+    local trinketCircleBorder = self.Trinket.CircleBorder
     local racialBorder = self.Racial.Border
+    local dispelBorder = self.Dispel.Border
     local castBorder = self.CastBar.Border
 
 
@@ -1221,9 +1260,17 @@ function sArenaFrameMixin:DarkModeFrame()
         trinketBorder:SetDesaturated(shouldDesaturate)
         trinketBorder:SetVertexColor(lighter, lighter, lighter)
     end
+    if trinketCircleBorder then
+        trinketCircleBorder:SetDesaturated(shouldDesaturate)
+        trinketCircleBorder:SetVertexColor(darkModeColor, darkModeColor, darkModeColor)
+    end
     if racialBorder then
         racialBorder:SetDesaturated(shouldDesaturate)
         racialBorder:SetVertexColor(lighter, lighter, lighter)
+    end
+    if dispelBorder then
+        dispelBorder:SetDesaturated(shouldDesaturate)
+        dispelBorder:SetVertexColor(lighter, lighter, lighter)
     end
 
 end
@@ -1241,6 +1288,7 @@ function sArenaFrameMixin:ClassColorFrameTexture()
     local specBorder = self.SpecIcon.Border
     local trinketBorder = self.Trinket.Border
     local racialBorder = self.Racial.Border
+    local dispelBorder = self.Dispel.Border
     local castBorder = self.CastBar.Border
 
     if frameTexture then
@@ -1268,6 +1316,13 @@ function sArenaFrameMixin:ClassColorFrameTexture()
         local lighter_g = math.min(1, color.g + 0.2)
         local lighter_b = math.min(1, color.b + 0.2)
         racialBorder:SetVertexColor(lighter_r, lighter_g, lighter_b)
+    end
+    if dispelBorder then
+        dispelBorder:SetDesaturated(true)
+        local lighter_r = math.min(1, color.r + 0.2)
+        local lighter_g = math.min(1, color.g + 0.2)
+        local lighter_b = math.min(1, color.b + 0.2)
+        dispelBorder:SetVertexColor(lighter_r, lighter_g, lighter_b)
     end
 end
 
@@ -1576,6 +1631,7 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
                         self:UpdateRacial()
                     end
 
+                    self.Trinket.Texture:SetTexture(sArenaMixin.noTrinketTexture)
                     self:UpdateTrinketIcon(false)
                 end
             end
@@ -1630,9 +1686,6 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
 
         self:Initialize()
     elseif (event == "PLAYER_ENTERING_WORLD") or (event == "ARENA_PREP_OPPONENT_SPECIALIZATIONS") then
-        if TestTitle then
-            TestTitle:Hide()
-        end
         self.Name:SetText("")
         self.CastBar:Hide()
         self.specTexture = nil
@@ -1643,6 +1696,7 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
         self:UpdateVisible()
         self:ResetTrinket()
         self:ResetRacial()
+        self:ResetDispel()
         self:ResetDR()
         self:UpdateHealPrediction()
         self:UpdateAbsorb()
@@ -1650,7 +1704,7 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
         if UnitExists(self.unit) then
             self:UpdatePlayer("seen")
         else
-            self:UpdatePlayer(nil)
+            self:UpdatePlayer()
         end
         self:SetAlpha(1)
         self.HealthBar:SetAlpha(1)
@@ -1668,6 +1722,7 @@ function sArenaFrameMixin:Initialize()
     self.parent:SetupDrag(self.SpecIcon, self.SpecIcon, "specIcon", "UpdateSpecIconSettings")
     self.parent:SetupDrag(self.Trinket, self.Trinket, "trinket", "UpdateTrinketSettings")
     self.parent:SetupDrag(self.Racial, self.Racial, "racial", "UpdateRacialSettings")
+    self.parent:SetupDrag(self.Dispel, self.Dispel, "dispel", "UpdateDispelSettings")
 end
 
 function sArenaFrameMixin:OnEnter()
@@ -1730,6 +1785,7 @@ function sArenaMixin:AddMasqueSupport()
     local sArenaTrinket = Masque:Group("sArena |cffff8000Reloaded|r |T135884:13:13|t", "Trinket")
     local sArenaSpecIcon = Masque:Group("sArena |cffff8000Reloaded|r |T135884:13:13|t", "SpecIcon")
     local sArenaRacial = Masque:Group("sArena |cffff8000Reloaded|r |T135884:13:13|t", "Racial")
+    local sArenaDispel = Masque:Group("sArena |cffff8000Reloaded|r |T135884:13:13|t", "Dispel")
     local sArenaDRs = Masque:Group("sArena |cffff8000Reloaded|r |T135884:13:13|t", "DRs")
     local sArenaFrame = Masque:Group("sArena |cffff8000Reloaded|r |T135884:13:13|t", "Frame")
     local sArenaCastbar = Masque:Group("sArena |cffff8000Reloaded|r |T135884:13:13|t", "Castbar")
@@ -1740,6 +1796,7 @@ function sArenaMixin:AddMasqueSupport()
         sArenaTrinket:ReSkin(true)
         sArenaSpecIcon:ReSkin(true)
         sArenaRacial:ReSkin(true)
+        sArenaDispel:ReSkin(true)
         sArenaDRs:ReSkin(true)
         sArenaFrame:ReSkin(true)
         sArenaCastbarIcon:ReSkin(true)
@@ -1788,6 +1845,10 @@ function sArenaMixin:AddMasqueSupport()
         frame.RacialMsq:SetFrameStrata("DIALOG")
         frame.RacialMsq:SetAllPoints(frame.Racial)
 
+        frame.DispelMsq = CreateFrame("Frame", nil, frame)
+        frame.DispelMsq:SetFrameStrata("DIALOG")
+        frame.DispelMsq:SetAllPoints(frame.Dispel)
+
         frame.CastBarMsq = CreateFrame("Frame", nil, frame.CastBar)
         frame.CastBarMsq:SetFrameStrata("HIGH")
         frame.CastBarMsq:SetAllPoints(frame.CastBar)
@@ -1797,6 +1858,7 @@ function sArenaMixin:AddMasqueSupport()
         addToMasque(frame.SpecIconMsq, sArenaSpecIcon)
         addToMasque(frame.TrinketMsq, sArenaTrinket)
         addToMasque(frame.RacialMsq, sArenaRacial)
+        addToMasque(frame.DispelMsq, sArenaDispel)
         addToMasque(frame.CastBarMsq, sArenaCastbar)
         MsqSkinIcon(frame.CastBar, sArenaCastbarIcon)
 
@@ -1810,7 +1872,7 @@ function sArenaMixin:AddMasqueSupport()
                         frame.TrinketMsq:Hide()
                     end
                 else
-                    if frame.TrinketMsq and self.db.profile.enableMasque then
+                    if frame.TrinketMsq and frame.parent.db.profile.enableMasque then
                         frame.TrinketMsq:Hide()
                         frame.TrinketMsq:Show()
                     end
@@ -1827,13 +1889,30 @@ function sArenaMixin:AddMasqueSupport()
                         frame.RacialMsq:Hide()
                     end
                 else
-                    if frame.RacialMsq and self.db.profile.enableMasque then
+                    if frame.RacialMsq and frame.parent.db.profile.enableMasque then
                         frame.RacialMsq:Hide()
                         frame.RacialMsq:Show()
                     end
                 end
             end)
             frame.Racial.MasqueBorderHook = true
+        end
+
+        -- Add MasqueBorderHook for Dispel
+        if not frame.Dispel.MasqueBorderHook then
+            hooksecurefunc(frame.Dispel.Texture, "SetTexture", function(self, t)
+                if t == nil or t == "" or t == 0 or t == "nil" then
+                    if frame.DispelMsq then
+                        frame.DispelMsq:Hide()
+                    end
+                else
+                    if frame.DispelMsq and frame.parent.db.profile.enableMasque then
+                        frame.DispelMsq:Hide()
+                        frame.DispelMsq:Show()
+                    end
+                end
+            end)
+            frame.Dispel.MasqueBorderHook = true
         end
 
         -- DR frames
@@ -1867,12 +1946,15 @@ function sArenaFrameMixin:UpdateNameColor()
     end
 end
 
-function sArenaFrameMixin:UpdatePlayer(unitEvent, forceUpdate)
+function sArenaFrameMixin:UpdatePlayer(unitEvent)
     local unit = self.unit
 
     self:GetClass()
-    sArenaMixin:CheckClassStacking()
     self:FindAura()
+
+    if sArenaMixin:CheckClassStacking() and not healerTextureChanged then
+        sArenaMixin:UpdateTextures(true)
+    end
 
     if (unitEvent and unitEvent ~= "seen") or (UnitGUID(self.unit) == nil) then
         self:SetMysteryPlayer()
@@ -1882,6 +1964,7 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent, forceUpdate)
     C_PvP.RequestCrowdControlSpell(unit)
 
     self:UpdateRacial()
+    self:UpdateDispel()
 
     -- Prevent castbar and other frames from intercepting mouse clicks during a match
     if (unitEvent == "seen") then
@@ -1988,6 +2071,7 @@ function sArenaFrameMixin:GetClass()
         self.class = nil
         self.classLocal = nil
         self.specName = nil
+        self.specID = nil
         self.SpecIcon:Hide()
         self.SpecNameText:SetText("")
     elseif (not self.class) then
@@ -1998,6 +2082,7 @@ function sArenaFrameMixin:GetClass()
                 local _, specName, _, specTexture, _, class, classLocal = GetSpecializationInfoByID(specID)
                 self.class = class
                 self.classLocal = classLocal
+                self.specID = specID
                 self.specName = specName
                 self.SpecNameText:SetText(specName)
                 self.SpecNameText:SetShown(db.profile.layoutSettings[db.profile.currentLayout].showSpecManaText)
@@ -2173,6 +2258,8 @@ function sArenaFrameMixin:ResetLayout()
         self.Trinket.Border:SetVertexColor(1, 1, 1)
         self.Racial.Border:SetDesaturated(false)
         self.Racial.Border:SetVertexColor(1, 1, 1)
+        self.Dispel.Border:SetDesaturated(false)
+        self.Dispel.Border:SetVertexColor(1, 1, 1)
     end
 
     if self.SpecIcon.Border then
@@ -2193,6 +2280,15 @@ function sArenaFrameMixin:ResetLayout()
     local cropIcons = db.profile.layoutSettings[db.profile.currentLayout].cropIcons
 
     local f = self.Trinket
+    f:ClearAllPoints()
+    f:SetSize(0, 0)
+    if f.Mask then
+        f.Texture:RemoveMaskTexture(f.Mask)
+        f.Cooldown:SetSwipeTexture(1)
+    end
+    self:SetTextureCrop(f.Texture, cropIcons)
+
+    local f = self.Dispel
     f:ClearAllPoints()
     f:SetSize(0, 0)
     if f.Mask then
@@ -2342,6 +2438,7 @@ local specTemplates = {
         castName = "Cobra Shot",
         castIcon = 461114,
         racial = 132089,
+        race = "Orc",
         specName = "Beast Mastery",
         unint = true,
     },
@@ -2351,6 +2448,7 @@ local specTemplates = {
         castName = "Aimed Shot",
         castIcon = 132222,
         racial = 136225,
+        race = "NightElf",
         specName = "Marksmanship",
         unint = true,
     },
@@ -2360,6 +2458,7 @@ local specTemplates = {
         castName = "Mending Bandage",
         castIcon = isRetail and 1014022 or 133690,
         racial = 136225,
+        race = "NightElf",
         specName = "Survival",
         channel = true,
     },
@@ -2369,6 +2468,7 @@ local specTemplates = {
         castName = "Lightning Bolt",
         castIcon = 136048,
         racial = 135923,
+        race = "Orc",
         specName = "Elemental",
     },
     ENH_SHAMAN = {
@@ -2377,6 +2477,7 @@ local specTemplates = {
         castName = "Stormstrike",
         castIcon = 132314,
         racial = 135923,
+        race = "Orc",
         specName = "Enhancement",
     },
     RESTO_SHAMAN = {
@@ -2385,6 +2486,7 @@ local specTemplates = {
         castName = "Healing Wave",
         castIcon = 136052,
         racial = 135726,
+        race = "Troll",
         specName = "Restoration",
     },
     RESTO_DRUID = {
@@ -2393,6 +2495,7 @@ local specTemplates = {
         castName = "Regrowth",
         castIcon = 136085,
         racial = 132089,
+        race = "NightElf",
         specName = "Restoration",
     },
     AFF_WARLOCK = {
@@ -2401,6 +2504,7 @@ local specTemplates = {
         castName = "Fear",
         castIcon = 136183,
         racial = 135726,
+        race = "Scourge",
         specName = "Affliction",
     },
     DESTRO_WARLOCK = {
@@ -2409,6 +2513,7 @@ local specTemplates = {
         castName = "Chaos Bolt",
         castIcon = 136186,
         racial = 135726,
+        race = "Scourge",
         specName = "Destruction",
     },
     ARMS_WARRIOR = {
@@ -2417,6 +2522,7 @@ local specTemplates = {
         castName = "Slam",
         castIcon = 132340,
         racial = 132309,
+        race = "Human",
         specName = "Arms",
         unint = true,
     },
@@ -2426,6 +2532,7 @@ local specTemplates = {
         castName = "Penance",
         castIcon = 237545,
         racial = 136187,
+        race = "Human",
         specName = "Discipline",
         channel = true,
     },
@@ -2435,6 +2542,7 @@ local specTemplates = {
         castName = "Holy Fire",
         castIcon = 135972,
         racial = 136187,
+        race = "Human",
         specName = "Holy",
     },
     FERAL_DRUID = {
@@ -2443,6 +2551,7 @@ local specTemplates = {
         castName = "Cyclone",
         castIcon = 132469,
         racial = 132089,
+        race = "NightElf",
         specName = "Feral",
     },
     FROST_MAGE = {
@@ -2451,6 +2560,7 @@ local specTemplates = {
         castName = "Frostbolt",
         castIcon = 135846,
         racial = 136129,
+        race = "Human",
         specName = "Frost",
     },
     ARCANE_MAGE = {
@@ -2459,6 +2569,7 @@ local specTemplates = {
         castName = "Arcane Blast",
         castIcon = 135735,
         racial = 136129,
+        race = "Human",
         specName = "Arcane",
     },
     FIRE_MAGE = {
@@ -2467,6 +2578,7 @@ local specTemplates = {
         castName = "Pyroblast",
         castIcon = 135808,
         racial = 135991,
+        race = "Gnome",
         specName = "Fire",
     },
     RET_PALADIN = {
@@ -2475,12 +2587,14 @@ local specTemplates = {
         castName = "Feet Up",
         castIcon = 133029,
         racial = 136129,
+        race = "Human",
         specName = "Retribution",
     },
     UNHOLY_DK = {
         class = "DEATHKNIGHT",
         specIcon = 135775,
         racial = 135726,
+        race = "Scourge",
         specName = "Unholy",
         castName = "Army of the Dead",
         castIcon = 237511,
@@ -2492,6 +2606,7 @@ local specTemplates = {
         castName = "Crippling Poison",
         castIcon = 132273,
         racial = 132089,
+        race = "Orc",
         specName = "Subtlety",
         unint = true,
     },
@@ -2533,7 +2648,7 @@ local testPlayers = {
     { template = "UNHOLY_DK", name = "Darthchan" },
     { template = "UNHOLY_DK", name = "Mes" },
     { template = "SUB_ROGUE", name = "Nahj" },
-    { template = "SUB_ROGUE", name = "Invisbull", racial = 132368 },
+    { template = "SUB_ROGUE", name = "Invisbull", racial = 132368, race = "Human" },
     { template = "SUB_ROGUE", name = "Cshero" },
     { template = "SUB_ROGUE", name = "Pshero" },
     { template = "SUB_ROGUE", name = "Whaazz" },
@@ -2666,6 +2781,14 @@ function sArenaMixin:Test()
             frame.ClassIconMsq:Show()
             frame.SpecIconMsq:Show()
             frame.CastBarMsq:Show()
+            if frame.CastBar.MSQ then
+                frame.CastBar.MSQ:Show()
+                frame.CastBar.Icon:Hide()
+            end
+            frame.TrinketMsq:Show()
+            frame.RacialMsq:Show()
+            frame.DispelMsq:Show()
+            frame.masqueHidden = false
         end
 
         frame.tempName = data.name
@@ -2716,7 +2839,6 @@ function sArenaMixin:Test()
                 end
                 frame.ClassIcon:SetTexture(self.classIcons[data.class])
             end
-            frame:SetTextureCrop(self.ClassIcon, cropIcons or db.profile.currentLayout == "BlizzRetail")
             if frame.ClassIconMsq then
                 frame.ClassIconMsq:Show()
             end
@@ -2726,9 +2848,11 @@ function sArenaMixin:Test()
         if db.profile.replaceHealerIcon and healerSpecNames[frame.tempSpecName] then
             frame.ClassIcon:SetAtlas("UI-LFG-RoleIcon-Healer")
             cropType = "healer"
+        else
+            cropType = "class"
         end
 
-        frame:SetTextureCrop(frame.ClassIcon, cropIcons or db.profile.currentLayout == "BlizzRetail", cropType)
+        frame:SetTextureCrop(frame.ClassIcon, cropIcons, cropType)
 
         frame.SpecNameText:SetText(data.specName)
         frame.SpecNameText:SetShown(db.profile.layoutSettings[db.profile.currentLayout].showSpecManaText)
@@ -2753,9 +2877,40 @@ function sArenaMixin:Test()
             frame.Trinket.Texture:SetDesaturated(false)
         end
 
-        -- Racial
-        frame.Racial.Texture:SetTexture(data.racial or 132089)
-        frame.Racial.Cooldown:SetCooldown(currTime, math.random(5, 35))
+        -- Racial - Check if enabled before showing in test mode
+        local shouldShowRacial = false
+        if data.race and db.profile.racialCategories and db.profile.racialCategories[data.race] then
+            shouldShowRacial = true
+        end
+
+        if shouldShowRacial then
+            frame.Racial.Texture:SetTexture(data.racial or 132089)
+            frame.Racial.Cooldown:SetCooldown(currTime, math.random(5, 35))
+            if frame.RacialMsq then
+                frame.RacialMsq:Show()
+            end
+        else
+            frame.Racial.Texture:SetTexture(nil)
+            frame.Racial.Cooldown:Clear()
+            if frame.RacialMsq then
+                frame.RacialMsq:Hide()
+            end
+        end
+
+        if db.profile.showDispels then
+            local dispelInfo = frame:GetTestModeDispelData()
+            if dispelInfo then
+                frame.Dispel.Texture:SetTexture(dispelInfo.texture)
+                frame.Dispel:Show()
+                frame.Dispel.Cooldown:SetCooldown(currTime, math.random(5, 35))
+            else
+                frame.Dispel.Texture:SetTexture(nil)
+                frame.Dispel:Hide()
+            end
+        else
+            frame.Dispel.Texture:SetTexture(nil)
+            frame.Dispel:Hide()
+        end
 
         -- Colors
         local color = RAID_CLASS_COLORS[data.class]
@@ -2922,6 +3077,13 @@ function sArenaMixin:Test()
             frame.ClassIconMsq:Hide()
             frame.SpecIconMsq:Hide()
             frame.CastBarMsq:Hide()
+            if frame.CastBar.MSQ then
+                frame.CastBar.MSQ:Hide()
+                frame.CastBar.Icon:Show()
+            end
+            frame.TrinketMsq:Hide()
+            frame.RacialMsq:Hide()
+            frame.DispelMsq:Hide()
             frame.masqueHidden = true
         end
     end

@@ -26,6 +26,12 @@ layout.defaultSettings = {
         scale = 1.049,
         fontSize = 14,
     },
+    dispel = {
+        posX = 189,
+        posY = 0,
+        scale = 1.049,
+        fontSize = 14,
+    },
     castBar = {
         posX = -125,
         posY = -8.2,
@@ -171,6 +177,7 @@ function sArenaMixin:AddPixelBorder()
         CreatePixelTextureBorder(borders, frame.ClassIcon, "classIcon", size, offset)
         CreatePixelTextureBorder(borders, frame.Trinket, "trinket", size, offset)
         CreatePixelTextureBorder(borders, frame.Racial, "racial", size, offset)
+        CreatePixelTextureBorder(borders, frame.Dispel, "dispel", size, offset)
         CreatePixelTextureBorder(frame.SpecIcon, frame.SpecIcon, "specIcon", size, offset)
         CreatePixelTextureBorder(frame.CastBar, frame.CastBar, "castBar", size, offset)
         CreatePixelTextureBorder(frame.CastBar, frame.CastBar.Icon, "castBarIcon", size, offset)
@@ -385,6 +392,7 @@ function layout:Initialize(frame)
         frame.parent:UpdateSpecIconSettings(self.db.specIcon)
         frame.parent:UpdateTrinketSettings(self.db.trinket)
         frame.parent:UpdateRacialSettings(self.db.racial)
+        frame.parent:UpdateDispelSettings(self.db.dispel)
 
         frame.parent:AddPixelBorder()
 
@@ -404,6 +412,7 @@ function layout:Initialize(frame)
     frame.SpecIcon:SetSize(22, 22)
     frame.Trinket:SetSize(41, 41)
     frame.Racial:SetSize(41, 41)
+    frame.Dispel:SetSize(41, 41)
     frame.Name:SetTextColor(1,1,1)
     frame.SpecNameText:SetTextColor(1,1,1)
 
@@ -470,6 +479,25 @@ function layout:Initialize(frame)
             end
         end)
         frame.Racial.RacialPixelBorderHook = true
+    end
+
+    if not frame.Dispel.DispelPixelBorderHook then
+        hooksecurefunc(frame.Dispel.Texture, "SetTexture", function(self, t)
+            if t == nil or t == "" or t == 0 or t == "nil" or frame.parent.db.profile.currentLayout ~= layoutName then
+                frame.PixelBorders.dispel:Hide()
+            else
+                frame.PixelBorders.dispel:Show()
+            end
+        end)
+        hooksecurefunc(frame.Dispel, "Hide", function()
+            frame.PixelBorders.dispel:Hide()
+        end)
+        hooksecurefunc(frame.Dispel, "Show", function()
+            if frame.Dispel.Texture:GetTexture() then
+                frame.PixelBorders.dispel:Show()
+            end
+        end)
+        frame.Dispel.DispelPixelBorderHook = true
     end
 
     frame.PowerBar:SetHeight(self.db.powerBarHeight)

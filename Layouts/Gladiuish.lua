@@ -26,6 +26,12 @@ layout.defaultSettings = {
         scale = 0.8,
         fontSize = 14,
     },
+    dispel = {
+        posX = 225,
+        posY = 0,
+        scale = 0.8,
+        fontSize = 14,
+    },
     castBar = {
         posX = 8,
         posY = -23.5,
@@ -170,11 +176,13 @@ function layout:Initialize(frame)
         frame.parent:UpdateSpecIconSettings(self.db.specIcon)
         frame.parent:UpdateTrinketSettings(self.db.trinket)
         frame.parent:UpdateRacialSettings(self.db.racial)
+        frame.parent:UpdateDispelSettings(self.db.dispel)
     end
 
     frame:SetSize(self.db.width, self.db.height)
     frame.SpecIcon:SetSize(22, 22)
     frame.Trinket:SetSize(41, 41)
+    frame.Dispel:SetSize(41, 41)
     frame.Racial:SetSize(41, 41)
     frame.Name:SetTextColor(1,1,1)
     frame.SpecNameText:SetTextColor(1,1,1)
@@ -182,6 +190,8 @@ function layout:Initialize(frame)
     frame.Trinket.Cooldown:SetSwipeTexture(1)
     frame.Trinket.Cooldown:SetSwipeColor(0, 0, 0, 0.6)
 
+    frame.Dispel.Cooldown:SetSwipeTexture(1)
+    frame.Dispel.Cooldown:SetSwipeColor(0, 0, 0, 0.6)
 
     frame.PowerBar:SetHeight(self.db.powerBarHeight)
 
