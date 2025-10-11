@@ -1,3 +1,6 @@
+2.1.1
+- Fix Class Stacking Only Texture Change setting (but for real this time! oopsiewoopsie)
+
 2.1.0
 - Add Dispels module (Beta, needs more testing and verifying spell ids etc. Please report any issues)
 - Add "Trinket Circle Border" setting for Blizz Arena layout.
