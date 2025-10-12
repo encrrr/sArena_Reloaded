@@ -8,7 +8,6 @@ sArenaMixin.defaultSettings = {
         classColors = true,
         classColorFrameTexture = (BetterBlizzFramesDB and BetterBlizzFramesDB.classColorFrameTexture) or nil,
         showNames = true,
-        showArenaNumber = false,
         showDecimalsDR = true,
         showDecimalsClassIcon = true,
         decimalThreshold = 6,
@@ -16,11 +15,9 @@ sArenaMixin.defaultSettings = {
         darkModeValue = 0.2,
         darkModeDesaturate = true,
         statusText = {
-            usePercentage = false,
             alwaysShow = true,
             formatNumbers = true,
         },
-        skipMysteryGray = false,
         layoutSettings = {},
         invertClassIconCooldown = true,
     }
@@ -43,7 +40,6 @@ LSM:Register("statusbar", "sArena Stripes 2", [[Interface\AddOns\sArena_Reloaded
 LSM:Register("font", "Prototype", [[Interface\AddOns\sArena_Reloaded\Textures\Prototype.ttf]])
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture
 local stealthAlpha = 0.4
-local healerTextureChanged
 
 local healerSpecNames = {
     ["Discipline"] = true,
@@ -341,26 +337,6 @@ else
     end
 end
 
-function sArenaFrameMixin:IsHealer(unit)
-    if unit then
-        local id = string.match(unit, "arena(%d)")
-        local specID = GetArenaOpponentSpec(id)
-        if specID then
-            local spec = GetSpecializationInfoByID(specID)
-            if sArenaMixin.healerSpecIDs[spec] then
-                return true
-            end
-        end
-    end
-
-    -- Test mode
-    if healerSpecNames[self.tempSpecName] then
-        return true
-    end
-
-    return false
-end
-
 
 function sArenaMixin:CheckClassStacking()
     local classCount = {}
@@ -371,7 +347,7 @@ function sArenaMixin:CheckClassStacking()
         local frame = _G["sArenaEnemyFrame"..i]
         if frame.class then
             classCount[frame.class] = (classCount[frame.class] or 0) + 1
-            if frame:IsHealer(frame.unit) then
+            if frame.isHealer then
                 classHasHealer[frame.class] = true
             end
         end
@@ -433,7 +409,7 @@ function sArenaMixin:UpdateFonts()
     local cdKey    = fontCfg.cdFont
 
     local frameFontPath = frameKey and LSM:Fetch(LSM.MediaType.FONT, frameKey) or nil
-    local cdFontPath    = cdKey   and LSM:Fetch(LSM.MediaType.FONT, cdKey)   or nil
+    --local cdFontPath    = cdKey   and LSM:Fetch(LSM.MediaType.FONT, cdKey)   or nil
 
     local size    = fontCfg.size or 10
     local outline = fontCfg.fontOutline
@@ -452,7 +428,6 @@ function sArenaMixin:UpdateFonts()
         local frame = self["arena"..i]
         if not frame or not frame.HealthBar then return end
 
-        -- Frame-style text (labels/values)
         if frameFontPath then
             if not sArenaMixin.ogFonts then
                 sArenaMixin.ogFonts = {
@@ -472,7 +447,7 @@ function sArenaMixin:UpdateFonts()
     end
 end
 
-function sArenaMixin:UpdateTextures(setHealerChanged)
+function sArenaMixin:UpdateTextures()
     if not self.db then return end
     local layout = self.db.profile.layoutSettings[self.db.profile.currentLayout]
     local texKeys = layout.textures or {
@@ -487,17 +462,13 @@ function sArenaMixin:UpdateTextures(setHealerChanged)
     local keepDefaultModernTextures = layout.castBar.keepDefaultModernTextures
     local classStacking = self:CheckClassStacking()
 
-    if setHealerChanged then
-        healerTextureChanged = true
-    end
-
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena"..i]
         if not frame then return end
 
         local textureToUse = dpsTexture
 
-        if frame:IsHealer(frame.unit) then
+        if frame.isHealer then
             if layout.retextureHealerClassStackOnly then
                 if classStacking then
                     textureToUse = healerTexture
@@ -528,8 +499,6 @@ function sArenaFrameMixin:UpdateFrameTexture()
     local layout = self.parent.db.profile.layoutSettings[self.parent.db.profile.currentLayout]
 
     local texKeys = layout.textures
-    local key     = texKeys.generalStatusBarTexture
-
     local modernCastbars            = layout.castBar.useModernCastbars
     local keepDefaultModernTextures = layout.castBar.keepDefaultModernTextures
     local classStacking = sArenaMixin:CheckClassStacking()
@@ -537,7 +506,7 @@ function sArenaFrameMixin:UpdateFrameTexture()
     local healerTexture = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.healStatusBarTexture)
     local textureToUse = dpsTexture
 
-    if self:IsHealer(self.unit) then
+    if self.isHealer then
         if layout.retextureHealerClassStackOnly then
             if classStacking then
                 textureToUse = healerTexture
@@ -931,12 +900,12 @@ function sArenaMixin:OnEvent(event, ...)
                     frame.tempSpecName = nil
                     frame.tempClass = nil
                     frame.tempSpecIcon = nil
+                    frame.isHealer = nil
                 end
             end
             self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
             self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         else
-            healerTextureChanged = false
             self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
             self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
         end
@@ -950,7 +919,6 @@ function sArenaMixin:OnEvent(event, ...)
     elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
         self:UpdatePlayerSpec()
     elseif event == "ARENA_PREP_OPPONENT_SPECIALIZATIONS" then
-        -- Reset detected dispels when entering arena
         self:ResetDetectedDispels()
     end
 end
@@ -982,10 +950,10 @@ function sArenaMixin:UpdateCleanups(db)
 end
 
 function sArenaMixin:UpdatePlayerSpec()
-    local currentSpec = sArenaMixin.isRetail and GetSpecialization() or C_SpecializationInfo.GetSpecialization()
+    local currentSpec = isRetail and GetSpecialization() or C_SpecializationInfo.GetSpecialization()
     if currentSpec and currentSpec > 0 then
         local specID, specName
-        if sArenaMixin.isRetail then
+        if isRetail then
             specID, specName = GetSpecializationInfo(currentSpec)
         else
             specID, specName = C_SpecializationInfo.GetSpecializationInfo(currentSpec)
@@ -1592,7 +1560,11 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
                             trinketTexture = self:GetFactionTrinketIcon()
                         end
                     else
-                        trinketTexture = sArenaMixin.noTrinketTexture     -- Surrender flag if no trinket
+                        if not isRetail and self.race == "Human" and db.profile.forceShowTrinketOnHuman then
+                            trinketTexture = self:GetFactionTrinketIcon()
+                        else
+                            trinketTexture = sArenaMixin.noTrinketTexture     -- Surrender flag if no trinket
+                        end
                     end
 
                     -- Handle racial updates based on trinket state (same logic as UpdateTrinket)
@@ -1631,8 +1603,13 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
                         self:UpdateRacial()
                     end
 
-                    self.Trinket.Texture:SetTexture(sArenaMixin.noTrinketTexture)
-                    self:UpdateTrinketIcon(false)
+                    if not isRetail and self.race == "Human" and db.profile.forceShowTrinketOnHuman then
+                        self.Trinket.Texture:SetTexture(self:GetFactionTrinketIcon())
+                        self:UpdateTrinketIcon(true)
+                    else
+                        self.Trinket.Texture:SetTexture(sArenaMixin.noTrinketTexture)
+                        self:UpdateTrinketIcon(false)
+                    end
                 end
             end
         elseif (event == "UNIT_AURA") then
@@ -1948,12 +1925,14 @@ end
 
 function sArenaFrameMixin:UpdatePlayer(unitEvent)
     local unit = self.unit
+    local prevClass = self.class
+    local prevIsHealer = self.isHealer
 
     self:GetClass()
     self:FindAura()
 
-    if sArenaMixin:CheckClassStacking() and not healerTextureChanged then
-        sArenaMixin:UpdateTextures(true)
+    if prevClass ~= self.class or prevIsHealer ~= self.isHealer then
+        sArenaMixin:UpdateTextures()
     end
 
     if (unitEvent and unitEvent ~= "seen") or (UnitGUID(self.unit) == nil) then
@@ -2072,6 +2051,7 @@ function sArenaFrameMixin:GetClass()
         self.classLocal = nil
         self.specName = nil
         self.specID = nil
+        self.isHealer = nil
         self.SpecIcon:Hide()
         self.SpecNameText:SetText("")
     elseif (not self.class) then
@@ -2084,6 +2064,7 @@ function sArenaFrameMixin:GetClass()
                 self.classLocal = classLocal
                 self.specID = specID
                 self.specName = specName
+                self.isHealer = sArenaMixin.healerSpecIDs[specID] or false
                 self.SpecNameText:SetText(specName)
                 self.SpecNameText:SetShown(db.profile.layoutSettings[db.profile.currentLayout].showSpecManaText)
                 self.specTexture = specTexture
@@ -2119,7 +2100,7 @@ function sArenaFrameMixin:UpdateClassIcon()
 
     if (texture == "class") then
 
-        if db.profile.replaceHealerIcon and self:IsHealer(self.unit) then
+        if db.profile.replaceHealerIcon and self.isHealer then
             useHealerTexture = true
         end
 
@@ -2797,6 +2778,7 @@ function sArenaMixin:Test()
         frame.class = data.class
         frame.tempSpecIcon = data.specIcon
         frame.replaceClassIcon = replaceClassIcon
+        frame.isHealer = healerSpecNames[data.specName] or false
 
         frame:Show()
         frame:SetAlpha(1)
@@ -2845,7 +2827,7 @@ function sArenaMixin:Test()
         end
 
         local cropType
-        if db.profile.replaceHealerIcon and healerSpecNames[frame.tempSpecName] then
+        if db.profile.replaceHealerIcon and frame.isHealer then
             frame.ClassIcon:SetAtlas("UI-LFG-RoleIcon-Healer")
             cropType = "healer"
         else
@@ -2863,7 +2845,13 @@ function sArenaMixin:Test()
         frame.Name:SetShown(db.profile.showNames or db.profile.showArenaNumber)
         frame:UpdateNameColor()
 
-        -- Trinket
+        frame.race = data.race
+        frame.unit = "arena" .. i
+
+        local shouldForceHumanTrinket = not isRetail and data.race == "Human" and db.profile.forceShowTrinketOnHuman
+        local shouldReplaceHumanRacial = not isRetail and data.race == "Human" and db.profile.replaceHumanRacialWithTrinket
+        local shouldSwapRacialToTrinket = false
+
         frame.Trinket.Cooldown:SetCooldown(currTime, math.random(5, 35))
         if colorTrinket then
             if i <= 2 then
@@ -2873,17 +2861,30 @@ function sArenaMixin:Test()
                 frame.Trinket.Texture:SetColorTexture(1,0,0)
             end
         else
-            frame.Trinket.Texture:SetTexture(sArenaMixin.trinketTexture)
+            if shouldSwapRacialToTrinket then
+                frame.Trinket.Texture:SetTexture(data.racial or 132089)
+            elseif shouldForceHumanTrinket then
+                frame.Trinket.Texture:SetTexture(133452)
+            else
+                frame.Trinket.Texture:SetTexture(sArenaMixin.trinketTexture)
+            end
             frame.Trinket.Texture:SetDesaturated(false)
         end
 
-        -- Racial - Check if enabled before showing in test mode
+        frame.updateRacialOnTrinketSlot = shouldSwapRacialToTrinket
         local shouldShowRacial = false
+
         if data.race and db.profile.racialCategories and db.profile.racialCategories[data.race] then
             shouldShowRacial = true
         end
 
-        if shouldShowRacial then
+        if shouldReplaceHumanRacial then
+            frame.Racial.Texture:SetTexture(133452)
+            frame.Racial.Cooldown:SetCooldown(currTime, math.random(5, 35))
+            if frame.RacialMsq then
+                frame.RacialMsq:Show()
+            end
+        elseif shouldShowRacial and not shouldSwapRacialToTrinket then
             frame.Racial.Texture:SetTexture(data.racial or 132089)
             frame.Racial.Cooldown:SetCooldown(currTime, math.random(5, 35))
             if frame.RacialMsq then

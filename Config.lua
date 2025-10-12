@@ -1,4 +1,5 @@
 local LSM = LibStub("LibSharedMedia-3.0")
+local isRetail = sArenaMixin.isRetail
 
 local function GetSpellInfoCompat(spellID)
     if not spellID then
@@ -54,8 +55,6 @@ local function validateCombat()
 end
 
 local growthValues = { "Down", "Up", "Right", "Left" }
-local isRetail = sArenaMixin.isRetail
-
 local drCategories
 local racialCategories
 local dispelCategories
@@ -3080,6 +3079,36 @@ else
                                         get = function(info) return info.handler.db.profile.swapRacialTrinket end,
                                         set = function(info, val)
                                             info.handler.db.profile.swapRacialTrinket = val
+                                        end,
+                                    },
+                                    forceShowTrinketOnHuman = {
+                                        order = 2,
+                                        name = "Force Show Trinket on Human (Beta)",
+                                        desc = "Always show the Alliance trinket texture on Human players, even if they don't have a trinket equipped.",
+                                        type = "toggle",
+                                        width = "full",
+                                        hidden = function() return isRetail end,
+                                        get = function(info) return info.handler.db.profile.forceShowTrinketOnHuman end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.forceShowTrinketOnHuman = val
+                                            if val then
+                                                info.handler.db.profile.replaceHumanRacialWithTrinket = false
+                                            end
+                                        end,
+                                    },
+                                    replaceHumanRacialWithTrinket = {
+                                        order = 3,
+                                        name = "Replace Human Racial with Trinket (Beta)",
+                                        desc = "Replace the Human racial ability with the Alliance trinket texture in the racial slot.",
+                                        type = "toggle",
+                                        width = "full",
+                                        hidden = function() return isRetail end,
+                                        get = function(info) return info.handler.db.profile.replaceHumanRacialWithTrinket end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.replaceHumanRacialWithTrinket = val
+                                            if val then
+                                                info.handler.db.profile.forceShowTrinketOnHuman = false
+                                            end
                                         end,
                                     },
                                 }

@@ -185,7 +185,7 @@ end
 
 function sArenaFrameMixin:GetSharedCD()
     -- Human healers have Will to Survive Shared CD reduced from 90 to 60 sec on Retail.
-    if self.race == "Human" and self:IsHealer(self.unit) and isRetail and self.Trinket.spellID == 336126 then
+    if self.race == "Human" and self.isHealer and isRetail and self.Trinket.spellID == 336126 then
         return 60
     end
     return racialData[self.race] and racialData[self.race].sharedCD
@@ -197,10 +197,16 @@ function sArenaFrameMixin:FindRacial(spellID)
 
 	-- Racial used
 	if duration and not trinkets[spellID] then
+		-- Check if we're using replaceHumanRacialWithTrinket (MoP specific)
+		if not isRetail and self.race == "Human" and self.parent.db.profile.replaceHumanRacialWithTrinket then
+			-- Apply racial cooldown to the racial slot (which shows trinket texture)
+			if self.Racial.Texture:GetTexture() then
+				self.Racial.Cooldown:SetCooldown(currTime, duration)
+			end
 		-- Check if we're using swapRacialTrinket and racial is displayed on trinket slot
-		if self.updateRacialOnTrinketSlot then
+		elseif self.updateRacialOnTrinketSlot then
 			-- Apply racial cooldown to trinket slot instead (only if spellID exists)
-			if self.Trinket.spellID then
+			if self.Trinket.spellID and (self.Trinket.Texture:GetTexture() ~= sArenaMixin.noTrinketTexture) then
 				self.Trinket.Cooldown:SetCooldown(currTime, duration)
 			end
 			if self.parent.db.profile.colorTrinket then
@@ -222,7 +228,7 @@ function sArenaFrameMixin:FindRacial(spellID)
 			local sharedCD = self:GetSharedCD()
 
 			if sharedCD and remainingCD < sharedCD then
-				if self.Trinket.spellID then
+				if self.Trinket.spellID and (self.Trinket.Texture:GetTexture() ~= sArenaMixin.noTrinketTexture) then
 					self.Trinket.Cooldown:SetCooldown(currTime, sharedCD)
 				end
 				if self.parent.db.profile.colorTrinket then
@@ -255,6 +261,13 @@ function sArenaFrameMixin:UpdateRacial()
 	if (self.race) then
 
 		if (self.parent.db and self.parent.db.profile.racialCategories[self.race]) then
+			-- Handle MoP-specific Human racial replacement with trinket
+			if not isRetail and self.race == "Human" and self.parent.db.profile.replaceHumanRacialWithTrinket then
+				-- Replace Human racial with Alliance trinket texture in racial slot
+				self.Racial.Texture:SetTexture(self:GetFactionTrinketIcon())
+				return
+			end
+
 			-- Check if we should display racial on trinket slot instead
 			local swapEnabled = self.parent.db.profile.swapRacialTrinket or self.parent.db.profile.swapHumanTrinket
 			if swapEnabled then
@@ -281,7 +294,7 @@ function sArenaFrameMixin:UpdateRacial()
 
 						local start, duration = self.Racial.Cooldown:GetCooldownTimes()
 						if duration and duration > 0 and (start > 0) then
-							if self.Trinket.spellID then
+							if self.Trinket.spellID and (self.Trinket.Texture:GetTexture() ~= sArenaMixin.noTrinketTexture)then
 								self.Trinket.Cooldown:SetCooldown(start / 1000.0, duration / 1000.0)
 							end
 						end

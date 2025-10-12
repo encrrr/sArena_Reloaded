@@ -15,6 +15,11 @@ function sArenaFrameMixin:GetFactionTrinketIcon()
     end
 end
 
+-- Helper function to check if we should force trinket display for humans in MoP
+function sArenaFrameMixin:ShouldForceHumanTrinket()
+    return not isRetail and self.race == "Human" and self.parent.db.profile.forceShowTrinketOnHuman
+end
+
 function sArenaFrameMixin:UpdateTrinketIcon(available)
     if available then
         if self.parent.db.profile.colorTrinket then
@@ -76,7 +81,12 @@ function sArenaFrameMixin:UpdateTrinket()
                     trinketTexture = self:GetFactionTrinketIcon()
                 end
             else
-                trinketTexture = sArenaMixin.noTrinketTexture     -- Surrender flag if no trinket
+                -- Handle MoP-specific Human trinket logic
+                if not isRetail and self.race == "Human" and self.parent.db.profile.forceShowTrinketOnHuman then
+                    trinketTexture = self:GetFactionTrinketIcon()  -- Show Alliance trinket even if not equipped
+                else
+                    trinketTexture = sArenaMixin.noTrinketTexture     -- Surrender flag if no trinket
+                end
             end
 
             -- Handle racial updates based on trinket state
@@ -103,7 +113,7 @@ function sArenaFrameMixin:UpdateTrinket()
             self:UpdateTrinketIcon(true)
         end
         if (startTime ~= 0 and duration ~= 0 and self.Trinket.spellID) then
-            if self.Trinket.spellID then
+            if self.Trinket.spellID and (self.Trinket.Texture:GetTexture() ~= sArenaMixin.noTrinketTexture)then
                 if self.updateRacialOnTrinketSlot then
                     local racialDuration = self:GetRacialDuration()
                     self.Trinket.Cooldown:SetCooldown(startTime / 1000.0, racialDuration)
