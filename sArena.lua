@@ -448,13 +448,15 @@ function sArenaMixin:UpdateFonts()
 end
 
 function sArenaMixin:UpdateTextures()
-    if not self.db then return end
-    local layout = self.db.profile.layoutSettings[self.db.profile.currentLayout]
+    if not db then return end
+
+    local layout = db.profile.layoutSettings[db.profile.currentLayout]
     local texKeys = layout.textures or {
         generalStatusBarTexture   = "sArena Default",
-        healStatusBarTexture      = "sArena Default",
+        healStatusBarTexture      = "sArena Stripes",
         castbarStatusBarTexture   = "sArena Default",
     }
+
     local castTexture = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.castbarStatusBarTexture)
     local dpsTexture     = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.generalStatusBarTexture)
     local healerTexture = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.healStatusBarTexture)
@@ -462,10 +464,8 @@ function sArenaMixin:UpdateTextures()
     local keepDefaultModernTextures = layout.castBar.keepDefaultModernTextures
     local classStacking = self:CheckClassStacking()
 
-    for i = 1, sArenaMixin.maxArenaOpponents do
-        local frame = self["arena"..i]
-        if not frame then return end
-
+    for i = 1, self.maxArenaOpponents do
+        local frame = _G["sArenaEnemyFrame" .. i]
         local textureToUse = dpsTexture
 
         if frame.isHealer then
@@ -489,39 +489,9 @@ function sArenaMixin:UpdateTextures()
             frame.CastBar:SetStatusBarTexture(castTexture)
         end
 
-        if self.db.profile.currentLayout == "BlizzRetail" then
+        if db.profile.currentLayout == "BlizzRetail" then
             frame.PowerBar:GetStatusBarTexture():SetDrawLayer("BACKGROUND", 2)
         end
-    end
-end
-
-function sArenaFrameMixin:UpdateFrameTexture()
-    local layout = self.parent.db.profile.layoutSettings[self.parent.db.profile.currentLayout]
-
-    local texKeys = layout.textures
-    local modernCastbars            = layout.castBar.useModernCastbars
-    local keepDefaultModernTextures = layout.castBar.keepDefaultModernTextures
-    local classStacking = sArenaMixin:CheckClassStacking()
-    local dpsTexture     = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.generalStatusBarTexture)
-    local healerTexture = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.healStatusBarTexture)
-    local textureToUse = dpsTexture
-
-    if self.isHealer then
-        if layout.retextureHealerClassStackOnly then
-            if classStacking then
-                textureToUse = healerTexture
-            end
-        else
-            textureToUse = healerTexture
-        end
-    end
-
-    self.HealthBar:SetStatusBarTexture(textureToUse)
-    self.PowerBar:SetStatusBarTexture(dpsTexture)
-
-    local castPath = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.castbarStatusBarTexture)
-    if not modernCastbars and not keepDefaultModernTextures then
-        self.CastBar:SetStatusBarTexture(castPath)
     end
 end
 
@@ -1677,7 +1647,6 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
         self:ResetDR()
         self:UpdateHealPrediction()
         self:UpdateAbsorb()
-        self:UpdateFrameTexture()
         if UnitExists(self.unit) then
             self:UpdatePlayer("seen")
         else
@@ -1925,15 +1894,9 @@ end
 
 function sArenaFrameMixin:UpdatePlayer(unitEvent)
     local unit = self.unit
-    local prevClass = self.class
-    local prevIsHealer = self.isHealer
 
     self:GetClass()
     self:FindAura()
-
-    if prevClass ~= self.class or prevIsHealer ~= self.isHealer then
-        sArenaMixin:UpdateTextures()
-    end
 
     if (unitEvent and unitEvent ~= "seen") or (UnitGUID(self.unit) == nil) then
         self:SetMysteryPlayer()
@@ -2071,6 +2034,7 @@ function sArenaFrameMixin:GetClass()
                 self.class = class
                 self:UpdateSpecIcon()
                 self:UpdateFrameColors()
+                sArenaMixin:UpdateTextures()
             end
         end
 
