@@ -2,7 +2,7 @@
 
 New and updated sArena Frames with tons of new great features. Fork of sArena addon made by Stako, and maintained by many in the PvP community.
 
-This is a further improvement of my sArena MoP Classic addon and it also brings it to Retail. This version will work on both Retail and MoP. This version will let you import settings from both sArena MoP and sArena Updated 2 by sammers.
+This is a further improvement of my sArena MoP Classic addon and it also brings it to Retail. This version will work on both Retail and MoP. This version will let you import settings from both sArena MoP and any other sArena version, see below.
 
 This version comes packed with many new features such as:
 
