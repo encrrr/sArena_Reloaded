@@ -467,6 +467,10 @@ function sArenaMixin:UpdateTextures()
     local keepDefaultModernTextures = layout.castBar.keepDefaultModernTextures
     local classStacking = self:CheckClassStacking()
 
+    -- Store castTexture and keepDefaultTextures for use in ModernCastbar hooks
+    self.castTexture = castTexture
+    self.keepDefaultModernTextures = keepDefaultModernTextures
+
     for i = 1, self.maxArenaOpponents do
         local frame = _G["sArenaEnemyFrame" .. i]
         local textureToUse = dpsTexture
@@ -3129,13 +3133,14 @@ end
 function sArenaMixin:ModernOrClassicCastbar()
     local layoutSettings = db.profile.layoutSettings[db.profile.currentLayout]
     local useModern = layoutSettings.castBar.useModernCastbars
+    local simpleCastbar = layoutSettings.castBar.simpleCastbar
     local castbarSettings = layoutSettings.castBar
 
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = _G["sArenaEnemyFrame" .. i]
         if (frame and useModern) or frame.CastBar.__modernHooked then
             local unit = "arena"..i
-            self:ApplyCastbarStyle(frame, unit, useModern)
+            self:ApplyCastbarStyle(frame, unit, useModern, simpleCastbar)
             if i == sArenaMixin.maxArenaOpponents then
                 frame.parent:UpdateCastBarSettings(castbarSettings)
                 sArenaMixin:UpdateFonts()

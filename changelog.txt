@@ -1,3 +1,9 @@
+2.1.4
+- New "Simple Castbar" setting for Modern Castbars. Removes text background and puts text inside of the castbar.
+- Tweak to make sure "Swap Trinket with Human Racial" setting works even when Human racial is turned off.
+- Fix unique DR sizes causing first DR icon to not be positioned correctly if it was increased/decreased in size.
+- Retail: Reduce Warlock's Malevolence prio below Dark Pact and Unending Resolve.
+
 2.1.3
 - Added a new temporary section for Midnight info.
 - Fix Font Shadow offset & color. Visible with Outline off.

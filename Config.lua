@@ -715,6 +715,25 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             end,
                         },
 
+                        simpleCastbar = {
+                            order    = 2.3,
+                            type     = "toggle",
+                            name     = "Simple Castbar",
+                            width    = "75%",
+                            desc     = "Hides the castbar text background and moves the castbar text inside the castbar.",
+                            disabled = function(info)
+                                return not info.handler.db.profile.layoutSettings[layoutName].castBar.useModernCastbars
+                            end,
+                            get      = function(info)
+                                return info.handler.db.profile.layoutSettings[layoutName].castBar.simpleCastbar
+                            end,
+                            set      = function(info, val)
+                                local castDB = info.handler.db.profile.layoutSettings[layoutName].castBar
+                                castDB.simpleCastbar = val
+                                info.handler:RefreshConfig()
+                            end,
+                        },
+
                         spacerOne = {
                             order = 2.4,
                             type  = "description",
@@ -1687,6 +1706,8 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
     end
 
     local categorySizeOffsets = db.drCategorySizeOffsets or {}
+
+    sArenaMixin.drBaseSize = db.size
 
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena" .. i]

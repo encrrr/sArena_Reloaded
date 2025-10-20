@@ -260,7 +260,7 @@ function sArenaFrameMixin:UpdateRacial()
 
 	if (self.race) then
 
-		if (self.parent.db and self.parent.db.profile.racialCategories[self.race]) then
+		if (self.parent.db and (self.parent.db.profile.racialCategories[self.race] or (self.parent.db.profile.swapRacialTrinket or self.parent.db.profile.swapHumanTrinket) and self.race == "Human")) then
 			-- Handle MoP-specific Human racial replacement with trinket
 			if not isRetail and self.race == "Human" and self.parent.db.profile.replaceHumanRacialWithTrinket then
 				-- Replace Human racial with Alliance trinket texture in racial slot

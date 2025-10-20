@@ -703,7 +703,17 @@ function sArenaFrameMixin:UpdateDRPositions()
 		if (frame:IsShown()) then
 			frame:ClearAllPoints()
 			if (numActive == 0) then
-				frame:SetPoint("CENTER", self, "CENTER", layoutdb.dr.posX, layoutdb.dr.posY)
+				-- First frame, offset due to unique DR sizes
+				local offset = (sArenaMixin.drBaseSize or 28) / 2
+				if (growthDirection == 4) then
+					frame:SetPoint("RIGHT", self, "CENTER", layoutdb.dr.posX + offset, layoutdb.dr.posY)
+				elseif (growthDirection == 3) then
+					frame:SetPoint("LEFT", self, "CENTER", layoutdb.dr.posX - offset, layoutdb.dr.posY)
+				elseif (growthDirection == 1) then
+					frame:SetPoint("TOP", self, "CENTER", layoutdb.dr.posX, layoutdb.dr.posY + offset)
+				elseif (growthDirection == 2) then
+					frame:SetPoint("BOTTOM", self, "CENTER", layoutdb.dr.posX, layoutdb.dr.posY - offset)
+				end
 			else
 				if (growthDirection == 4) then
 					frame:SetPoint("RIGHT", prevFrame, "LEFT", -spacing, 0)

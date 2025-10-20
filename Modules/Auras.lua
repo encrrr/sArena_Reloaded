@@ -349,7 +349,7 @@ if isRetail then
         [113858] = 3, -- Warlock: Dark Soul: Instability
         [113860] = 3, -- Warlock: Dark Soul: Misery
         [399680] = 3, -- Soul Swap
-        [442726] = 3, -- Malevolence
+        [442726] = 2.4, -- Malevolence (Not more important than defensives)
         [328774] = 3, -- Amp Curse
         [107574] = 3, -- Warrior: Avatar
         -- [260708] = 3, -- Warrior: Sweeping Strikes
