@@ -70,6 +70,7 @@ layout.defaultSettings = {
 
     textSettings = {
         specNameSize = 0.85,
+        powerAnchor = "RIGHT",
     },
 }
 
@@ -148,8 +149,8 @@ function layout:Initialize(frame)
     healthText:SetDrawLayer("OVERLAY", 4)
 
     local powerText = frame.PowerText
-    powerText:SetJustifyH("CENTER")
-    powerText:SetPoint("CENTER", healthBar, "CENTER", -1, -16.5)
+    -- powerText:SetJustifyH("CENTER")
+    -- powerText:SetPoint("CENTER", healthBar, "CENTER", -1, -16.5)
     --powerText:SetShadowOffset(0, 0)
     powerText:SetDrawLayer("OVERLAY", 4)
 
@@ -320,13 +321,7 @@ function layout:Initialize(frame)
     --specBorder:Hide()
 
     frame.SpecNameText:SetTextColor(1,1,1)
-    --frame.SpecNameText:SetScale(0.85)
-    frame.PowerText:SetAlpha(0)
-
-    f = frame.CastBar
-    -- f:SetHeight(8)
-    -- f.Text:ClearAllPoints()
-    -- f.Text:SetPoint("BOTTOM", f, 0, -14)
+    frame.PowerText:SetAlpha(frame.parent.db.profile.hidePowerText and 0 or 1)
 
     f = frame.DeathIcon
     f:ClearAllPoints()
@@ -381,6 +376,7 @@ function layout:UpdateOrientation(frame)
     local name = frame.Name
     local specName = frame.SpecNameText
     local healthText = frame.HealthText
+    local powerText = frame.PowerText
     local castbarText = frame.CastBar.Text
 
     name:ClearAllPoints()
@@ -393,10 +389,11 @@ function layout:UpdateOrientation(frame)
         local txt = self.db.textSettings
         local modernCastbar = self.db.castBar.useModernCastbars
 
-        name:SetScale(txt.nameSize or 1.0)
-        healthText:SetScale(txt.healthSize or 1.0)
-        specName:SetScale(txt.specNameSize or 1.0)
-        castbarText:SetScale(txt.castbarSize or 1.0)
+        name:SetScale(txt.nameSize or 1)
+        healthText:SetScale(txt.healthSize or 1)
+        specName:SetScale(txt.specNameSize or 1)
+        castbarText:SetScale(txt.castbarSize or 1)
+        powerText:SetScale(txt.powerSize or 1)
 
         -- Name
         name:ClearAllPoints()
@@ -416,6 +413,16 @@ function layout:UpdateOrientation(frame)
             healthText:SetPoint("RIGHT", healthBar, "RIGHT", -3 + (txt.healthOffsetX or 0), (txt.healthOffsetY or 0))
         else
             healthText:SetPoint("CENTER", healthBar, "CENTER", -1 + (txt.healthOffsetX or 0), (txt.healthOffsetY or 0))
+        end
+
+        -- Power Text
+        powerText:ClearAllPoints()
+        if (txt.powerAnchor or "CENTER") == "LEFT" then
+            powerText:SetPoint("LEFT", frame.PowerBar, "LEFT", 0 + (txt.powerOffsetX or 0), (txt.powerOffsetY or 0))
+        elseif (txt.powerAnchor or "CENTER") == "RIGHT" then
+            powerText:SetPoint("RIGHT", frame.PowerBar, "RIGHT", 0 + (txt.powerOffsetX or 0), (txt.powerOffsetY or 0))
+        else
+            powerText:SetPoint("CENTER", frame.PowerBar, "CENTER", (txt.powerOffsetX or 0), (txt.powerOffsetY or 0))
         end
 
         -- Spec Text

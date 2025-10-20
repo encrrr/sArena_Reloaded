@@ -11,6 +11,7 @@ sArenaMixin.defaultSettings = {
         classColors = true,
         classColorFrameTexture = (BetterBlizzFramesDB and BetterBlizzFramesDB.classColorFrameTexture) or nil,
         showNames = true,
+        hidePowerText = true,
         showDecimalsDR = true,
         showDecimalsClassIcon = true,
         decimalThreshold = 6,
@@ -1017,10 +1018,10 @@ function sArenaMixin:ApplyPrototypeFont(frame)
     end
 
     updateFont(frame.Name)
-    updateFont(frame.SpecNameText, 9, "THINOUTLINE")
+    updateFont(frame.SpecNameText, 9)
     updateFont(frame.HealthText)
     updateFont(frame.PowerText)
-    updateFont(frame.CastBar and frame.CastBar.Text, nil, "THINOUTLINE")
+    updateFont(frame.CastBar and frame.CastBar.Text)
 end
 
 function sArenaMixin:SetupCastColor()
@@ -2286,8 +2287,6 @@ function sArenaFrameMixin:ResetLayout()
     ResetFontString(f)
     f:SetDrawLayer("OVERLAY", 6)
     f:SetFontObject("SystemFont_Shadow_Small2")
-    local fName, s, o = f:GetFont()
-    f:SetFont(fName, s, "THINOUTLINE")
     f:SetScale(1)
     f:SetShadowColor(0, 0, 0, 1)
     f:SetShadowOffset(1, -1)
@@ -2396,6 +2395,7 @@ end
 function sArenaFrameMixin:UpdateStatusTextVisible()
     self.HealthText:SetShown(db.profile.statusText.alwaysShow)
     self.PowerText:SetShown(db.profile.statusText.alwaysShow)
+    self.PowerText:SetAlpha(db.profile.statusText.hidePowerText and 0 or 1)
 end
 
 local specTemplates = {

@@ -189,7 +189,7 @@
 
             <Layer level="ARTWORK" textureSubLevel="3">
                 <FontString parentKey="Name" inherits="GameFontNormalSmall"/>
-                <FontString parentKey="SpecNameText" inherits="GameFontNormalSmall"/>
+                <FontString parentKey="SpecNameText"/>
                 <FontString parentKey="HealthText"/>
                 <FontString parentKey="PowerText"/>
                 <Texture parentKey="overAbsorbGlow" inherits="OverAbsorbGlowTemplate"/>

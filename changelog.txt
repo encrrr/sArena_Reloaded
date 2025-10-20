@@ -1,3 +1,7 @@
+2.1.5
+- Add options to disable desaturation on Trinket & Dispel CD.
+- Re-enable manabar text and add settings to show/hide it and position settings etc. Disabled by default.
+
 2.1.4
 - New "Simple Castbar" setting for Modern Castbars. Removes text background and puts text inside of the castbar.
 - Tweak to make sure "Swap Trinket with Human Racial" setting works even when Human racial is turned off.

@@ -407,10 +407,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 1,
                             name = "Horizontal",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -418,10 +418,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 2,
                             name = "Vertical",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -469,10 +469,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 1,
                             name = "Horizontal",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -480,10 +480,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 2,
                             name = "Vertical",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -542,10 +542,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 1,
                             name = "Horizontal",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -553,10 +553,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 2,
                             name = "Vertical",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -615,10 +615,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 1,
                             name = "Horizontal",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -626,10 +626,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 2,
                             name = "Vertical",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -815,10 +815,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 1,
                             name = "Horizontal",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -826,10 +826,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 2,
                             name = "Vertical",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -966,10 +966,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 1,
                             name = "Horizontal",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -977,10 +977,10 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             order = 2,
                             name = "Vertical",
                             type = "range",
-                            min = -500,
-                            max = 500,
-                            softMin = -200,
-                            softMax = 200,
+                            min = -700,
+                            max = 700,
+                            softMin = -350,
+                            softMax = 350,
                             step = 0.1,
                             bigStep = 1,
                         },
@@ -1371,6 +1371,116 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             layout.textSettings.healthSize = defaults.healthSize
                             layout.textSettings.healthOffsetX = defaults.healthOffsetX
                             layout.textSettings.healthOffsetY = defaults.healthOffsetY
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, nil)
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
+                        end,
+                    },
+                },
+            },
+            powerText = {
+                order = 2.5,
+                name = "Mana Text",
+                type = "group",
+                inline = true,
+                args = {
+                    powerAnchor = {
+                        order = 1,
+                        name = "Anchor Point",
+                        type = "select",
+                        style = "dropdown",
+                        width = 0.5,
+                        values = {
+                            ["LEFT"] = "Left",
+                            ["CENTER"] = "Center",
+                            ["RIGHT"] = "Right",
+                        },
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.powerAnchor or "CENTER"
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.powerAnchor = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    powerSize = {
+                        order = 2,
+                        name = "Size",
+                        type = "range",
+                        min = 0.05,
+                        max = 5,
+                        step = 0.01,
+                        width = 0.8,
+                        isPercent = true,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.powerSize or 1.0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.powerSize = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    powerOffsetX = {
+                        order = 3,
+                        name = "Horizontal",
+                        type = "range",
+                        softMin = -200,
+                        softMax = 200,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.powerOffsetX or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.powerOffsetX = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    powerOffsetY = {
+                        order = 4,
+                        name = "Vertical",
+                        type = "range",
+                        softMin = -200,
+                        softMax = 200,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.powerOffsetY or 0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.powerOffsetY = val
+                            sArenaMixin:UpdateTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    resetPowerText = {
+                        order = 5,
+                        name = "Reset",
+                        width = 0.4,
+                        type = "execute",
+                        func = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            local currentLayout = info.handler.layouts[layoutName]
+                            local defaults = currentLayout.defaultSettings.textSettings
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.powerAnchor = defaults.powerAnchor
+                            layout.textSettings.powerSize = defaults.powerSize
+                            layout.textSettings.powerOffsetX = defaults.powerOffsetX
+                            layout.textSettings.powerOffsetY = defaults.powerOffsetY
                             sArenaMixin:UpdateTextPositions(layout.textSettings, info, nil)
                             LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
                         end,
@@ -2339,6 +2449,19 @@ else
                                             local _, instanceType = IsInInstance()
                                             if (instanceType ~= "arena" and info.handler.arena1:IsShown()) then
                                                 info.handler:Test()
+                                            end
+                                        end,
+                                    },
+                                    hidePowerText = {
+                                        order = 4,
+                                        name = "Hide Power Text",
+                                        desc = "Hide mana/rage/energy text",
+                                        type = "toggle",
+                                        get = function(info) return info.handler.db.profile.statusText.hidePowerText end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.statusText.hidePowerText = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                info.handler["arena" .. i]:UpdateStatusTextVisible()
                                             end
                                         end,
                                     },
