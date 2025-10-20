@@ -1499,6 +1499,10 @@ function sArenaFrameMixin:OnLoad()
     self.AuraStacks:SetJustifyH("LEFT")
     self.AuraStacks:SetJustifyV("BOTTOM")
 
+    self.DispelStacks:SetTextColor(1,1,1,1)
+    self.DispelStacks:SetJustifyH("LEFT")
+    self.DispelStacks:SetJustifyV("BOTTOM")
+
     self.TexturePool = CreateTexturePool(self, "ARTWORK", nil, nil, ResetTexture)
 end
 
@@ -2193,6 +2197,8 @@ function sArenaFrameMixin:ResetLayout()
     self.ClassIconCooldown:SetSwipeTexture(1)
     self.AuraStacks:SetPoint("BOTTOMLEFT", self.ClassIcon, "BOTTOMLEFT", 2, 0)
     self.AuraStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 13, "THICKOUTLINE")
+    self.DispelStacks:SetPoint("BOTTOMLEFT", self.Dispel.Texture, "BOTTOMLEFT", 2, 0)
+    self.DispelStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 13, "THICKOUTLINE")
 
     self.ClassIcon:RemoveMaskTexture(self.ClassIconMask)
     self.ClassIcon:SetDrawLayer("BORDER", 1)

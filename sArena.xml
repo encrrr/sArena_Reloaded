@@ -202,6 +202,7 @@
                     <TexCoords left="0" right="1" top="0" bottom="0.5"/>
                 </Texture>
                 <FontString parentKey="AuraStacks" inherits="SystemFont_Shadow_Small2"/>
+                <FontString parentKey="DispelStacks" inherits="SystemFont_Shadow_Small2"/>
             </Layer>
         </Layers>
 
