@@ -1,6 +1,7 @@
 2.1.5
 - Add options to disable desaturation on Trinket & Dispel CD.
 - Re-enable manabar text and add settings to show/hide it and position settings etc. Disabled by default.
+- Tweak layouts a little: Removed font outline on spec name text for Retail layout. Add font outline to old Arena layout's health & mana text (as it used to be, this got unintentionally removed with new settings).
 
 2.1.4
 - New "Simple Castbar" setting for Modern Castbars. Removes text background and puts text inside of the castbar.
