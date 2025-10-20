@@ -337,7 +337,7 @@ function sArenaFrameMixin:UpdateDispel()
 
 	--print("7: Dispel icon set for", self.unit, "spellID:", dispelInfo.spellID)
 
-	local onCooldown = dispel.Cooldown:GetCooldownDuration() > 0
+	local onCooldown = db.profile.desaturateDispelCD and dispel.Cooldown:GetCooldownDuration() > 0
 	dispel.Texture:SetDesaturated(onCooldown)
 end
 

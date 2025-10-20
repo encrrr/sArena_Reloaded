@@ -2761,6 +2761,28 @@ else
                                             end
                                         end
                                     },
+                                    desaturateTrinketCD = {
+                                        order = 2.1,
+                                        name = "Desaturate Trinket CD",
+                                        desc = "Desaturate the Trinket icon when it is on cooldown.",
+                                        type = "toggle",
+                                        width = "full",
+                                        get = function(info) return info.handler.db.profile.desaturateTrinketCD end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.desaturateTrinketCD = val
+                                        end
+                                    },
+                                    desaturateDispelCD = {
+                                        order = 2.2,
+                                        name = "Desaturate Dispel CD",
+                                        desc = "Desaturate the Dispel icon when it is on cooldown.",
+                                        type = "toggle",
+                                        width = "full",
+                                        get = function(info) return info.handler.db.profile.desaturateDispelCD end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.desaturateDispelCD = val
+                                        end
+                                    },
                                 },
                             },
                         },

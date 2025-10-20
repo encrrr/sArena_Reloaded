@@ -213,7 +213,7 @@ function sArenaFrameMixin:FindRacial(spellID)
 				self.Trinket.Texture:SetColorTexture(1, 0, 0)
 			else
 				-- Since racial is on trinket slot, desaturate the trinket texture when on cooldown
-				self.Trinket.Texture:SetDesaturated(true)
+				self.Trinket.Texture:SetDesaturated(self.parent.db.profile.desaturateTrinketCD)
 			end
 		else
 			-- Normal racial cooldown handling
@@ -234,7 +234,7 @@ function sArenaFrameMixin:FindRacial(spellID)
 				if self.parent.db.profile.colorTrinket then
 					self.Trinket.Texture:SetColorTexture(1, 0, 0)
 				else
-					self.Trinket.Texture:SetDesaturated(true)
+					self.Trinket.Texture:SetDesaturated(self.parent.db.profile.desaturateTrinketCD)
 				end
 			end
 		end

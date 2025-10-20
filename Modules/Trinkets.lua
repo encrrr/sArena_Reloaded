@@ -39,7 +39,7 @@ function sArenaFrameMixin:UpdateTrinketIcon(available)
             if self.updateRacialOnTrinketSlot then
                 desaturate = false
             else
-                desaturate = true
+                desaturate = self.parent.db.profile.desaturateTrinketCD
             end
             self.Trinket.Texture:SetDesaturated(desaturate)
         end
@@ -125,7 +125,7 @@ function sArenaFrameMixin:UpdateTrinket()
                 self.Trinket.Texture:SetColorTexture(1,0,0)
             else
                 if not self.updateRacialOnTrinketSlot then
-                    self.Trinket.Texture:SetDesaturated(true)
+                    self.Trinket.Texture:SetDesaturated(self.parent.db.profile.desaturateTrinketCD)
                 end
             end
         else
