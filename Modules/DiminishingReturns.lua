@@ -565,25 +565,33 @@ end
 
 function sArenaFrameMixin:FindDR(combatEvent, spellID)
 	local category = drList[spellID]
-	
+
 	-- Check if this DR category is enabled (considering per-spec, per-class, or global settings)
 	local categoryEnabled = false
 	local db = self.parent.db.profile
-	
+
 	if db.drCategoriesPerSpec then
 		local specKey = sArenaMixin.playerSpecID or 0
 		local perSpec = db.drCategoriesSpec or {}
-		local specCategories = perSpec[specKey] or {}
-		categoryEnabled = specCategories[category] ~= nil and specCategories[category] or db.drCategories[category]
+		local specCategories = perSpec[specKey]
+		if specCategories ~= nil and specCategories[category] ~= nil then
+			categoryEnabled = specCategories[category]
+		else
+			categoryEnabled = db.drCategories[category]
+		end
 	elseif db.drCategoriesPerClass then
 		local classKey = sArenaMixin.playerClass
 		local perClass = db.drCategoriesClass or {}
-		local classCategories = perClass[classKey] or {}
-		categoryEnabled = classCategories[category] ~= nil and classCategories[category] or db.drCategories[category]
+		local classCategories = perClass[classKey]
+		if classCategories ~= nil and classCategories[category] ~= nil then
+			categoryEnabled = classCategories[category]
+		else
+			categoryEnabled = db.drCategories[category]
+		end
 	else
 		categoryEnabled = db.drCategories[category]
 	end
-	
+
 	if not categoryEnabled then return end
 
 	local frame = self[category]

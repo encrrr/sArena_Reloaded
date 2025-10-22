@@ -1,5 +1,6 @@
 2.1.6
 - Fix GUI not updating position settings immediately after dragging things around.
+- Fix DR Categories not respecting per spec & per class settings due to falling back to global settings like how Static Icons work, oops.
 
 2.1.5
 - Priest's Purify now displays a stack number on it if double dispel. At 0 stacks it gets desaturated. At 1 or more stacks it stays colored.
