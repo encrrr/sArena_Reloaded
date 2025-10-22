@@ -2300,7 +2300,7 @@ if sArenaMixin:CompatibilityIssueExists() then
                         order = 3,
                         type = "execute",
                         name = "|cffffffffUse sArena |cffff8000Reloaded|r |T135884:13:13|t: Import other settings",
-                        desc = "This will copy your existing settings from the other sArena, disable the other sArena for compatibility, and reload your UI so you can start using sArena |cffff8000Reloaded|r |T135884:13:13|t",
+                        desc = "This will copy your current profile and existing settings from the other sArena, disable the other sArena for compatibility, and reload your UI so you can start using sArena |cffff8000Reloaded|r |T135884:13:13|t",
                         func = function()
                             if sArenaMixin.ImportOtherForkSettings then
                                 sArenaMixin:ImportOtherForkSettings()
@@ -2308,7 +2308,7 @@ if sArenaMixin:CompatibilityIssueExists() then
                         end,
                         width = "full",
                         confirm = true,
-                        confirmText = "This will copy your existing settings from the other sArena, disable the other sArena for compatibility, and reload your UI so you can start using sArena |cffff8000Reloaded|r |T135884:13:13|t\n\nContinue?",
+                        confirmText = "This will copy your current profile and existing settings from the other sArena, disable the other sArena for compatibility, and reload your UI so you can start using sArena |cffff8000Reloaded|r |T135884:13:13|t\n\nContinue?",
                     },
                     option3 = {
                         order = 4,

@@ -855,6 +855,7 @@ function sArenaMixin:OnEvent(event, ...)
 
     elseif (event == "PLAYER_LOGIN") then
         self:Initialize()
+        if sArenaMixin:CompatibilityIssueExists() then return end
         self:UpdatePlayerSpec()
         self:SetupCastColor()
         self:SetupGrayTrinket()
@@ -955,19 +956,10 @@ end
 function sArenaMixin:Initialize()
     if (db) then return end
 
-    if self:CompatibilityIssueExists() and not db then
-        C_Timer.After(5, function()
-            sArenaMixin:Print("Two different versions of sArena are loaded. Please select how you want to continue by typing /sarena")
-        end)
-    end
+    local compatIssue = self:CompatibilityIssueExists()
 
     self.db = LibStub("AceDB-3.0"):New("sArena_ReloadedDB", self.defaultSettings, true)
     db = self.db
-
-    self:UpdateCleanups(db)
-
-    self:UpdateDRTimeSetting()
-    self:UpdateDecimalThreshold()
 
     db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
     db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
@@ -975,11 +967,19 @@ function sArenaMixin:Initialize()
     self.optionsTable.handler = self
     self.optionsTable.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(db)
     LibStub("AceConfig-3.0"):RegisterOptionsTable("sArena", self.optionsTable)
-    LibStub("AceConfigDialog-3.0"):AddToBlizOptions("sArena", "sArena |cffff8000Reloaded|r |T135884:13:13|t")
-    LibStub("AceConfigDialog-3.0"):SetDefaultSize("sArena", 860, 690)
+    LibStub("AceConfigDialog-3.0"):SetDefaultSize("sArena", compatIssue and 520 or 860, compatIssue and 300 or 690)
     LibStub("AceConsole-3.0"):RegisterChatCommand("sarena", ChatCommand)
-
-    self:SetLayout(_, db.profile.currentLayout)
+    if not compatIssue then
+        self:UpdateCleanups(db)
+        self:UpdateDRTimeSetting()
+        self:UpdateDecimalThreshold()
+        LibStub("AceConfigDialog-3.0"):AddToBlizOptions("sArena", "sArena |cffff8000Reloaded|r |T135884:13:13|t")
+        self:SetLayout(_, db.profile.currentLayout)
+    else
+        C_Timer.After(5, function()
+            sArenaMixin:Print("Two different versions of sArena are loaded. Please select how you want to continue by typing /sarena")
+        end)
+    end
 end
 
 function sArenaMixin:RefreshConfig()
@@ -1428,6 +1428,7 @@ local function ResetTexture(texturePool, t)
 end
 
 function sArenaFrameMixin:OnLoad()
+    if sArenaMixin:CompatibilityIssueExists() then return end
     local unit = "arena" .. self:GetID()
     self.parent = self:GetParent()
 

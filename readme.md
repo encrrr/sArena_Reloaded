@@ -9,7 +9,7 @@ This version comes packed with many new features such as:
 *   Three new layouts and one updated one.
 *   Import/Export feature for Profile Sharing.
 *   A smarter aura priority system
-*   Dispel Icon (for Healer dispels but also things like Remove Curse & Mending Bandage)
+*   Dispel Icon (for Healer dispels by default but also things like Remove Curse & Mending Bandage)
 *   Many new customisation options such as Texture, Font, Dark Mode, Icon Crop, Modern Castbars, Masque support, Text Positions, etc.
 *   Put a unique texture on Healers specifically, or only when there is Class Stacking.
 *   Show shields and overshields on healthbars.
@@ -41,7 +41,7 @@ Ctrl+Shift+Click to drag stuff
 
 ### Import from other sArena versions
 
-You can easily import your other sArena versions just by launching both addons at the same time and typing `/sarena` will open open a "Import Settings" window. From there you can chose which option you want to go with. There will be some lua errors popping up when you launch both addons at the same time due to both addons trying to do things with the "sArena" name, these are expected and safe to ignore. When you chose "Import Settings" it will also disable the other addon.
+You can easily import your other sArena versions just by launching both addons at the same time and typing `/sarena` will open open a "Import Settings" window. From there you can chose which option you want to go with. When you chose "Import Settings" it will also disable the other addon for compatibility and save you some clicks.
 
 ## New layouts:
 
