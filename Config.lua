@@ -957,7 +957,11 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             set = function(info, val)
                                 local db = info.handler.db.profile.layoutSettings[layoutName].dr
                                 db.brightDRBorder = val
+                                if val then
+                                    db.drBorderGlowOff = false
+                                end
                                 self:UpdateDRSettings(info.handler.db.profile.layoutSettings[layoutName].dr, info, val)
+                                LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
                             end,
                         },
                         blackDRBorder = {
@@ -988,6 +992,42 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                                 local db = info.handler.db.profile.layoutSettings[layoutName].dr
                                 db.showDRText = val
                                 self:UpdateDRSettings(db, info, val)
+                            end,
+                        },
+                        drBorderGlowOff = {
+                            order = 4,
+                            name  = "Disable DR Border Glow",
+                            type  = "toggle",
+                            desc  = "Removes the glowing border effect from DR icons, providing a cleaner appearance",
+                            get = function(info)
+                                return info.handler.db.profile.layoutSettings[layoutName].dr.drBorderGlowOff
+                            end,
+                            set = function(info, val)
+                                local db = info.handler.db.profile.layoutSettings[layoutName].dr
+                                db.drBorderGlowOff = val
+                                if val then
+                                    db.brightDRBorder = false
+                                end
+                                self:UpdateDRSettings(info.handler.db.profile.layoutSettings[layoutName].dr, info, val)
+                                info.handler:RefreshConfig()
+                                info.handler:Test()
+                                LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
+                            end,
+                        },
+                        disableDRBorder = {
+                            order = 5,
+                            name  = "Disable DR Border",
+                            type  = "toggle",
+                            desc  = "Completely hides the DR border frames",
+                            get = function(info)
+                                return info.handler.db.profile.layoutSettings[layoutName].dr.disableDRBorder
+                            end,
+                            set = function(info, val)
+                                local db = info.handler.db.profile.layoutSettings[layoutName].dr
+                                db.disableDRBorder = val
+                                self:UpdateDRSettings(info.handler.db.profile.layoutSettings[layoutName].dr, info, val)
+                                info.handler:RefreshConfig()
+                                info.handler:Test()
                             end,
                         },
                     },
@@ -1066,7 +1106,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             step = 0.1,
                             bigStep = 1,
                             disabled = function(info)
-                                return info.handler.db.profile.layoutSettings[layoutName].dr.brightDRBorder
+                                local drSettings = info.handler.db.profile.layoutSettings[layoutName].dr
+                                return drSettings.brightDRBorder or drSettings.drBorderGlowOff
                             end,
                         },
                         fontSize = {
@@ -2256,7 +2297,7 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
             local dr = frame[category]
 
             local offset = categorySizeOffsets[category] or 0
-            local borderSize = (db.brightDRBorder and 1) or db.borderSize or 1
+            local borderSize = (db.drBorderGlowOff and 1.5) or (db.brightDRBorder and 1) or db.borderSize or 1
             local size = db.size + offset
 
             dr:SetSize(size, size)
@@ -2293,13 +2334,39 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                 dr.DRTextFrame:Hide()
             end
 
-            if db.brightDRBorder then
+            -- Handle DR border visibility (layout-specific setting)
+            if db.disableDRBorder then
+                dr.Border:Hide()
+                dr.Border.hidden = true
+            elseif dr.Border.hidden then
+                dr.Border:Show()
+                dr.Border.hidden = nil
+            end
+
+            dr.Icon:SetDrawLayer("ARTWORK", 0)
+            if dr.Boverlay then
+                dr.Border:SetParent(dr)
+                dr.Boverlay:Hide()
+            end
+            if db.drBorderGlowOff then
                 if not dr.Mask then
                     dr.Mask = dr:CreateMaskTexture()
-                    --dr.Mask:SetAllPoints(dr.Icon)
-                    dr.Mask:SetPoint("TOPLEFT", dr.Icon, "TOPLEFT", -1, 1)
-                    dr.Mask:SetPoint("BOTTOMRIGHT", dr.Icon, "BOTTOMRIGHT", 1, -1)
                 end
+                dr.Mask:SetPoint("TOPLEFT", dr.Icon, "TOPLEFT", 0.5, -0.5)
+                dr.Mask:SetPoint("BOTTOMRIGHT", dr.Icon, "BOTTOMRIGHT", -0.5, 0.5)
+                dr.Border:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+                dr.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\squarecutcornermask")
+                dr.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\squarecutcornermask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+                dr.Icon:SetDrawLayer("OVERLAY", 7)
+                dr.Icon:SetTexCoord(0.05, 0.95, 0.05, 0.9)
+                dr.Icon:AddMaskTexture(dr.Mask)
+                dr.changedDRBorder = true
+            elseif db.brightDRBorder then
+                if not dr.Mask then
+                    dr.Mask = dr:CreateMaskTexture()
+                end
+                dr.Mask:SetPoint("TOPLEFT", dr.Icon, "TOPLEFT", -1, 1)
+                dr.Mask:SetPoint("BOTTOMRIGHT", dr.Icon, "BOTTOMRIGHT", 1, -1)
                 if isRetail then
                     dr.Border:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\UI-HUD-ActionBar-PetAutoCast-Mask.tga")
                     dr.Cooldown:SetSwipeTexture("Interface\\TalentFrame\\talentsmasknodechoiceflyout")
@@ -2321,9 +2388,9 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                 dr.Boverlay:Show()
                 dr.Border:SetParent(dr.Boverlay)
 
-                dr.brightDRBorder = true
+                dr.changedDRBorder = true
             else
-                if dr.brightDRBorder then
+                if dr.changedDRBorder then
                     -- revert to normal
                     dr.Border:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
                     dr.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
@@ -2333,12 +2400,7 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                         dr.Icon:RemoveMaskTexture(dr.Mask)
                     end
 
-                    if dr.Boverlay then
-                        dr.Border:SetParent(dr)
-                        dr.Boverlay:Hide()
-                    end
-
-                    dr.brightDRBorder = nil
+                    dr.changedDRBorder = nil
                 end
             end
 
@@ -3436,18 +3498,6 @@ else
                                             info.handler.db.profile.decimalThreshold = val
                                             info.handler:UpdateDecimalThreshold()
                                             info.handler:SetupCustomCD()
-                                        end
-                                    },
-                                    disableDRBorder = {
-                                        order = 5,
-                                        name = "Disable DR Border",
-                                        type = "toggle",
-                                        width = "full",
-                                        get = function(info) return info.handler.db.profile.disableDRBorder end,
-                                        set = function(info, val)
-                                            info.handler.db.profile.disableDRBorder = val
-                                            info.handler:SetDRBorderShownStatus()
-                                            info.handler:Test()
                                         end
                                     },
                                 },

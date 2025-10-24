@@ -157,6 +157,8 @@ if isRetail then
         [6789] = 9,   -- Mortal Coil (Incapacitate)
 
         -- Immunities
+        [213610] = 8.1, -- Priest: Holy Ward
+        [377362] = 8.1, -- Precog
         [456499] = 8, -- Absolute Serenity
         [473909] = 8, -- Ancient of Lore
         [354610] = 8, -- Demon Hunter: Glimpse
@@ -165,19 +167,15 @@ if isRetail then
         [45438] = 8,  -- Ice Block
         [196555] = 8, -- Demon Hunter: Netherwalk
         [47585] = 8,  -- Priest: Dispersion
-        [377362] = 8, -- Precog
         [1022] = 8,   -- Blessing of Protection
         [204018] = 8, -- Blessing of Spellwarding
         [323524] = 8, -- Ultimate Form
         [216113] = 8, -- Way of the Crane
         [31224] = 8,  -- Cloak of Shadows
-        [212182] = 8, -- Smoke Bomb
-        [212183] = 8, -- Smoke Bomb
         [8178] = 8,   -- Grounding Totem Effect
         [199448] = 8, -- Blessing of Sacrifice
         [236321] = 8, -- War Banner
         [215769] = 8, -- Spirit of Redemption
-        [5277] = 8,   -- Rogue: Evasion
         [227847] = 8, -- Warrior: Bladestorm (Arms)
         [118038] = 8, -- Warrior: Die by the Sword
         [357210] = 8, -- Deep Breath
@@ -191,9 +189,9 @@ if isRetail then
         [48792] = 8,  -- Death Knight: Icebound Fortitude
         [409293] = 8, -- Burrow
 
-        -- Anti-CC / Immunity Buffs
+        -- Lesser Immunity Buffs
+        [5277] = 7,   -- Rogue: Evasion
         [23920] = 7,  -- Spell Reflection
-        [213610] = 7, -- Priest: Holy Ward
         [212295] = 7, -- Warlock: Nether Ward
         [48707] = 7,  -- Death Knight: Anti-Magic Shell
         [410358] = 7, -- Death Knight: Anti-Magic Shell
@@ -251,6 +249,10 @@ if isRetail then
         [209749] = 5, -- Faerie Swarm (Disarm)
         [233759] = 5, -- Grapple Weapon
         [207777] = 5, -- Dismantle
+
+        -- Smoke
+        [212182] = 4.9, -- Smoke Bomb
+        [212183] = 4.9, -- Smoke Bomb
 
         -- Offensive Debuffs
         [383005] = 4.5, -- Chrono Loop

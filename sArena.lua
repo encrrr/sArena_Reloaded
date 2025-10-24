@@ -1031,6 +1031,26 @@ function sArenaMixin:UpdateCleanups(db)
         -- Remove old global setting
         db.profile.drTextOn = nil
     end
+
+    -- Migrate old global disableDRBorder setting
+    if db.profile.disableDRBorder ~= nil then
+        local disableDRBorder = db.profile.disableDRBorder
+
+        -- Apply disableDRBorder to all layouts as disableDRBorder
+        if db.profile.layoutSettings then
+            for layoutName, layoutSettings in pairs(db.profile.layoutSettings) do
+                if layoutSettings.dr then
+                    -- Only set if the old setting was true (enabled) and new setting doesn't exist
+                    if disableDRBorder == true and layoutSettings.dr.disableDRBorder == nil then
+                        layoutSettings.dr.disableDRBorder = true
+                    end
+                end
+            end
+        end
+
+        -- Remove old global setting
+        db.profile.disableDRBorder = nil
+    end
 end
 
 function sArenaMixin:UpdatePlayerSpec()
@@ -1245,13 +1265,17 @@ function sArenaMixin:SetupCustomCD()
 end
 
 function sArenaMixin:SetDRBorderShownStatus()
+    local currentLayout = self.db.profile.currentLayout
+    local layoutSettings = self.db.profile.layoutSettings[currentLayout]
+    local disableDRBorder = layoutSettings and layoutSettings.dr and layoutSettings.dr.disableDRBorder
+
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena" .. i]
         -- DR frames
         for _, category in ipairs(self.drCategories) do
             local drFrame = frame[category]
             if drFrame then
-                if self.db.profile.disableDRBorder then
+                if disableDRBorder then
                     drFrame.Border:Hide()
                     drFrame.Border.hidden = true
                 elseif drFrame.Border.hidden then

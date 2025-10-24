@@ -69,7 +69,6 @@ layout.defaultSettings = {
             scale = 1.2,
         },
         focusIndicator = {
-            enabled = true,
             posX = 0,
             posY = 0,
             scale = 1.2,

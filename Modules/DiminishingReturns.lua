@@ -242,7 +242,7 @@ if isRetail then
 		[202249]  = "Knock", -- Overrun
 		[61391]   = "Knock", -- Typhoon
 		[102793]  = "Knock", -- Ursol's Vortex
-		[431620]  = "Knock", -- Upheaval
+		--[431620]  = "Knock", -- Upheaval (has no DR)
 		[186387]  = "Knock", -- Bursting Shot
 		[236776]  = "Knock", -- Hi-Explosive Trap
 		[236777]  = "Knock", -- Hi-Explosive Trap 2

@@ -1,3 +1,9 @@
+2.1.8
+- Tweak a few aura priorities.
+- Add new "DR Glow Off" setting.
+- Remove Upheaval from Knock DR's.
+- Focus Indicator no longer enabled by default for Blizz Compact layout.
+
 2.1.7
 - One new layout: Blizz Compact
 - Four new features in layout settings in new Widgets section:
