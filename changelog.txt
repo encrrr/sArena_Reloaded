@@ -7,7 +7,7 @@
 - Tweak a few aura priorities.
 - Remove Upheaval from Knock DR's.
 - Focus Indicator no longer enabled by default for Blizz Compact layout.
-- Fix DR Reset Time description on MoP. It had the Retail description and was inaccurate.
+- Due to an oversight after combining Retail & MoP version into one version I've had to reset DR Reset Time back to their default value (18.5 on Retail and 20 on MoP). Also fix DR Reset Time description on MoP. It had the Retail description and was inaccurate.
 
 2.1.7
 - One new layout: Blizz Compact

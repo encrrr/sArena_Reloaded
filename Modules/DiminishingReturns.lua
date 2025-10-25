@@ -556,9 +556,10 @@ drCategories = sArenaMixin.drCategories
 sArenaMixin.drList = drList
 
 function sArenaMixin:UpdateDRTimeSetting()
-	if not self.db.profile.drResetTimeDEL then
-		self.db.profile.drResetTime = 18.5
-		self.db.profile.drResetTimeDEL = true
+	if not self.db.profile.drResetTimeFix then
+		self.db.profile.drResetTime = (isRetail and 18.5 or 20)
+		self.db.profile.drResetTimeFix = true
+		self.db.profile.drResetTimeDEL = nil
 	end
     drTime = self.db.profile.drResetTime or (isRetail and 18.5 or 20)
 end
