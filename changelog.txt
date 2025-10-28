@@ -1,3 +1,6 @@
+2.1.9
+- Fix potential coloring issues with Modern Castbar + Changing away from the default textures.
+
 2.1.8
 - Add new DR settings and tweak them a bit.
 - New DR Thin Pixel Border setting.

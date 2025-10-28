@@ -2401,6 +2401,7 @@ end
 local function ResetStatusBar(f)
     f:ClearAllPoints()
     f:SetSize(0, 0)
+    f:SetStatusBarColor(1, 1, 1, 1)
     f:SetScale(1)
 end
 

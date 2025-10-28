@@ -55,7 +55,7 @@ You can easily import your other sArena versions just by launching both addons a
 
 ### Settings:
 
-![sArenaSettings](https://github.com/user-attachments/assets/2f0e6716-ee7e-4a2f-a638-921ba344b0a2)
+![sArenaSettings](https://github.com/user-attachments/assets/21d9651f-e8f9-4081-a8ee-e55ea852f91d)
 
 ### Healer Texture when Class Stacking (optional)
 
