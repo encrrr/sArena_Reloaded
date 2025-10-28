@@ -1,5 +1,6 @@
 2.1.9
-- Fix potential coloring issues with Modern Castbar + Changing away from the default textures.
+- Fix potential castbar coloring issues with Modern Castbar + Custom texture instead of the default ones.
+- Potential fix for some MoP+Human racial settings. Unable to test cuz no test environment. No PTR, no lvl 90, no skirmishes, gg.
 
 2.1.8
 - Add new DR settings and tweak them a bit.

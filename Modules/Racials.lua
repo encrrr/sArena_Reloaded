@@ -198,11 +198,18 @@ function sArenaFrameMixin:FindRacial(spellID)
 	-- Racial used
 	if duration and not trinkets[spellID] then
 		-- Check if we're using replaceHumanRacialWithTrinket (MoP specific)
-		if not isRetail and self.race == "Human" and self.parent.db.profile.replaceHumanRacialWithTrinket then
-			-- Apply racial cooldown to the racial slot (which shows trinket texture)
-			if self.Racial.Texture:GetTexture() then
+		if not isRetail and self.race == "Human" and (self.parent.db.profile.replaceHumanRacialWithTrinket or self.parent.db.profile.forceShowTrinketOnHuman) then
+			if self.parent.db.profile.forceShowTrinketOnHuman then
+				if self.Trinket.spellID and (self.Trinket.Texture:GetTexture() ~= sArenaMixin.noTrinketTexture) then
+					self.Trinket.Cooldown:SetCooldown(currTime, duration)
+				end
 				self.Racial.Cooldown:SetCooldown(currTime, duration)
 				self:UpdateTrinketIcon(false)
+			else
+				if self.Racial.Texture:GetTexture() then
+					self.Racial.Cooldown:SetCooldown(currTime, duration)
+					self:UpdateTrinketIcon(false)
+				end
 			end
 		-- Check if we're using swapRacialTrinket and racial is displayed on trinket slot
 		elseif self.updateRacialOnTrinketSlot then
