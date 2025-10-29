@@ -3360,7 +3360,7 @@ else
                                     },
                                     hideClassIcon = {
                                         order = 6,
-                                        name = "Hide Class Icon",
+                                        name = "Hide Class Icon (Show Auras Only)",
                                         type = "toggle",
                                         width = "full",
                                         desc = "Hide the Class Icon and only show Auras when they are active.",
