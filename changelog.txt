@@ -1,7 +1,7 @@
 2.2.1
 - Add option to disable all auras from Class/Spec icon.
 - Retail: Add missing Surge of Power root.
-- Midnight support is just about ready but I need to wait for skirmishes to actually test it and make sure first.
+- Midnight support should be around the corner but I need to wait for skirmishes to actually test it and make sure first and probably make some tweaks.
 
 2.2.0
 - Separate Dark Mode color from BetterBlizzFrames' dark mode so you can change it to a different value than the rest of your UI. Your dark mode value might need re-adjusting because of this if you were using BBF dark mode plus sArena dark mode.
