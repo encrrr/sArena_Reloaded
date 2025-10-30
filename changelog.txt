@@ -1,6 +1,6 @@
 2.2.1
 - Add option to disable all auras from Class/Spec icon.
-- Retail: Add missing Surge of Power root.
+- Retail: Add missing Surge of Power root from aura list (existed as DR). Ty Jaime.
 - Midnight support should be around the corner but I need to wait for skirmishes to actually test it and make sure first and probably make some tweaks.
 
 2.2.0
