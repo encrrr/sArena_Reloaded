@@ -11,11 +11,14 @@
     <Script file="Ace3\Libs\LibDeflate\LibDeflate.lua"/>
     <Script file="Ace3\Libs\LibSerialize\LibSerialize.lua"/>
 
+    <Script file="sArena_Init.lua"/>
     <Script file="sArena.lua"/>
+    <Script file="Modules\Interrupt.lua"/>
     <Script file="Modules\Racials.lua"/>
     <Script file="Modules\Dispels.lua"/>
     <Script file="Data\DrList_Retail.lua"/>
     <Script file="Modules\DiminishingReturns.lua"/>
+    <Script file="Data\Profiles.lua"/>
     <Script file="Config.lua"/>
     <Script file="Data\AuraList_Retail.lua"/>
     <Script file="Modules\Auras.lua"/>
@@ -23,6 +26,7 @@
     <Script file="Modules\ModernCastbar.lua"/>
     <Script file="Modules\ImportExport.lua"/>
     <Script file="Layouts\BlizzArena.lua"/>
+    <Script file="Layouts\BlizzRaid.lua"/>
     <Script file="Layouts\BlizzRetail.lua"/>
     <Script file="Layouts\BlizzCompact.lua"/>
     <Script file="Layouts\BlizzTourney.lua"/>
@@ -223,7 +227,6 @@
         <Frames>
             <StatusBar parentKey="HealthBar" drawLayer="BORDER" useParentLevel="true"/>
             <StatusBar parentKey="PowerBar" drawLayer="BORDER" useParentLevel="true"/>
-            <StatusBar parentKey="CastBar" inherits="sArenaCastBarFrameTemplate"/>
             <Cooldown parentKey="ClassIconCooldown" drawLayer="BORDER" useParentLevel="true" reverse="true" hideCountdownNumbers="false" inherits="CooldownFrameTemplate">
                 <Scripts>
                     <OnLoad>
@@ -249,7 +252,7 @@
                 </Layers>
             </Frame>
 
-            <Frame parentKey="WidgetOverlay" frameLevel="10" setAllPoints="true">
+            <Frame parentKey="WidgetOverlay" frameStrata="HIGH" frameLevel="10" setAllPoints="true">
                 <Frames>
                     <Frame parentKey="targetIndicator" inherits="sArenaWidgetFrameTemplate">
                         <KeyValues>
@@ -284,14 +287,6 @@
             <Frame parentKey="Trinket" inherits="sArenaIconFrameTemplate"/>
             <Frame parentKey="Racial" inherits="sArenaIconFrameTemplate"/>
             <Frame parentKey="Dispel" inherits="sArenaIconFrameTemplate"/>
-
-            <Frame parentKey="Incapacitate" inherits="sArenaDRFrameTemplate"/>
-            <Frame parentKey="Stun" inherits="sArenaDRFrameTemplate"/>
-			<Frame parentKey="Root" inherits="sArenaDRFrameTemplate"/>
-			<Frame parentKey="Disarm" inherits="sArenaDRFrameTemplate"/>
-            <Frame parentKey="Disorient" inherits="sArenaDRFrameTemplate"/>
-			<Frame parentKey="Silence" inherits="sArenaDRFrameTemplate"/>
-			<Frame parentKey="Knock" inherits="sArenaDRFrameTemplate"/>
         </Frames>
 
         <Scripts>

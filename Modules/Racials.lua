@@ -1,5 +1,6 @@
 local GetTime = GetTime
 local isRetail = sArenaMixin.isRetail
+local isMidnight = sArenaMixin.isMidnight
 
 local racialSpells
 local racialData
@@ -37,6 +38,10 @@ if isRetail then
 		["EarthenDwarf"] = true
 	}
 
+	if isMidnight then
+		sArenaMixin.defaultSettings.profile.racialCategories["Haranir"] = true
+	end
+
 	racialSpells = {
 		[59752] = 180,  -- Will to Survive
 		[7744] = 120,   -- Will of the Forsaken
@@ -66,6 +71,7 @@ if isRetail then
 		[368970] = 90,  -- Tail Swipe
 		[357214] = 90,  -- Wing Buffet
 		[436344] = 120, -- Azerite Surge
+		[1237885] = 180, -- Thorn Bloom
 
 		-- Trinkets
 		[336126] = 0,
@@ -102,8 +108,11 @@ if isRetail then
 		["Mechagnome"] = { texture = C_Spell.GetSpellTexture(312924), sharedCD = 0, spellID = 312924 },
 		["Vulpera"] = { texture = C_Spell.GetSpellTexture(312411), sharedCD = 0, spellID = 312411 },
 		["Dracthyr"] = { texture = C_Spell.GetSpellTexture(368970), sharedCD = 0, spellID = 368970 },
-		["EarthenDwarf"] = { texture = C_Spell.GetSpellTexture(436344), sharedCD = 0, spellID = 436344 }
+		["EarthenDwarf"] = { texture = C_Spell.GetSpellTexture(436344), sharedCD = 0, spellID = 436344 },
 	}
+	if isMidnight then
+		racialData["Haranir"] = { texture = C_Spell.GetSpellTexture(1238623), sharedCD = 0, spellID = 1237885 } -- temp icon
+	end
 else
 	sArenaMixin.defaultSettings.profile.racialCategories = {
 		["Human"] = true,

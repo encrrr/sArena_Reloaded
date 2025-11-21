@@ -1,3 +1,5 @@
+if sArenaMixin.isMidnight then return end
+
 local GetTime = GetTime
 local isRetail = sArenaMixin.isRetail
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture

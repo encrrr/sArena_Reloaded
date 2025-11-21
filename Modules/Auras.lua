@@ -1,3 +1,5 @@
+if sArenaMixin.isMidnight then return end
+
 local isRetail = sArenaMixin.isRetail
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture
 local auraList = sArenaMixin.auraList
@@ -77,7 +79,7 @@ local function AuraTooltipExtractPercent(unit, index, filter)
 end
 
 function sArenaFrameMixin:FindAura()
-    if self.parent.db and self.parent.db.profile.disableAurasOnClassIcon then
+    if (self.parent.db and self.parent.db.profile.disableAurasOnClassIcon) or sArenaMixin.isMidnight then
         self:UpdateClassIcon()
         return
     end

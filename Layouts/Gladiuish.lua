@@ -40,6 +40,7 @@ layout.defaultSettings = {
         iconScale = 1,
         iconPosX = 5,
         keepDefaultModernTextures = true,
+        recolorCastbar = false,
     },
     dr = {
         posX = -101,
@@ -57,6 +58,7 @@ layout.defaultSettings = {
             scale = 1,
         },
         targetIndicator = {
+            enabled = true,
             posX = 0,
             posY = 0,
             scale = 1,
@@ -81,6 +83,7 @@ layout.defaultSettings = {
         generalStatusBarTexture       = "sArena Default",
         healStatusBarTexture          = "sArena Stripes",
         castbarStatusBarTexture       = "sArena Default",
+        castbarUninterruptibleTexture = "sArena Default",
     },
     retextureHealerClassStackOnly = true,
 

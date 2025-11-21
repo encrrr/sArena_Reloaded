@@ -44,6 +44,7 @@ layout.defaultSettings = {
         keepDefaultModernTextures = true,
         simpleCastbar = true,
         --hideCastbarIcon = true,
+        recolorCastbar = false,
     },
     dr = {
         posX = -105,
@@ -85,6 +86,7 @@ layout.defaultSettings = {
         generalStatusBarTexture       = "Blizzard RetailBar",
         healStatusBarTexture          = "sArena Stripes 2",
         castbarStatusBarTexture       = "sArena Default",
+        castbarUninterruptibleTexture = "sArena Default",
     },
     retextureHealerClassStackOnly = true,
 

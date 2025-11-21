@@ -1,5 +1,13 @@
 local LSM = LibStub("LibSharedMedia-3.0")
 local isRetail = sArenaMixin.isRetail
+local isMidnight = sArenaMixin.isMidnight
+
+local midnightInfo
+if not isMidnight then
+    midnightInfo = "|cff00ff00UPDATE: All now available on Midnight.|r\n\nI'm planning to continue developing |cffffffffsArena |cffff8000Reloaded|r |T135884:13:13|t for Midnight as well.\n\nSome features will need to be adjusted or removed but the addon should stick around.\nMidnight is still in early Alpha and I haven't started preparing yet (14th Oct), but I will soon.\n\nPlans might change, but I'm confident |cffffffffsArena |cffff8000Reloaded|r |T135884:13:13|t and my other addons\n|A:gmchat-icon-blizz:16:16|aBetter|cff00c0ffBlizz|rFrames & |A:gmchat-icon-blizz:16:16|aBetter|cff00c0ffBlizz|rPlates will stick around for Midnight (with changes/removals).\n\nI have a lot of work ahead of me, and any support is greatly appreciated. (|cff00c0ff@bodify|r)\nI'll update this section with more detailed information as I know more in some weeks/months."
+else
+    midnightInfo = "Welcome to Midnight! My other addons |A:gmchat-icon-blizz:16:16|aBetter|cff00c0ffBlizz|rFrames & |A:gmchat-icon-blizz:16:16|aBetter|cff00c0ffBlizz|rPlates are also being worked on.\n\nThings will change rapidly during development here, especially as new API becomes available.\nThis Midnight Beta is premature and a lot of stuff is still missing in the game.\nI will experiment with a lot of things until the release of Midnight.\n\nCurrently this has changed:\n1) DR's are now handled by Blizzard, sArena only tweaks as much as allowed.\n 1.1) Gap setting is gone.\n 1.2) Individual sizing is gone.\n 1.3) Grow up/down is gone.\n 1.4) Icons are now Blizzards weird icons so those settings are gone.\n2) Non-CC auras are no longer shown, only CC that Blizzard lets us see.\n3) Absorbs on frames are gone.\n4)Racial cooldown can't be tracked, but racial is still visible.\n5) Dispels are gone..\n\nNot everything is fully set in stone and there might be new stuff popping up but we will see. I will keep this updated here."
+end
 
 local function GetSpellInfoCompat(spellID)
     if not spellID then
@@ -248,6 +256,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                                     generalStatusBarTexture = "sArena Default",
                                     healStatusBarTexture    = "sArena Default",
                                     castbarStatusBarTexture = "sArena Default",
+                                    castbarUninterruptibleTexture = "sArena Default",
                                 }
                                 layout.textures.generalStatusBarTexture = key
                                 info.handler:UpdateTextures()
@@ -272,6 +281,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                                     generalStatusBarTexture = "sArena Default",
                                     healStatusBarTexture    = "sArena Default",
                                     castbarStatusBarTexture = "sArena Default",
+                                    castbarUninterruptibleTexture = "sArena Default",
                                 }
                                 layout.textures.healStatusBarTexture = key
                                 info.handler:UpdateTextures()
@@ -695,6 +705,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             set   = function(info, val)
                                 local castDB = info.handler.db.profile.layoutSettings[layoutName].castBar
                                 castDB.useModernCastbars = val
+                                info.handler:UpdateTextures()
+                                info.handler:RefreshTestModeCastbars()
                                 info.handler:RefreshConfig()
                             end,
                         },
@@ -711,6 +723,8 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             set      = function(info, val)
                                 local castDB = info.handler.db.profile.layoutSettings[layoutName].castBar
                                 castDB.keepDefaultModernTextures = val
+                                info.handler:UpdateTextures()
+                                info.handler:RefreshTestModeCastbars()
                                 info.handler:RefreshConfig()
                             end,
                         },
@@ -808,6 +822,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                                     generalStatusBarTexture = "sArena Default",
                                     healStatusBarTexture    = "sArena Default",
                                     castbarStatusBarTexture = "sArena Default",
+                                    castbarUninterruptibleTexture = "sArena Default",
                                 }
                                 layout.textures.castbarStatusBarTexture = key
                                 info.handler:UpdateTextures()
@@ -816,6 +831,183 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             disabled      = function(info)
                                 return info.handler.db.profile.layoutSettings[layoutName].castBar.useModernCastbars and info.handler.db.profile.layoutSettings[layoutName].castBar.keepDefaultModernTextures
                             end,
+                        },
+                        castbarUninterruptibleTexture = {
+                            order         = 3.5,
+                            type          = "select",
+                            name          = "|A:GarrMission_ClassIcon-DemonHunter-Outcast:20:20|a Uninterruptible Texture",
+                            style         = "dropdown",
+                            dialogControl = "LSM30_Statusbar",
+                            values        = StatusbarValues,
+                            get           = function(info)
+                                local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                local t = layout.textures
+                                return (t and t.castbarUninterruptibleTexture) or (t and t.castbarStatusBarTexture) or "sArena Default"
+                            end,
+                            set           = function(info, key)
+                                local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                layout.textures = layout.textures or {
+                                    generalStatusBarTexture = "sArena Default",
+                                    healStatusBarTexture    = "sArena Default",
+                                    castbarStatusBarTexture = "sArena Default",
+                                    castbarUninterruptibleTexture = "sArena Default",
+                                }
+                                layout.textures.castbarUninterruptibleTexture = key
+                                info.handler:UpdateTextures()
+                            end,
+                            width         = "75%",
+                            disabled      = function(info)
+                                return info.handler.db.profile.layoutSettings[layoutName].castBar.useModernCastbars and info.handler.db.profile.layoutSettings[layoutName].castBar.keepDefaultModernTextures
+                            end,
+                        },
+                        castBarColorsGroup = {
+                            order = 4,
+                            type = "group",
+                            name = "Castbar Colors",
+                            inline = true,
+                            args = {
+                                recolorCastbar = {
+                                    order = 0,
+                                    type = "toggle",
+                                    width = "full",
+                                    name = "Recolor Castbar",
+                                    desc = "Enable custom castbar colors",
+                                    get = function(info)
+                                        local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                        return layout.castBar.recolorCastbar or false
+                                    end,
+                                    set = function(info, val)
+                                        local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                        layout.castBar.recolorCastbar = val
+                                        info.handler:UpdateCastbarColors()
+                                        info.handler:UpdateTextures()
+                                        info.handler:RefreshTestModeCastbars()
+                                    end,
+                                },
+                                standard = {
+                                    order = 1,
+                                    disabled = function(info)
+                                        local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                        return not layout.castBar.recolorCastbar
+                                    end,
+                                    type = "color",
+                                    name = "Cast",
+                                    hasAlpha = true,
+                                    get = function(info)
+                                        local colors = info.handler.db.profile.castBarColors
+                                        if colors and colors.standard then
+                                            return unpack(colors.standard)
+                                        end
+                                        return 1.0, 0.7, 0.0, 1
+                                    end,
+                                    set = function(info, r, g, b, a)
+                                        info.handler.db.profile.castBarColors = info.handler.db.profile.castBarColors or {}
+                                        info.handler.db.profile.castBarColors.standard = {r, g, b, a}
+                                        info.handler:UpdateCastbarColors()
+                                        info.handler:UpdateTextures()
+                                        info.handler:RefreshTestModeCastbars()
+                                    end,
+                                },
+                                channel = {
+                                    order = 2,
+                                    type = "color",
+                                    name = "Channeled",
+                                    hasAlpha = true,
+                                    disabled = function(info)
+                                        local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                        return not layout.castBar.recolorCastbar
+                                    end,
+                                    get = function(info)
+                                        local colors = info.handler.db.profile.castBarColors
+                                        if colors and colors.channel then
+                                            return unpack(colors.channel)
+                                        end
+                                        return 0.0, 1.0, 0.0, 1
+                                    end,
+                                    set = function(info, r, g, b, a)
+                                        info.handler.db.profile.castBarColors = info.handler.db.profile.castBarColors or {}
+                                        info.handler.db.profile.castBarColors.channel = {r, g, b, a}
+                                        info.handler:UpdateCastbarColors()
+                                        info.handler:UpdateTextures()
+                                        info.handler:RefreshTestModeCastbars()
+                                    end,
+                                },
+                                uninterruptable = {
+                                    order = 3,
+                                    type = "color",
+                                    name = "Uninterruptible",
+                                    hasAlpha = true,
+                                    disabled = function(info)
+                                        local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                        return not layout.castBar.recolorCastbar
+                                    end,
+                                    get = function(info)
+                                        local colors = info.handler.db.profile.castBarColors
+                                        if colors and colors.uninterruptable then
+                                            return unpack(colors.uninterruptable)
+                                        end
+                                        return 0.7, 0.7, 0.7, 1
+                                    end,
+                                    set = function(info, r, g, b, a)
+                                        info.handler.db.profile.castBarColors = info.handler.db.profile.castBarColors or {}
+                                        info.handler.db.profile.castBarColors.uninterruptable = {r, g, b, a}
+                                        info.handler:UpdateCastbarColors()
+                                        info.handler:UpdateTextures()
+                                        info.handler:RefreshTestModeCastbars()
+                                    end,
+                                },
+                            },
+                        },
+                        interruptNotReadyGroup = {
+                            order = 5,
+                            type = "group",
+                            name = "Interrupt Not Ready",
+                            inline = true,
+                            args = {
+                                interruptStatusColorOn = {
+                                    order = 1,
+                                    type = "toggle",
+                                    width = "full",
+                                    name = "Enable No Interrupt Color",
+                                    desc = "Enable to color the castbars this color when you have no interrupt ready",
+                                    get = function(info)
+                                        local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                        return layout.castBar.interruptStatusColorOn or false
+                                    end,
+                                    set = function(info, val)
+                                        local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                        layout.castBar.interruptStatusColorOn = val
+                                        info.handler:UpdateCastbarColors()
+                                        info.handler:UpdateTextures()
+                                        info.handler:RefreshTestModeCastbars()
+                                    end,
+                                },
+                                interruptNotReady = {
+                                    order = 2,
+                                    type = "color",
+                                    name = "Interrupt Not Ready Color",
+                                    width = "full",
+                                    hasAlpha = true,
+                                    disabled = function(info)
+                                        local layout = info.handler.db.profile.layoutSettings[layoutName]
+                                        return not (layout.castBar.interruptStatusColorOn)
+                                    end,
+                                    get = function(info)
+                                        local colors = info.handler.db.profile.castBarColors
+                                        if colors and colors.interruptNotReady then
+                                            return unpack(colors.interruptNotReady)
+                                        end
+                                        return 1.0, 0.0, 0.0, 1
+                                    end,
+                                    set = function(info, r, g, b, a)
+                                        info.handler.db.profile.castBarColors = info.handler.db.profile.castBarColors or {}
+                                        info.handler.db.profile.castBarColors.interruptNotReady = {r, g, b, a}
+                                        info.handler:UpdateCastbarColors()
+                                        info.handler:UpdateTextures()
+                                        info.handler:RefreshTestModeCastbars()
+                                    end,
+                                },
+                            },
                         },
                     },
                 },
@@ -1114,6 +1306,9 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             softMin = 0,
                             softMax = 32,
                             step = 1,
+                            disabled = function()
+                                return sArenaMixin.isMidnight
+                            end,
                         },
                         growthDirection = {
                             order = 4,
@@ -1173,6 +1368,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                     name = "DR Specific Size Adjustment",
                     type = "group",
                     inline = true,
+                    disabled = function() return isMidnight end,
                     args = {},
                 },
             },
@@ -2326,15 +2522,16 @@ end
 
 function sArenaMixin:UpdateCastBarPixelBorders()
     local currentLayout = self.db and self.db.profile and self.db.profile.currentLayout
-    local isPixelatedLayout = (currentLayout == "Pixelated")
+    local isPixelBorderLayout = (currentLayout == "Pixelated" or currentLayout == "BlizzRaid")
     local layoutSettings = self.db and self.db.profile and self.db.profile.layoutSettings and self.db.profile.layoutSettings[currentLayout]
     local cropIcons = layoutSettings and layoutSettings.cropIcons or false
+    local useModernCastbars = layoutSettings and layoutSettings.castBar and layoutSettings.castBar.useModernCastbars or false
 
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena" .. i]
 
         if frame.CastBar.castBar then
-            if isPixelatedLayout then
+            if isPixelBorderLayout and not useModernCastbars then
                 frame.CastBar.castBar:Show()
             else
                 frame.CastBar.castBar:Hide()
@@ -2342,15 +2539,110 @@ function sArenaMixin:UpdateCastBarPixelBorders()
         end
 
         if frame.CastBar.castBarIcon then
-            if isPixelatedLayout then
+            if isPixelBorderLayout and not useModernCastbars then
                 frame.CastBar.castBarIcon:Show()
             else
                 frame.CastBar.castBarIcon:Hide()
             end
         end
 
-        local shouldCrop = isPixelatedLayout or cropIcons
+        local shouldCrop = isPixelBorderLayout or cropIcons
         frame:SetTextureCrop(frame.CastBar.Icon, shouldCrop)
+    end
+end
+
+function sArenaMixin:UpdateCastbarColors()
+    local currentLayout = self.db and self.db.profile and self.db.profile.currentLayout
+    local layoutSettings = self.db and self.db.profile and self.db.profile.layoutSettings and self.db.profile.layoutSettings[currentLayout]
+    local recolorEnabled = layoutSettings and layoutSettings.castBar and layoutSettings.castBar.recolorCastbar
+    local interruptStatusColorOn = layoutSettings and layoutSettings.castBar and layoutSettings.castBar.interruptStatusColorOn
+    local colors = self.db and self.db.profile and self.db.profile.castBarColors
+
+    if layoutSettings then
+        sArenaMixin.interruptStatusColorOn = interruptStatusColorOn
+    end
+
+    local defaultStandard = { 1.0, 0.7, 0.0, 1 }
+    local defaultChannel = { 0.0, 1.0, 0.0, 1 }
+    local defaultUninterruptable = { 0.7, 0.7, 0.7, 1 }
+    local defaultInterruptNotReady = { 1.0, 0.0, 0.0, 1 }
+
+    if colors then
+        local standardColor = colors.standard or defaultStandard
+        local channelColor = colors.channel or defaultChannel
+        local uninterruptableColor = colors.uninterruptable or defaultUninterruptable
+        local interruptNotReadyColor = colors.interruptNotReady or defaultInterruptNotReady
+
+        -- Update the colors in ModernCastbar.lua's actionColors table
+        sArenaMixin.castbarColors = {
+            enabled = recolorEnabled,
+            standard = standardColor,
+            channel = channelColor,
+            uninterruptable = uninterruptableColor,
+            interruptNotReady = interruptNotReadyColor,
+        }
+    end
+
+    -- Update MoP castbar colors for already-created castbars
+    if sArenaMixin.isMoP and self.UpdateMoPCastbarColors then
+        self:UpdateMoPCastbarColors()
+    end
+end
+
+function sArenaMixin:RefreshTestModeCastbars()
+    for i = 1, self.maxArenaOpponents do
+        local frame = self["arena" .. i]
+        if frame and frame.tempCast and frame.CastBar:IsShown() then
+            local db = self.db
+            local layout = db.profile.layoutSettings[db.profile.currentLayout]
+            local recolorEnabled = layout and layout.castBar and layout.castBar.recolorCastbar
+            local colors = db.profile.castBarColors
+            local barTexture = frame.CastBar:GetStatusBarTexture()
+            local useModernCastbars = layout and layout.castBar and layout.castBar.useModernCastbars
+            local keepDefaultModernTextures = layout and layout.castBar and layout.castBar.keepDefaultModernTextures
+
+            -- Update texture based on cast type
+            if not (useModernCastbars and keepDefaultModernTextures) then
+                local texKeys = layout.textures or {
+                    generalStatusBarTexture = "sArena Default",
+                    healStatusBarTexture    = "sArena Default",
+                    castbarStatusBarTexture = "sArena Default",
+                    castbarUninterruptibleTexture = "sArena Default",
+                }
+
+                local castPath
+                if frame.tempUninterruptible then
+                    castPath = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.castbarUninterruptibleTexture or texKeys.castbarStatusBarTexture)
+                else
+                    castPath = LSM:Fetch(LSM.MediaType.STATUSBAR, texKeys.castbarStatusBarTexture)
+                end
+                frame.CastBar:SetStatusBarTexture(castPath)
+            end
+
+            if recolorEnabled and colors then
+                if frame.CastBar.BorderShield:IsShown() then
+                    frame.CastBar:SetStatusBarColor(unpack(colors.uninterruptable or {0.7, 0.7, 0.7, 1}))
+                elseif frame.tempChannel then
+                    frame.CastBar:SetStatusBarColor(unpack(colors.channel or {0.0, 1.0, 0.0, 1}))
+                else
+                    frame.CastBar:SetStatusBarColor(unpack(colors.standard or {1.0, 0.7, 0.0, 1}))
+                end
+                barTexture:SetDesaturated(true)
+            else
+                if useModernCastbars and keepDefaultModernTextures then
+                    barTexture:SetDesaturated(false)
+                    frame.CastBar:SetStatusBarColor(1, 1, 1)
+                else
+                    if frame.CastBar.BorderShield:IsShown() then
+                        frame.CastBar:SetStatusBarColor(0.7, 0.7, 0.7, 1)
+                    elseif frame.tempChannel then
+                        frame.CastBar:SetStatusBarColor(0, 1, 0, 1)
+                    else
+                        frame.CastBar:SetStatusBarColor(1, 0.7, 0, 1)
+                    end
+                end
+            end
+        end
     end
 end
 
@@ -2415,24 +2707,755 @@ local function CreatePixelTextureBorder(parent, target, key, size, offset)
     holder:Show()
 end
 
+-- Initialize DR frames for Midnight
+function sArenaMixin:InitializeDRFrames()
+    if not sArenaMixin.isMidnight then return end
+
+
+    if EditModeManagerFrame and EditModeManagerFrame.AccountSettings then
+        ShowUIPanel(EditModeManagerFrame)
+    end
+
+    local layoutdb = self.db.profile.layoutSettings[self.db.profile.currentLayout]
+    local growthDirection = layoutdb.dr.growthDirection
+
+    for i = 1, sArenaMixin.maxArenaOpponents do
+        local blizzArenaFrame = _G["CompactArenaFrameMember" .. i]
+        local arenaFrame = self["arena" .. i]
+
+        if not blizzArenaFrame or not arenaFrame then return end
+
+        -- Initialize DR frames from Blizzard's SpellDiminishStatusTray
+        local drTray = blizzArenaFrame.SpellDiminishStatusTray
+        if not drTray then return end
+
+        drTray:SetParent(arenaFrame)
+        arenaFrame.drTray = drTray
+        drTray:SetFrameStrata("MEDIUM")
+        drTray:SetFrameLevel(10)
+        drTray:EnableMouse(false)
+        drTray:SetMouseClickEnabled(false)
+        --local arenaExtraOffset = 0
+        -- if inArena then
+        --     -- If reloaded in arena the DR frames are secrets and can't be adjusted.
+        --     -- Instead we mimic the users settings the best we can using only the parent frame.
+        --     drTray:SetScale(1.2)
+        --     arenaExtraOffset = 20
+        --     sArenaMixin.launchedDuringArena = true
+        -- end
+        drTray:ClearAllPoints()
+        local offset = ((sArenaMixin.drBaseSize or 28) / 2)-- + arenaExtraOffset
+
+        local anchorPoint
+        if (growthDirection == 4) then
+            anchorPoint = "RIGHT"
+        elseif (growthDirection == 3) then
+            anchorPoint = "LEFT"
+        elseif (growthDirection == 1) then
+            anchorPoint = "RIGHT"
+        elseif (growthDirection == 2) then
+            anchorPoint = "RIGHT"
+        end
+        drTray:SetPoint(anchorPoint, arenaFrame, "CENTER", layoutdb.dr.posX + offset, layoutdb.dr.posY)
+
+
+        -- Get the 4 DR frames from the tray
+        local drFrames = {drTray:GetChildren()}
+        arenaFrame.drFrames = drFrames
+
+        -- Initialize each DR frame with custom borders
+        for drIndex, drFrame in ipairs(drFrames) do
+            if drFrame and drFrame.Icon then
+                drFrame:SetFrameStrata("MEDIUM")
+                drFrame:SetFrameLevel(11)
+                drFrame:SetAlpha(1)
+                drFrame:Show()
+                drFrame.Icon:Show()
+                drFrame:EnableMouse(false)
+                drFrame:SetMouseClickEnabled(false)
+
+                -- Create border for active DR (will be styled by UpdateDRSettings)
+                if not drFrame.Border then
+                    drFrame.Border = drFrame:CreateTexture(nil, "OVERLAY", nil, 6)
+                    drFrame.Border:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+                    drFrame.Border:SetAllPoints(drFrame)
+                    drFrame.Border:SetVertexColor(0,1,0)
+
+                    drFrame.ImmunityIndicator:SetFrameStrata("MEDIUM")
+                    drFrame.ImmunityIndicator:SetFrameLevel(27)
+
+                    drFrame.BorderImmune = drFrame:CreateTexture(nil, "OVERLAY", nil, 7)
+                    drFrame.BorderImmune:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+                    drFrame.BorderImmune:SetAllPoints(drFrame)
+                    drFrame.BorderImmune:SetIgnoreParentAlpha(true)
+                    drFrame.BorderImmune:SetVertexColor(1,0,0,1)
+                    hooksecurefunc(drFrame.Border, "SetTexture", function(self, texture)
+                        drFrame.BorderImmune:SetTexture(texture)
+                    end)
+                end
+
+                if not drFrame.DRTextFrame then
+                    drFrame.DRTextFrame = CreateFrame("Frame", nil, drFrame)
+                    drFrame.DRTextFrame:SetAllPoints(drFrame)
+                    drFrame.DRTextFrame:SetFrameStrata("MEDIUM")
+                    drFrame.DRTextFrame:SetFrameLevel(26)
+
+                    drFrame.DRText = drFrame.DRTextFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+                    drFrame.DRText:SetPoint("BOTTOMRIGHT", 4, -4)
+                    drFrame.DRText:SetFont("Interface\\AddOns\\sArena_MoP\\Textures\\arialn.ttf", 14, "OUTLINE")
+                    drFrame.DRText:SetTextColor(0, 1, 0)
+                    drFrame.DRText:SetText("½")
+
+                    drFrame.DRText2 = drFrame.DRTextFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+                    drFrame.DRText2:SetPoint("BOTTOMRIGHT", 4, -4)
+                    drFrame.DRText2:SetFont("Interface\\AddOns\\sArena_MoP\\Textures\\arialn.ttf", 14, "OUTLINE")
+                    drFrame.DRText2:SetTextColor(1, 0, 0)
+                    drFrame.DRText2:SetText("%")
+                    drFrame.DRText2:SetParent(drFrame.ImmunityIndicator)
+                    drFrame.DRText2:SetIgnoreParentAlpha(true)
+                    drFrame.DRText2:SetAlpha(1)
+
+                end
+
+                if not drFrame.Boverlay then
+                    drFrame.Boverlay = CreateFrame("Frame", nil, drFrame)
+                    drFrame.Boverlay:SetFrameStrata("MEDIUM")
+                    drFrame.Boverlay:SetFrameLevel(26)
+                end
+                drFrame.Boverlay:Show()
+                drFrame.Border:SetParent(drFrame.Boverlay)
+                drFrame.BorderImmune:SetParent(drFrame.ImmunityIndicator)
+                drFrame.ImmunityIndicator:SetAlpha(0)
+
+                -- Border color will be set by UpdateDRSettings
+                drFrame.Border:Show()
+                if not drFrame.Cooldown then
+                    drFrame.Cooldown = drFrame.Icon
+                end
+            end
+        end
+    end
+
+    -- Apply DR settings after all frames are initialized
+    if self.layoutdb and self.layoutdb.dr then
+        self:UpdateDRSettings(self.layoutdb.dr)
+    end
+
+
+    if EditModeManagerFrame and EditModeManagerFrame.AccountSettings then
+        HideUIPanel(EditModeManagerFrame)
+    end
+
+end
+
 function sArenaMixin:UpdateDRSettings(db, info, val)
-    local categories = drCategorieslist
+    -- Early return if db is nil or frames aren't ready
+    if not db then return end
 
     if (val) then
         db[info[#info]] = val
     end
 
+    -- For Midnight: full DR settings support with new frame structure
+    if sArenaMixin.isMidnight then
+        sArenaMixin.drBaseSize = db.size or 28
+        for i = 1, sArenaMixin.maxArenaOpponents do
+            local frame = self["arena" .. i]
+            -- Handle DR swipe settings (global setting) - defined here for both real and fake frames
+            local disableSwipeEdge = self.db.profile.disableSwipeEdge
+            local disableDRSwipe = self.db.profile.disableDRSwipe
+            local reverseDR = self.db.profile.invertDRCooldown
+
+            -- Settings for positioning
+            local growthDirection = db.growthDirection or 4
+            local spacing = db.spacing or 3
+            local size = db.size or 28
+
+            if frame and frame.drFrames then
+                -- Get Blizzard's DR tray for positioning
+                local blizzArenaFrame = _G["CompactArenaFrameMember" .. i]
+                local drTray = blizzArenaFrame and blizzArenaFrame.SpellDiminishStatusTray
+
+                if drTray then
+                    -- Position the tray
+                    --local arenaScale = 0.05143 * size - 0.24
+                    local arenaOffset = 0--2.43 * size - 52
+                    -- local _, instanceType = IsInInstance()
+                    -- local inArena = (instanceType == "arena")
+                    -- if inArena then
+                    --     -- If reloaded in arena the DR frames are secrets and can't be adjusted.
+                    --     -- Instead we mimic the users settings the best we can using only the parent frame.
+                    --     drTray:SetScale(arenaScale) -- 1.2 == 28 size, 1.56 == 35 size.
+                    --     -- For default settings, aka 28 size. We need to do SetScale(1.2) and offset by 15.
+                    --     -- For 35 size, we do SetScale(1.56) and offset by 32.
+                    --     sArenaMixin.launchedDuringArena = true
+                    -- end
+
+                    local anchorPoint
+                    if (growthDirection == 4) then
+                        anchorPoint = "RIGHT"
+                    elseif (growthDirection == 3) then
+                        anchorPoint = "LEFT"
+                    elseif (growthDirection == 1) then
+                        anchorPoint = "RIGHT"
+                    elseif (growthDirection == 2) then
+                        anchorPoint = "RIGHT"
+                    end
+                    drTray:ClearAllPoints()
+                    local offset = ((sArenaMixin.drBaseSize or 28) / 2) + (sArenaMixin.launchedDuringArena and arenaOffset or 0)
+                    drTray:SetPoint(anchorPoint, frame, "CENTER", db.posX + offset, db.posY)
+                end
+
+                for drIndex, drFrame in ipairs(frame.drFrames) do
+                    if drFrame then
+                        -- Set size
+                        drFrame:SetSize(size, size)
+
+                        -- Position based on growth direction
+                        -- drFrame:ClearAllPoints()
+                        -- if drIndex == 1 then
+                        --     -- First frame anchors to the tray
+                        --     if drTray then
+                        --         drFrame:SetPoint("CENTER", drTray, "CENTER", 0, 0)
+                        --     end
+                        -- else
+                        --     -- Subsequent frames position relative to previous frame
+                        --     local prevFrame = frame.drFrames[drIndex - 1]
+                        --     if prevFrame then
+                        --         if growthDirection == 1 then
+                        --             -- Down
+                        --             drFrame:SetPoint("TOP", prevFrame, "BOTTOM", 0, -spacing)
+                        --         elseif growthDirection == 2 then
+                        --             -- Up
+                        --             drFrame:SetPoint("BOTTOM", prevFrame, "TOP", 0, spacing)
+                        --         elseif growthDirection == 3 then
+                        --             -- Right
+                        --             drFrame:SetPoint("LEFT", prevFrame, "RIGHT", spacing, 0)
+                        --         elseif growthDirection == 4 then
+                        --             -- Left (default)
+                        --             drFrame:SetPoint("RIGHT", prevFrame, "LEFT", -spacing, 0)
+                        --         end
+                        --     end
+                        -- end
+
+                        -- Handle swipe/edge settings if Cooldown exists
+                        if drFrame.Cooldown then
+                            drFrame.Cooldown:SetReverse(reverseDR)
+                            if disableDRSwipe then
+                                drFrame.Cooldown:SetDrawSwipe(false)
+                                drFrame.Cooldown:SetDrawEdge(false)
+                            else
+                                drFrame.Cooldown:SetDrawSwipe(true)
+                                drFrame.Cooldown:SetDrawEdge(not disableSwipeEdge)
+                            end
+                        end
+
+                        -- Reset states before applying new styles
+                        if drFrame.Icon then
+                            drFrame.Icon:SetDrawLayer("ARTWORK", 0)
+                        end
+                        if drFrame.Boverlay then
+                            drFrame.Border:SetParent(drFrame)
+                            drFrame.Boverlay:Hide()
+                        end
+                        if drFrame.Mask and drFrame.Icon then
+                            drFrame.Icon:RemoveMaskTexture(drFrame.Mask)
+                        end
+                        if drFrame.PixelBorder then
+                            drFrame.PixelBorder:Hide()
+                        end
+                        if drFrame.PixelBorderImmune then
+                            drFrame.PixelBorderImmune:Hide()
+                        end
+
+                        -- Apply border styles
+                        if db.disableDRBorder then
+                            if drFrame.Border then
+                                drFrame.Border:Hide()
+                            end
+                            if drFrame.BorderImmune then
+                                drFrame.BorderImmune:Hide()
+                            end
+                            if drFrame.PixelBorder then
+                                drFrame.PixelBorder:Hide()
+                            end
+                            if drFrame.PixelBorderImmune then
+                                drFrame.PixelBorderImmune:Hide()
+                            end
+                            if drFrame.Icon then
+                                drFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                            end
+                            if drFrame.Cooldown then
+                                drFrame.Cooldown:SetSwipeTexture(1)
+                            end
+
+                        elseif db.thinPixelBorder then
+                            -- Thin pixel border style
+                            if drFrame.Border then
+                                drFrame.Border:Show()
+                                drFrame.Border:SetAtlas("communities-create-avatar-border-selected")
+                            end
+                            if drFrame.BorderImmune then
+                                drFrame.BorderImmune:Show()
+                                drFrame.BorderImmune:SetAtlas("communities-create-avatar-border-selected")
+                            end
+                            if drFrame.PixelBorder then
+                                drFrame.PixelBorder:Hide()
+                            end
+                            if drFrame.PixelBorderImmune then
+                                drFrame.PixelBorderImmune:Hide()
+                            end
+                            if drFrame.Icon then
+                                drFrame.Icon:SetTexCoord(0.05, 0.95, 0.07, 0.9)
+                            end
+                            if drFrame.Cooldown then
+                                drFrame.Cooldown:SetSwipeTexture(1)
+                            end
+
+                        elseif db.thickPixelBorder then
+                            -- Thick pixel border style with dual borders (green/red)
+                            if drFrame.Border then
+                                drFrame.Border:Hide()
+                            end
+                            if drFrame.BorderImmune then
+                                drFrame.BorderImmune:Hide()
+                            end
+                            local drSize = 2
+
+                            -- Create green border (active DR)
+                            CreatePixelTextureBorder(drFrame, drFrame, "PixelBorder", drSize, 0)
+                            drFrame.PixelBorder:Show()
+
+                            -- Create red border (immune) - parent to ImmunityIndicator
+                            if not drFrame.PixelBorderImmune then
+                                CreatePixelTextureBorder(drFrame, drFrame, "PixelBorderImmune", drSize, 0)
+                                drFrame.PixelBorderImmune:SetParent(drFrame.ImmunityIndicator)
+                                drFrame.PixelBorderImmune:SetIgnoreParentAlpha(true)
+                                -- Hook to keep both borders in sync when positioning
+                                hooksecurefunc(drFrame.PixelBorder, "ClearAllPoints", function()
+                                    if drFrame.PixelBorderImmune then
+                                        drFrame.PixelBorderImmune:ClearAllPoints()
+                                        drFrame.PixelBorderImmune:SetPoint("TOPLEFT", drFrame, "TOPLEFT", -drSize, drSize)
+                                        drFrame.PixelBorderImmune:SetPoint("BOTTOMRIGHT", drFrame, "BOTTOMRIGHT", drSize, -drSize)
+                                    end
+                                end)
+                            end
+                            drFrame.PixelBorderImmune:Show()
+
+                            if db.blackDRBorder then
+                                drFrame.PixelBorder:SetVertexColor(0, 0, 0, 1)
+                                drFrame.PixelBorderImmune:SetVertexColor(0, 0, 0, 1)
+                            else
+                                drFrame.PixelBorder:SetVertexColor(0, 1, 0, 1)
+                                drFrame.PixelBorderImmune:SetVertexColor(1, 0, 0, 1)
+                            end
+                            if drFrame.Icon then
+                                drFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                            end
+                            if drFrame.Cooldown then
+                                drFrame.Cooldown:SetSwipeTexture(1)
+                            end
+
+                        elseif db.drBorderGlowOff then
+                            -- Square border with cut corners (no glow)
+                            if drFrame.Border then
+                                drFrame.Border:Show()
+                                drFrame.Border:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+
+                                -- Set border color
+                                if db.blackDRBorder then
+                                    drFrame.Border:SetVertexColor(0, 0, 0, 1)
+                                    drFrame.BorderImmune:SetVertexColor(0, 0, 0, 1)
+                                else
+                                    drFrame.Border:SetVertexColor(0, 1, 0, 1)
+                                    drFrame.BorderImmune:SetVertexColor(1, 0, 0, 1)
+                                end
+                            end
+                            if drFrame.BorderImmune then
+                                drFrame.BorderImmune:Show()
+                                drFrame.BorderImmune:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+                            end
+                            if drFrame.PixelBorder then
+                                drFrame.PixelBorder:Hide()
+                            end
+                            if drFrame.PixelBorderImmune then
+                                drFrame.PixelBorderImmune:Hide()
+                            end
+                            if not drFrame.Mask then
+                                drFrame.Mask = drFrame:CreateMaskTexture()
+                            end
+                            drFrame.Mask:SetPoint("TOPLEFT", drFrame.Icon, "TOPLEFT", 0.5, -0.5)
+                            drFrame.Mask:SetPoint("BOTTOMRIGHT", drFrame.Icon, "BOTTOMRIGHT", -0.5, 0.5)
+                            if drFrame.Cooldown then
+                                drFrame.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\squarecutcornermask")
+                            end
+                            drFrame.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\squarecutcornermask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+                            if drFrame.Icon then
+                                drFrame.Icon:SetDrawLayer("OVERLAY", 7)
+                                drFrame.Icon:SetTexCoord(0.05, 0.95, 0.05, 0.9)
+                                drFrame.Icon:AddMaskTexture(drFrame.Mask)
+                            end
+
+                            -- Set border size
+                            local borderSize = 1.5
+                            if drFrame.Border then
+                                drFrame.Border:SetPoint("TOPLEFT", drFrame, "TOPLEFT", -borderSize, borderSize)
+                                drFrame.Border:SetPoint("BOTTOMRIGHT", drFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                                drFrame.BorderImmune:SetPoint("TOPLEFT", drFrame, "TOPLEFT", -borderSize, borderSize)
+                                drFrame.BorderImmune:SetPoint("BOTTOMRIGHT", drFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                            end
+
+                        elseif db.brightDRBorder then
+                            -- Bright/glow border style
+                            if drFrame.Border then
+                                drFrame.Border:Show()
+                                drFrame.Border:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\UI-HUD-ActionBar-PetAutoCast-Mask.tga")
+
+                                -- Set border color
+                                if db.blackDRBorder then
+                                    drFrame.Border:SetVertexColor(0, 0, 0, 1)
+                                    drFrame.BorderImmune:SetVertexColor(0, 0, 0, 1)
+                                else
+                                    drFrame.Border:SetVertexColor(0, 1, 0, 1)
+                                    drFrame.BorderImmune:SetVertexColor(1, 0, 0, 1)
+                                end
+                            end
+                            if drFrame.BorderImmune then
+                                drFrame.BorderImmune:Show()
+                                drFrame.BorderImmune:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\UI-HUD-ActionBar-PetAutoCast-Mask.tga")
+                            end
+                            if drFrame.PixelBorder then
+                                drFrame.PixelBorder:Hide()
+                            end
+                            if drFrame.PixelBorderImmune then
+                                drFrame.PixelBorderImmune:Hide()
+                            end
+                            if not drFrame.Mask then
+                                drFrame.Mask = drFrame:CreateMaskTexture()
+                            end
+                            drFrame.Mask:SetPoint("TOPLEFT", drFrame.Icon, "TOPLEFT", -1, 1)
+                            drFrame.Mask:SetPoint("BOTTOMRIGHT", drFrame.Icon, "BOTTOMRIGHT", 1, -1)
+                            if isRetail then
+                                if drFrame.Cooldown then
+                                    drFrame.Cooldown:SetSwipeTexture("Interface\\TalentFrame\\talentsmasknodechoiceflyout")
+                                end
+                                drFrame.Mask:SetTexture("Interface\\TalentFrame\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+                            else
+                                if drFrame.Cooldown then
+                                    drFrame.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout")
+                                end
+                                drFrame.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+                            end
+                            if drFrame.Icon then
+                                drFrame.Icon:SetTexCoord(0.05, 0.95, 0.05, 0.9)
+                                drFrame.Icon:AddMaskTexture(drFrame.Mask)
+                            end
+
+                            if not drFrame.Boverlay then
+                                drFrame.Boverlay = CreateFrame("Frame", nil, drFrame)
+                                drFrame.Boverlay:SetFrameStrata("MEDIUM")
+                                drFrame.Boverlay:SetFrameLevel(6)
+                            end
+                            drFrame.Boverlay:Show()
+                            if drFrame.Border then
+                                drFrame.Border:SetParent(drFrame.Boverlay)
+                            end
+
+                            -- Set border size
+                            local borderSize = 1
+                            if drFrame.Border then
+                                drFrame.Border:SetPoint("TOPLEFT", drFrame, "TOPLEFT", -borderSize, borderSize)
+                                drFrame.Border:SetPoint("BOTTOMRIGHT", drFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                                drFrame.BorderImmune:SetPoint("TOPLEFT", drFrame, "TOPLEFT", -borderSize, borderSize)
+                                drFrame.BorderImmune:SetPoint("BOTTOMRIGHT", drFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                            end
+
+                        else
+                            -- Default border style
+                            if drFrame.Border then
+                                drFrame.Border:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+                                drFrame.Border:Show()
+
+                                if db.blackDRBorder then
+                                    drFrame.Border:SetVertexColor(0, 0, 0, 1)
+                                    drFrame.BorderImmune:SetVertexColor(0, 0, 0, 1)
+                                else
+                                    drFrame.Border:SetVertexColor(0, 1, 0, 1)
+                                    drFrame.BorderImmune:SetVertexColor(1, 0, 0, 1)
+                                end
+
+                                local borderSize = db.borderSize or 1
+                                drFrame.Border:SetPoint("TOPLEFT", drFrame, "TOPLEFT", -borderSize, borderSize)
+                                drFrame.Border:SetPoint("BOTTOMRIGHT", drFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                                drFrame.BorderImmune:SetPoint("TOPLEFT", drFrame, "TOPLEFT", -borderSize, borderSize)
+                                drFrame.BorderImmune:SetPoint("BOTTOMRIGHT", drFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                            end
+                            if drFrame.BorderImmune then
+                                drFrame.BorderImmune:Show()
+                                drFrame.BorderImmune:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+                            end
+                            if drFrame.PixelBorder then
+                                drFrame.PixelBorder:Hide()
+                            end
+                            if drFrame.PixelBorderImmune then
+                                drFrame.PixelBorderImmune:Hide()
+                            end
+                            if drFrame.Icon then
+                                drFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                            end
+                            if drFrame.Cooldown then
+                                drFrame.Cooldown:SetSwipeTexture(1)
+                            end
+                        end
+                    end
+                end
+            end
+
+            -- Also update FAKE DR frames if they exist (from test mode)
+            if frame.fakeDRFrames then
+                for drIndex, fakeDRFrame in ipairs(frame.fakeDRFrames) do
+                    if fakeDRFrame then
+                        fakeDRFrame:SetSize(size, size)
+                        
+                        -- Set border and text colors based on DR index
+                        if fakeDRFrame.Border then
+                            if drIndex == 1 then
+                                fakeDRFrame.Border:SetVertexColor(1, 0, 0)
+                            else
+                                fakeDRFrame.Border:SetVertexColor(0, 1, 0)
+                            end
+                        end
+                        
+                        if fakeDRFrame.DRText then
+                            if drIndex == 1 then
+                                fakeDRFrame.DRText:SetTextColor(1, 0, 0)
+                                fakeDRFrame.DRText:SetText("%")
+                            else
+                                fakeDRFrame.DRText:SetTextColor(0, 1, 0)
+                                fakeDRFrame.DRText:SetText("½")
+                            end
+                        end
+                        
+                        if fakeDRFrame.Cooldown then
+                            fakeDRFrame.Cooldown:SetReverse(reverseDR)
+                            if disableDRSwipe then
+                                fakeDRFrame.Cooldown:SetDrawSwipe(false)
+                                fakeDRFrame.Cooldown:SetDrawEdge(false)
+                            else
+                                fakeDRFrame.Cooldown:SetDrawSwipe(true)
+                                fakeDRFrame.Cooldown:SetDrawEdge(not disableSwipeEdge)
+                            end
+                        end
+                        fakeDRFrame.Icon:SetDrawLayer("ARTWORK", 0)
+                        fakeDRFrame.Border:SetParent(fakeDRFrame)
+                        fakeDRFrame.Boverlay:Hide()
+                        if fakeDRFrame.Mask then
+                            fakeDRFrame.Icon:RemoveMaskTexture(fakeDRFrame.Mask)
+                        end
+                        if fakeDRFrame.PixelBorder then
+                            fakeDRFrame.PixelBorder:Hide()
+                        end
+
+                        if db.disableDRBorder then
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:Hide()
+                            end
+                            if fakeDRFrame.PixelBorder then
+                                fakeDRFrame.PixelBorder:Hide()
+                            end
+                            if fakeDRFrame.Icon then
+                                fakeDRFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                            end
+                            if fakeDRFrame.Cooldown then
+                                fakeDRFrame.Cooldown:SetSwipeTexture(1)
+                            end
+                            
+                        elseif db.thinPixelBorder then
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:Show()
+                                fakeDRFrame.Border:SetAtlas("communities-create-avatar-border-selected")
+                            end
+                            if fakeDRFrame.PixelBorder then
+                                fakeDRFrame.PixelBorder:Hide()
+                            end
+                            if fakeDRFrame.Icon then
+                                fakeDRFrame.Icon:SetTexCoord(0.05, 0.95, 0.07, 0.9)
+                            end
+                            if fakeDRFrame.Cooldown then
+                                fakeDRFrame.Cooldown:SetSwipeTexture(1)
+                            end
+
+                        elseif db.thickPixelBorder then
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:Hide()
+                            end
+                            local drSize = 2
+                            CreatePixelTextureBorder(fakeDRFrame, fakeDRFrame, "PixelBorder", drSize, 0)
+                            fakeDRFrame.PixelBorder:Show()
+
+                            if db.blackDRBorder then
+                                fakeDRFrame.PixelBorder:SetVertexColor(0, 0, 0, 1)
+                            else
+                                if drIndex == 1 then
+                                    fakeDRFrame.PixelBorder:SetVertexColor(1, 0, 0, 1)
+                                else
+                                    fakeDRFrame.PixelBorder:SetVertexColor(0, 1, 0, 1)
+                                end
+                            end
+                            if fakeDRFrame.Icon then
+                                fakeDRFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                            end
+                            if fakeDRFrame.Cooldown then
+                                fakeDRFrame.Cooldown:SetSwipeTexture(1)
+                            end
+
+                        elseif db.drBorderGlowOff then
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:Show()
+                                fakeDRFrame.Border:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+
+                                if db.blackDRBorder then
+                                    fakeDRFrame.Border:SetVertexColor(0, 0, 0, 1)
+                                    fakeDRFrame.BorderImmune:SetVertexColor(0, 0, 0, 1)
+                                else
+                                    if drIndex == 1 then
+                                        fakeDRFrame.Border:SetVertexColor(1, 0, 0, 1)
+                                        fakeDRFrame.BorderImmune:SetVertexColor(1, 0, 0, 1)
+                                    else
+                                        fakeDRFrame.Border:SetVertexColor(0, 1, 0, 1)
+                                        fakeDRFrame.BorderImmune:SetVertexColor(0, 1, 0, 1)
+                                    end
+                                end
+                            end
+                            if fakeDRFrame.PixelBorder then
+                                fakeDRFrame.PixelBorder:Hide()
+                            end
+                            if not fakeDRFrame.Mask then
+                                fakeDRFrame.Mask = fakeDRFrame:CreateMaskTexture()
+                            end
+                            fakeDRFrame.Mask:SetPoint("TOPLEFT", fakeDRFrame.Icon, "TOPLEFT", 0.5, -0.5)
+                            fakeDRFrame.Mask:SetPoint("BOTTOMRIGHT", fakeDRFrame.Icon, "BOTTOMRIGHT", -0.5, 0.5)
+                            if fakeDRFrame.Cooldown then
+                                fakeDRFrame.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\squarecutcornermask")
+                            end
+                            fakeDRFrame.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\squarecutcornermask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+                            if fakeDRFrame.Icon then
+                                fakeDRFrame.Icon:SetDrawLayer("OVERLAY", 7)
+                                fakeDRFrame.Icon:SetTexCoord(0.05, 0.95, 0.05, 0.9)
+                                fakeDRFrame.Icon:AddMaskTexture(fakeDRFrame.Mask)
+                            end
+
+                            local borderSize = 1.5
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:SetPoint("TOPLEFT", fakeDRFrame, "TOPLEFT", -borderSize, borderSize)
+                                fakeDRFrame.Border:SetPoint("BOTTOMRIGHT", fakeDRFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                            end
+                            
+                        elseif db.brightDRBorder then
+
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:Show()
+                                fakeDRFrame.Border:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\UI-HUD-ActionBar-PetAutoCast-Mask.tga")
+                                if db.blackDRBorder then
+                                    fakeDRFrame.Border:SetVertexColor(0, 0, 0, 1)
+                                else
+                                    if drIndex == 1 then
+                                        fakeDRFrame.Border:SetVertexColor(1, 0, 0, 1)
+                                    else
+                                        fakeDRFrame.Border:SetVertexColor(0, 1, 0, 1)
+                                    end
+                                end
+                            end
+                            if fakeDRFrame.PixelBorder then
+                                fakeDRFrame.PixelBorder:Hide()
+                            end
+                            if not fakeDRFrame.Mask then
+                                fakeDRFrame.Mask = fakeDRFrame:CreateMaskTexture()
+                            end
+                            fakeDRFrame.Mask:SetPoint("TOPLEFT", fakeDRFrame.Icon, "TOPLEFT", -1, 1)
+                            fakeDRFrame.Mask:SetPoint("BOTTOMRIGHT", fakeDRFrame.Icon, "BOTTOMRIGHT", 1, -1)
+                            if isRetail then
+                                if fakeDRFrame.Cooldown then
+                                    fakeDRFrame.Cooldown:SetSwipeTexture("Interface\\TalentFrame\\talentsmasknodechoiceflyout")
+                                end
+                                fakeDRFrame.Mask:SetTexture("Interface\\TalentFrame\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+                            else
+                                if fakeDRFrame.Cooldown then
+                                    fakeDRFrame.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout")
+                                end
+                                fakeDRFrame.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+                            end
+                            fakeDRFrame.Icon:SetTexCoord(0.05, 0.95, 0.05, 0.9)
+                            fakeDRFrame.Icon:AddMaskTexture(fakeDRFrame.Mask)
+                            if not fakeDRFrame.Boverlay then
+                                fakeDRFrame.Boverlay = CreateFrame("Frame", nil, fakeDRFrame)
+                                fakeDRFrame.Boverlay:SetFrameStrata("MEDIUM")
+                                fakeDRFrame.Boverlay:SetFrameLevel(6)
+                            end
+                            fakeDRFrame.Boverlay:Show()
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:SetParent(fakeDRFrame.Boverlay)
+                            end
+
+                            local borderSize = 1
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:SetPoint("TOPLEFT", fakeDRFrame, "TOPLEFT", -borderSize, borderSize)
+                                fakeDRFrame.Border:SetPoint("BOTTOMRIGHT", fakeDRFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                            end
+                        else
+                            if fakeDRFrame.Border then
+                                fakeDRFrame.Border:SetTexture("Interface\\Buttons\\UI-Quickslot-Depress")
+                                fakeDRFrame.Border:Show()
+
+                                if db.blackDRBorder then
+                                    fakeDRFrame.Border:SetVertexColor(0, 0, 0, 1)
+                                else
+                                    if drIndex == 1 then
+                                        fakeDRFrame.Border:SetVertexColor(1, 0, 0, 1)
+                                    else
+                                        fakeDRFrame.Border:SetVertexColor(0, 1, 0, 1)
+                                    end
+                                end
+
+                                local borderSize = db.borderSize or 1
+                                fakeDRFrame.Border:SetPoint("TOPLEFT", fakeDRFrame, "TOPLEFT", -borderSize, borderSize)
+                                fakeDRFrame.Border:SetPoint("BOTTOMRIGHT", fakeDRFrame, "BOTTOMRIGHT", borderSize, -borderSize)
+                            end
+                            if fakeDRFrame.Icon then
+                                fakeDRFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                            end
+                            if fakeDRFrame.Cooldown then
+                                fakeDRFrame.Cooldown:SetSwipeTexture(1)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return
+    end
+
+    -- Legacy system for non-Midnight
+    local categories = drCategorieslist
     local categorySizeOffsets = db.drCategorySizeOffsets or {}
 
     sArenaMixin.drBaseSize = db.size
 
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena" .. i]
-        frame:UpdateDRPositions()
+        if not frame then return end
+
+        if frame.UpdateDRPositions then
+            frame:UpdateDRPositions()
+        end
 
         for n = 1, #categories do
             local category = categories[n]
             local dr = frame[category]
+            -- Skip if DR frame doesn't exist yet (not initialized)
+            if not dr then
+                return
+            end
 
             local offset = categorySizeOffsets[category] or 0
             local borderSize = (db.drBorderGlowOff and 1.5) or (db.brightDRBorder and 1) or db.borderSize or 1
@@ -2457,6 +3480,9 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
             -- Handle DR swipe settings (global setting)
             local disableSwipeEdge = self.db.profile.disableSwipeEdge
             local disableDRSwipe = self.db.profile.disableDRSwipe
+            local reverseDR = self.db.profile.invertDRCooldown
+
+            dr.Cooldown:SetReverse(reverseDR)
             if disableDRSwipe then
                 dr.Cooldown:SetDrawSwipe(false)
                 dr.Cooldown:SetDrawEdge(false)
@@ -2665,11 +3691,12 @@ function sArenaMixin:UpdateWidgetSettings(db, info, val)
         db[info[#info]] = val
     end
 
+    self:UnregisterWidgetEvents()
+    self:RegisterWidgetEvents()
+
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena" .. i]
 
-        frame:UnregisterWidgetEvents()
-        frame:RegisterWidgetEvents()
 
         frame.WidgetOverlay.combatIndicator:SetScale(db.combatIndicator.scale or 1)
         frame.WidgetOverlay.targetIndicator:SetScale(db.targetIndicator.scale or 1)
@@ -3141,17 +4168,20 @@ else
                                 name = "Dark Mode",
                                 type = "group",
                                 inline = true,
-                                hidden = function(info)
-                                    local layout = info.handler.db.profile.currentLayout
-                                    return layout == "Xaryu" or layout == "Gladiuish" or layout == "Pixelated"
-                                end,
                                 args = {
                                     darkMode = {
                                         order = 1,
                                         name = "Enable Dark Mode",
                                         type = "toggle",
                                         width = 1,
-                                        desc = "Enable Dark Mode for Arena Frames.\n\nCan be combined with Class Color FrameTexture. When combined, class colors take priority - use 'Only Class Icon' to apply class color to the icon while Dark Mode colors the rest.",
+                                        desc = function(info)
+                                            local baseDesc = "Enable Dark Mode for Arena Frames."
+                                            local layout = info.handler.db.profile.currentLayout
+                                            if layout == "BlizzCompact" then
+                                                return baseDesc .. "\n\nCan be combined with Class Color FrameTexture. When combined, class colors take priority - use 'Only Class Icon' to apply class color to the icon while Dark Mode colors the rest."
+                                            end
+                                            return baseDesc
+                                        end,
                                         get = function(info) return info.handler.db.profile.darkMode end,
                                         set = function(info, val)
                                             info.handler.db.profile.darkMode = val
@@ -3240,10 +4270,6 @@ else
                                         desc = "Apply class colors to frame textures (Borders)",
                                         type = "toggle",
                                         width = 1.1,
-                                        hidden = function(info)
-                                            local layout = info.handler.db.profile.currentLayout
-                                            return layout == "Xaryu" or layout == "Gladiuish"
-                                        end,
                                         get = function(info) return info.handler.db.profile.classColorFrameTexture end,
                                         set = function(info, val)
                                             info.handler.db.profile.classColorFrameTexture = val
@@ -3282,10 +4308,6 @@ else
                                         name = "Color Healer Green",
                                         desc = "Change healer frames to bright green instead of class color",
                                         type = "toggle",
-                                        hidden = function(info)
-                                            local layout = info.handler.db.profile.currentLayout
-                                            return layout == "Xaryu" or layout == "Gladiuish"
-                                        end,
                                         disabled = function(info) return not info.handler.db.profile.classColorFrameTexture end,
                                         get = function(info) return info.handler.db.profile.classColorFrameTextureHealerGreen end,
                                         set = function(info, val)
@@ -3355,6 +4377,22 @@ else
                                             for i = 1, sArenaMixin.maxArenaOpponents do
                                                 info.handler["arena" .. i].Name:SetShown(val)
                                                 info.handler["arena" .. i].Name:SetText("arena"..i)
+                                            end
+                                        end,
+                                    },
+                                    reverseBarsFill = {
+                                        order = 6,
+                                        name = "Reverse Bars Fill",
+                                        desc = "Make health and power bars fill from right to left instead of left to right",
+                                        type = "toggle",
+                                        width = "full",
+                                        get = function(info) return info.handler.db.profile.reverseBarsFill end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.reverseBarsFill = val
+                                            for i = 1, sArenaMixin.maxArenaOpponents do
+                                                local frame = info.handler["arena" .. i]
+                                                frame.HealthBar:SetReverseFill(val)
+                                                frame.PowerBar:SetReverseFill(val)
                                             end
                                         end,
                                     },
@@ -3562,8 +4600,10 @@ else
                                         get = function(info) return info.handler.db.profile.invertDRCooldown end,
                                         set = function(info, val)
                                             info.handler.db.profile.invertDRCooldown = val
-                                            for i = 1, sArenaMixin.maxArenaOpponents do
-                                                info.handler["arena" .. i]:UpdateDRCooldownReverse()
+                                            -- Update DR settings which now handles cooldown reverse
+                                            local layoutdb = info.handler.layoutdb
+                                            if layoutdb and layoutdb.dr then
+                                                info.handler:UpdateDRSettings(layoutdb.dr)
                                             end
                                         end
                                     },
@@ -3659,6 +4699,7 @@ else
                                     drResetTime = {
                                         order = 1,
                                         name = "DR Reset Time",
+                                        disabled = function() return isMidnight end,
                                         desc = isRetail and
                                         "Blizzard no longer uses a dynamic timer for DR resets, it is 18 seconds\n\nBy default sArena has a 0.5 leeway added so a total of 18.5 seconds." or
                                         "Blizzard uses a dynamic timer for DR resets, ranging between 15 and 20 seconds.\n\nSetting this to 20 seconds is the safest option, but you can lower it slightly (e.g., 18.5) for more aggressive tracking.",
@@ -3717,6 +4758,7 @@ else
                                 order = 2,
                                 name = "DR Categories",
                                 type = "group",
+                                disabled = function() return isMidnight end,
                                 inline = true,
                                 args = {
                                     drCategoriesPerClass = {
@@ -3823,6 +4865,7 @@ else
                             dynamicIcons = {
                                 order = 3,
                                 name = "DR Icons",
+                                disabled = function() return isMidnight end,
                                 type = "group",
                                 inline = true,
                                 args = {
@@ -3955,7 +4998,7 @@ else
                                     },
                                     forceShowTrinketOnHuman = {
                                         order = 2,
-                                        name = "Force Show Trinket on Human (Beta)",
+                                        name = "Force Show Trinket on Human",
                                         desc = "Always show the Alliance trinket texture on Human players, even if they don't have a trinket equipped.",
                                         type = "toggle",
                                         width = "full",
@@ -3970,7 +5013,7 @@ else
                                     },
                                     replaceHumanRacialWithTrinket = {
                                         order = 3,
-                                        name = "Replace Human Racial with Trinket (Beta)",
+                                        name = "Replace Human Racial with Trinket",
                                         desc = "Replace the Human racial ability with the Alliance trinket texture in the racial slot.",
                                         type = "toggle",
                                         width = "full",
@@ -3991,13 +5034,14 @@ else
                     },
                     dispelGroup = {
                         order = 4,
-                        name = "Dispels (BETA)",
+                        name = "Dispels",
+                        disabled = function() return isMidnight end,
                         type = "group",
                         args = (function()
                             local args = {
                                 showDispels = {
                                     order = 0,
-                                    name = "Show Dispels (BETA)",
+                                    name = "Show Dispels",
                                     desc = "Enable to show Dispel Cooldown on Arena Frames.",
                                     type = "toggle",
                                     width = "full",
@@ -4207,7 +5251,7 @@ else
                     description = {
                         order = 1,
                         type = "description",
-                        name = "I'm planning to continue developing |cffffffffsArena |cffff8000Reloaded|r |T135884:13:13|t for Midnight as well.\n\nSome features will need to be adjusted or removed but the addon should stick around.\nMidnight is still in early Alpha and I haven't started preparing yet (14th Oct), but I will soon.\n\nPlans might change, but I'm confident |cffffffffsArena |cffff8000Reloaded|r |T135884:13:13|t and my other addons\n|A:gmchat-icon-blizz:16:16|aBetter|cff00c0ffBlizz|rFrames & |A:gmchat-icon-blizz:16:16|aBetter|cff00c0ffBlizz|rPlates will stick around for Midnight (with changes/removals).\n\nI have a lot of work ahead of me, and any support is greatly appreciated. (|cff00c0ff@bodify|r)\nI'll update this section with more detailed information as I know more in some weeks/months.",
+                        name = midnightInfo,
                         fontSize = "medium",
                         width = "full",
                     },
@@ -4284,6 +5328,99 @@ else
                                 sArena_ReloadedDB.reOpenOptions = true
                             end
                         end,
+                    },
+                    spacer2 = {
+                        order = 6,
+                        type = "description",
+                        name = " ",
+                    },
+                    streamerProfilesHeader = {
+                        order = 7,
+                        type = "description",
+                        name = "|cffffff00Streamer Profiles:|r",
+                        fontSize = "large",
+                    },
+                    streamerProfilesDesc = {
+                        order = 8,
+                        type = "description",
+                        name = function(info)
+                            local name, realm = UnitName("player")
+                            realm = realm or GetRealmName()
+                            local fullKey = name .. " - " .. realm
+                            local currentProfileKey = sArena_ReloadedDB.profileKeys[fullKey] or "Default"
+                            return "Import pre-configured profiles from popular streamers.\nYou'll keep all your current profiles including your active \"|cff00ff00" .. currentProfileKey .. "|r\" profile.\nTo change profiles again go to the Profiles tab."
+                        end,
+                        fontSize = "medium",
+                    },
+                    streamerProfilesGroup = {
+                        order = 9,
+                        type = "group",
+                        name = "",
+                        inline = true,
+                        args = (function()
+                            local args = {}
+                            
+                            -- Class colors and icons
+                            local CLASS_COLORS = {
+                                ROGUE = "|cfffff569",
+                                WARRIOR = "|cffc79c6e",
+                                MAGE = "|cff40c7eb",
+                                DRUID = "|cffff7d0a",
+                                HUNTER = "|cffabd473",
+                                PRIEST = "|cffffffff",
+                                WARLOCK = "|cff8787ed",
+                                SHAMAN = "|cff0070de",
+                                PALADIN = "|cfff58cba",
+                                DEATHKNIGHT = "|cffc41f3b",
+                                MONK = "|cff00ff96",
+                                DEMONHUNTER = "|cffa330c9",
+                                EVOKER = "|cff33937f",
+                            }
+                            
+                            local CLASS_ICONS = {
+                                ROGUE = "groupfinder-icon-class-rogue",
+                                WARRIOR = "groupfinder-icon-class-warrior",
+                                MAGE = "groupfinder-icon-class-mage",
+                                DRUID = "groupfinder-icon-class-druid",
+                                HUNTER = "groupfinder-icon-class-hunter",
+                                PRIEST = "groupfinder-icon-class-priest",
+                                WARLOCK = "groupfinder-icon-class-warlock",
+                                SHAMAN = "groupfinder-icon-class-shaman",
+                                PALADIN = "groupfinder-icon-class-paladin",
+                                DEATHKNIGHT = "groupfinder-icon-class-deathknight",
+                                MONK = "groupfinder-icon-class-monk",
+                                DEMONHUNTER = "groupfinder-icon-class-demonhunter",
+                                EVOKER = "groupfinder-icon-class-evoker",
+                            }
+                            
+                            -- Create a sorted copy of profiles (alphabetically by name)
+                            local sortedProfiles = {}
+                            for _, profile in ipairs(sArenaMixin.streamProfiles) do
+                                table.insert(sortedProfiles, profile)
+                            end
+                            table.sort(sortedProfiles, function(a, b)
+                                return a.name < b.name
+                            end)
+                            
+                            -- Dynamically generate buttons from sorted streamProfiles table
+                            for order, profile in ipairs(sortedProfiles) do
+                                local key = profile.name:gsub(" ", ""):lower()
+                                local color = CLASS_COLORS[profile.class] or "|cffffffff"
+                                local icon = CLASS_ICONS[profile.class] or "groupfinder-icon-role-leader"
+                                
+                                args[key] = {
+                                    order = order,
+                                    name = string.format("|A:%s:16:16|a %s%s|r", icon, color, profile.name),
+                                    desc = "Import " .. profile.name .. "'s profile settings.\n\n" .. color .. "www.twitch.tv/" .. profile.stream .. "|r",
+                                    type = "execute",
+                                    func = function(info)
+                                        info.handler:ImportStreamerProfile(profile.name:gsub(" ", ""), profile.profileString, profile.name, color)
+                                    end,
+                                    width = "normal",
+                                }
+                            end
+                            return args
+                        end)(),
                     },
                 },
             }

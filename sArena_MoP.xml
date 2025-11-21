@@ -11,11 +11,14 @@
     <Script file="Ace3\Libs\LibDeflate\LibDeflate.lua"/>
     <Script file="Ace3\Libs\LibSerialize\LibSerialize.lua"/>
 
+    <Script file="sArena_Init.lua"/>
     <Script file="sArena.lua"/>
+    <Script file="Modules\Interrupt.lua"/>
     <Script file="Modules\Racials.lua"/>
     <Script file="Modules\Dispels.lua"/>
     <Script file="Data\DrList_MoP.lua"/>
     <Script file="Modules\DiminishingReturns.lua"/>
+    <Script file="Data\Profiles.lua"/>
     <Script file="Config.lua"/>
     <Script file="Data\AuraList_MoP.lua"/>
     <Script file="Modules\Auras.lua"/>

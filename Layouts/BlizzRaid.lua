@@ -1,63 +1,68 @@
-local layoutName = "Pixelated"
+local layoutName = "BlizzRaid"
 local layout = {}
-layout.name = "Pixelated |A:NewCharacter-Alliance:38:65|a"
+layout.name = "|cff00b4ffBlizz|r Raid |A:NewCharacter-Alliance:38:65|a"
 
 layout.defaultSettings = {
-    posX = 433,
-    posY = 143,
-    scale = 1.05,
+    posX = 485.2,
+    posY = 121.6,
+    scale = 1,
     classIconFontSize = 14,
-    spacing = 35,
+    spacing = 0,
     growthDirection = 1,
     classIcon = {
-        posX = 0,
-        posY = 0,
-        scale = 1,
+        posX = 40,
+        posY = -1,
+        scale = 0.6,
     },
     specIcon = {
-        posX = -21,
-        posY = -2,
-        scale = 1,
+        posX = -45,
+        posY = 38,
+        scale = 0.62,
     },
     trinket = {
-        posX = 105,
-        posY = 0,
-        scale = 1.049,
+        posX = 164.2,
+        posY = 23.7,
+        scale = 0.75,
         fontSize = 14,
     },
     racial = {
-        posX = 147,
-        posY = 0,
-        scale = 1.049,
+        posX = 210.4,
+        posY = 23.4,
+        scale = 0.75,
         fontSize = 14,
     },
     dispel = {
         posX = 189,
         posY = 0,
-        scale = 1.049,
+        scale = 1.049,--handle
         fontSize = 14,
     },
     castBar = {
-        posX = -125,
-        posY = -8.2,
-        scale = 1.33,
-        width = 115,
+        posX = -84.5,
+        posY = -14,
+        scale = 1.5,
+        width = 117,
         iconScale = 1,
-        iconPosX = 4,
+        iconPosX = -2,
+        iconPosY = 0,
+        simpleCastbar = true,
         keepDefaultModernTextures = true,
         recolorCastbar = false,
     },
     dr = {
-        posX = -110,
-        posY = 22,
-        size = 31,
+        posX = -106,
+        posY = 15,
+        size = 36,
         borderSize = 1,
         fontSize = 12,
         spacing = 7,
         growthDirection = 4,
-        thickPixelBorder = true,
+        thinPixelBorder = true,
     },
     widgets = {
+        enabled = true,
+        posX = 9,
+        posY = 5,
         combatIndicator = {
             posX = 0,
             posY = 0,
@@ -65,8 +70,8 @@ layout.defaultSettings = {
         },
         targetIndicator = {
             enabled = true,
-            posX = 0,
-            posY = 0,
+            posX = 9,
+            posY = 4,
             scale = 1,
         },
         focusIndicator = {
@@ -75,6 +80,7 @@ layout.defaultSettings = {
             scale = 1,
         },
         partyTargetIndicators = {
+            enabled = true,
             posX = 0,
             posY = 0,
             scale = 1,
@@ -95,24 +101,29 @@ layout.defaultSettings = {
 
     -- custom layout settings
     changeFont = true,
-    frameFont = "Prototype",
-    cdFont  = "Prototype",
-    width = 177,
-    height = 47,
+    frameFont = "Friz Quadrata TT",
+    cdFont  = "2002 Bold",
+    fontOutline = "",
+    width = 208,
+    height = 70,
     powerBarHeight = 9,
     pixelBorderSize = 1,
     drPixelBorderSize = 2,
     mirrored = true,
     classicBars = false,
-    replaceClassIcon = true,
     showSpecManaText = true,
     cropIcons = true,
 
     textSettings = {
         nameAnchor = "LEFT",
-        healthAnchor = "RIGHT",
+        nameOffsetX = 17,
+        nameOffsetY = 20,
+        healthAnchor = "CENTER",
+        healthOffsetY = -1,
+        healthSize = 1.4,
         powerAnchor = "RIGHT",
-        specNameAnchor = "LEFT",
+        specNameAnchor = "CENTER",
+        castbarSize = 1.02,
     },
 }
 
@@ -256,9 +267,6 @@ function sArenaMixin:RemovePixelBorders()
         -- Reset ClassIcon to default draw layer and scale
         frame.ClassIcon:SetDrawLayer("BORDER", 1)
         frame.ClassIcon:SetScale(1)
-        frame.ClassIconCooldown:SetFrameStrata("HIGH")
-        frame.ClassIconCooldown:SetUseCircularEdge(false)
-        frame.ClassIconCooldown:SetSwipeTexture(1)
 
         -- Reset cast bar icon position
         frame.CastBar.Icon:ClearAllPoints()
@@ -397,7 +405,7 @@ local function setupOptionsTable(self)
         set = setSetting,
     }
 
-    -- Add classIcon settings specific to Pixelated layout
+    -- Add classIcon settings specific to BlizzRaid layout
     layout.optionsTable.classIcon = {
         order = 1.5,
         name = "Class Icon",
@@ -467,6 +475,7 @@ local function setupOptionsTable(self)
             },
         },
     }
+
 end
 
 function layout:Initialize(frame)
@@ -508,6 +517,10 @@ function layout:Initialize(frame)
     frame.Dispel:SetSize(41, 41)
     frame.Name:SetTextColor(1,1,1)
     frame.SpecNameText:SetTextColor(1,1,1)
+    frame.ClassIconCooldown:SetFrameStrata("HIGH")
+    frame.ClassIconCooldown:SetUseCircularEdge(false)
+    frame.ClassIconCooldown:SetSwipeTexture(1)
+
 
     frame.Trinket.Cooldown:SetSwipeTexture(1)
     frame.Trinket.Cooldown:SetSwipeColor(0, 0, 0, 0.6)
@@ -610,7 +623,7 @@ function layout:Initialize(frame)
     local classIconScale = self.db.classIcon and self.db.classIcon.scale or 1
     frame.ClassIcon:SetScale(classIconScale)
     frame.ClassIcon:Show()
-    
+
     -- Raise ClassIcon above healthbar for overlaying
     frame.ClassIcon:SetDrawLayer("OVERLAY", 1)
 

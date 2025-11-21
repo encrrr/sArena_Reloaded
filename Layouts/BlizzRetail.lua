@@ -42,6 +42,7 @@ layout.defaultSettings = {
         iconPosY = 0,
         useModernCastbars = true,
         keepDefaultModernTextures = true,
+        recolorCastbar = false,
     },
     dr = {
         posX = -113,
@@ -60,6 +61,7 @@ layout.defaultSettings = {
             scale = 1.1,
         },
         targetIndicator = {
+            enabled = true,
             posX = 0,
             posY = 0,
             scale = 1.2,
@@ -80,6 +82,7 @@ layout.defaultSettings = {
         generalStatusBarTexture       = "Blizzard RetailBar",
         healStatusBarTexture          = "sArena Stripes 2",
         castbarStatusBarTexture       = "sArena Default",
+        castbarUninterruptibleTexture = "sArena Default",
     },
     retextureHealerClassStackOnly = true,
 
@@ -179,6 +182,12 @@ function layout:Initialize(frame)
     healthText:SetJustifyH("CENTER")
     healthText:SetPoint("CENTER", healthBar, "CENTER", 0, 0)
     healthText:SetDrawLayer("OVERLAY", 4)
+    local font, size, flags = healthText:GetFont()
+    healthText:SetFont(font, size, "OUTLINE")
+
+    local specNameText = frame.SpecNameText
+    local font, size, flags = specNameText:GetFont()
+    specNameText:SetFont(font, size, "OUTLINE")
 
     local powerText = frame.PowerText
     powerText:SetDrawLayer("OVERLAY", 4)
@@ -211,7 +220,7 @@ function layout:Initialize(frame)
     end
     trinket.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
     trinket.Mask:SetAllPoints(trinket.Texture)
-    trinket.Texture:SetTexCoord(0.03, 0.97, 0.03, 0.97)
+    trinket.Texture:SetTexCoord(0.04, 0.96, 0.04, 0.96)
     trinket.Texture:AddMaskTexture(trinket.Mask)
     trinket.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout")
     trinket.Border = trinketBorder
@@ -253,7 +262,7 @@ function layout:Initialize(frame)
     end
     racial.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
     racial.Mask:SetAllPoints(racial.Texture)
-    racial.Texture:SetTexCoord(0.03, 0.97, 0.03, 0.97)
+    racial.Texture:SetTexCoord(0.04, 0.96, 0.04, 0.96)
     racial.Texture:AddMaskTexture(racial.Mask)
     racial.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout")
     racial:SetSize(32.4, 32.4)

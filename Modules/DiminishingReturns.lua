@@ -1,3 +1,5 @@
+if sArenaMixin.isMidnight then return end
+
 local isRetail = sArenaMixin.isRetail
 -- DR's are static 18 seconds on Retail and dynamic 15-20 on MoP.
 -- 0.5 leeway is added for Retail
