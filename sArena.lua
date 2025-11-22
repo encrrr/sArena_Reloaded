@@ -3150,11 +3150,9 @@ function sArenaFrameMixin:SetStatusText(unit)
                 self.PowerText:SetText(FormatLargeNumbers(pp))
             end
         else
-            self.HealthText:SetText(AbbreviateLargeNumbers(hp))
-            self.PowerText:SetText(AbbreviateLargeNumbers(pp))
+            self.HealthText:SetText(hp)
+            self.PowerText:SetText(pp)
         end
-        self.HealthText:SetText(hp)
-        self.PowerText:SetText(pp)
     end
 end
 

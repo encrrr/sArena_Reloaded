@@ -1,3 +1,6 @@
+2.2.5b
+- Fix health & mana number formatting having some leftover code from Midnight work.
+
 2.2.5
 - Add Mes Profile (www.twitch.tv/notmes)
 - Fix some potential click issues if reload during arena, like spec icon button eating clicks.
