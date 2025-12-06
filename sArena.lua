@@ -1390,6 +1390,14 @@ function sArenaMixin:UpdatePlayerSpec()
     end
 end
 
+function sArenaMixin:UpdateNoTrinketTexture()
+    if self.db.profile.removeUnequippedTrinketTexture then
+        sArenaMixin.noTrinketTexture = nil
+    else
+        sArenaMixin.noTrinketTexture = 638661
+    end
+end
+
 function sArenaMixin:Initialize()
     if (db) then return end
 
@@ -1412,6 +1420,7 @@ function sArenaMixin:Initialize()
             self:UpdateDRTimeSetting()
         end
         self:UpdateDecimalThreshold()
+        self:UpdateNoTrinketTexture()
         LibStub("AceConfigDialog-3.0"):AddToBlizOptions("sArena", "sArena |cffff8000Reloaded|r |T135884:13:13|t")
         self:SetLayout(_, db.profile.currentLayout)
     else
