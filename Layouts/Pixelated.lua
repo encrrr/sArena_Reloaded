@@ -351,13 +351,6 @@ local function setupOptionsTable(self)
         get = getSetting,
         set = setSetting,
     }
-    layout.optionsTable.arenaFrames.args.other.args.showSpecManaText = {
-        order = 2,
-        name = "Spec Text on Manabar",
-        type = "toggle",
-        get = getSetting,
-        set = setSetting,
-    }
     layout.optionsTable.arenaFrames.args.other.args.cropIcons = {
         order = 5,
         name = "Crop Icons",

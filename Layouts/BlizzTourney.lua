@@ -87,6 +87,7 @@ layout.defaultSettings = {
     mirrored = true,
 
     textSettings = {
+        specNameSize = 0.70,
         nameAnchor = "RIGHT",
         powerAnchor = "RIGHT",
     },
@@ -142,6 +143,15 @@ local function setupOptionsTable(self)
         set = setSetting,
     }
 
+    layout.optionsTable.arenaFrames.args.other.args.trinketCircleBorder = {
+        order = 6,
+        name = "Trinket Circle Border",
+        desc = "Enable circular border for trinket icons",
+        type = "toggle",
+        get = getSetting,
+        set = setSetting,
+    }
+
 end
 
 function layout:Initialize(frame)
@@ -190,6 +200,52 @@ function layout:Initialize(frame)
 
     frame.ClassIconMask:SetSize(34, 34)
 
+    local trinket = frame.Trinket
+    if self.db.trinketCircleBorder then
+        sArenaMixin.showTrinketCircleBorder = true
+        if not trinket.Mask then
+            trinket.Mask = trinket:CreateMaskTexture()
+        end
+        trinket.Mask:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+        trinket.Mask:SetAllPoints(trinket.Texture)
+        trinket.Texture:AddMaskTexture(trinket.Mask)
+
+        trinket.Cooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
+        trinket.Cooldown:SetUseCircularEdge(true)
+
+        if not trinket.CircleBorder then
+            trinket.CircleBorder = trinket:CreateTexture(nil, "ARTWORK", nil, 3)
+        end
+
+        local trinketCircleBorder = trinket.CircleBorder
+        trinketCircleBorder:ClearAllPoints()
+        trinketCircleBorder:SetTexture("Interface\\CHARACTERFRAME\\TotemBorder")
+        trinketCircleBorder:SetPoint("TOPLEFT", trinket, "TOPLEFT", -8, 8)
+        trinketCircleBorder:SetPoint("BOTTOMRIGHT", trinket, "BOTTOMRIGHT", 8, -8)
+        trinketCircleBorder:SetDrawLayer("OVERLAY", 7)
+        trinketCircleBorder:Show()
+
+        if not trinket.TrinketCircleBorderHook then
+            hooksecurefunc(trinket.Texture, "SetTexture", function(self, t)
+                if t == nil or t == "" or t == 0 or t == "nil" or not sArenaMixin.showTrinketCircleBorder then
+                    trinketCircleBorder:Hide()
+                else
+                    trinketCircleBorder:Show()
+                end
+            end)
+            trinket.TrinketCircleBorderHook = true
+        end
+    else
+        if trinket.Mask then
+            trinket.Texture:RemoveMaskTexture(trinket.Mask)
+        end
+        if trinket.CircleBorder then
+            trinket.CircleBorder:Hide()
+        end
+
+        trinket.Cooldown:SetUseCircularEdge(false)
+    end
+
     -- SpecIcon border (owned by SpecIcon)
     if not frame.SpecIcon.Border then
         frame.SpecIcon.Border = frame.SpecIcon:CreateTexture(nil, "ARTWORK", nil, 3)
@@ -211,7 +267,16 @@ function layout:Initialize(frame)
     f:SetSize(32, 32)
 
     frame.PowerBar:SetHeight(10)
+
+    local fn, fs, fstyle = frame.HealthText:GetFont()
+    frame.HealthText:SetFont(fn, fs, "OUTLINE")
+    local fn, fs, fstyle = frame.HealthText:GetFont()
+    frame.PowerText:SetFont(fn, fs, "OUTLINE")
     frame.PowerText:SetAlpha(frame.parent.db.profile.hidePowerText and 0 or 1)
+
+    local fn, fs, fstyle = frame.SpecNameText:GetFont()
+    frame.SpecNameText:SetFont(fn, fs, "OUTLINE")
+    frame.SpecNameText:SetTextColor(1,1,1)
 
     local underlay = frame.TexturePool:Acquire()
     underlay:SetDrawLayer("BACKGROUND", 1)

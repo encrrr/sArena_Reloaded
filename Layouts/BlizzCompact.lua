@@ -143,14 +143,6 @@ local function setupOptionsTable(self)
         get = getSetting,
         set = setSetting,
     }
-
-    layout.optionsTable.arenaFrames.args.other.args.showSpecManaText = {
-        order = 3,
-        name = "Spec Text on Manabar",
-        type = "toggle",
-        get = getSetting,
-        set = setSetting,
-    }
 end
 
 function layout:Initialize(frame)

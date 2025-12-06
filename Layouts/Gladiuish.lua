@@ -170,14 +170,6 @@ local function setupOptionsTable(self)
         set = setSetting,
     }
 
-    layout.optionsTable.arenaFrames.args.other.args.showSpecManaText = {
-        order = 3,
-        name = "Spec Text on Manabar",
-        type = "toggle",
-        get = getSetting,
-        set = setSetting,
-    }
-
     layout.optionsTable.arenaFrames.args.other.args.cropIcons = {
         order = 5,
         name = "Crop Icons",
@@ -208,9 +200,9 @@ function layout:Initialize(frame)
 
     frame:SetSize(self.db.width, self.db.height)
     frame.SpecIcon:SetSize(22, 22)
-    frame.Trinket:SetSize(41, 41)
-    frame.Dispel:SetSize(41, 41)
-    frame.Racial:SetSize(41, 41)
+    frame.Trinket:SetSize(40, 40)
+    frame.Dispel:SetSize(40, 40)
+    frame.Racial:SetSize(40, 40)
     frame.Name:SetTextColor(1,1,1)
     frame.SpecNameText:SetTextColor(1,1,1)
 

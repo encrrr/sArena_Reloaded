@@ -138,14 +138,6 @@ local function setupOptionsTable(self)
         set = setSetting,
     }
 
-    layout.optionsTable.arenaFrames.args.other.args.showSpecManaText = {
-        order = 3,
-        name = "Spec Text on Manabar",
-        type = "toggle",
-        get = getSetting,
-        set = setSetting,
-    }
-
     layout.optionsTable.arenaFrames.args.other.args.hideNameBackground = {
         order = 3,
         name = "Hide Name Background",

@@ -320,6 +320,13 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             get   = getSetting,
                             set   = setSetting,
                         },
+                        showSpecManaText = {
+                            order = 3,
+                            type  = "toggle",
+                            name  = "Spec Text on Manabar",
+                            get   = getSetting,
+                            set   = setSetting,
+                        },
                     },
                 },
                 positioning = {
@@ -2406,6 +2413,122 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                     },
                 },
             },
+            drText = {
+                order = 5,
+                name = "DR Text",
+                type = "group",
+                inline = true,
+                args = {
+                    drTextAnchor = {
+                        order = 1,
+                        name = "Anchor Point",
+                        type = "select",
+                        style = "dropdown",
+                        width = 0.5,
+                        values = {
+                            ["TOPLEFT"] = "TopLeft",
+                            ["TOP"] = "Top",
+                            ["TOPRIGHT"] = "TopRight",
+                            ["LEFT"] = "Left",
+                            ["CENTER"] = "Center",
+                            ["RIGHT"] = "Right",
+                            ["BOTTOMLEFT"] = "BotLeft",
+                            ["BOTTOM"] = "Bottom",
+                            ["BOTTOMRIGHT"] = "BotRight",
+                        },
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.drTextAnchor or "BOTTOMRIGHT"
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.drTextAnchor = val
+                            sArenaMixin:UpdateDRTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    drTextSize = {
+                        order = 2,
+                        name = "Scale",
+                        type = "range",
+                        min = 0.5,
+                        max = 3,
+                        step = 0.01,
+                        width = 0.8,
+                        isPercent = true,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.drTextSize or 1.0
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.drTextSize = val
+                            sArenaMixin:UpdateDRTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    drTextOffsetX = {
+                        order = 3,
+                        name = "Horizontal",
+                        type = "range",
+                        softMin = -50,
+                        softMax = 50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.drTextOffsetX or 4
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.drTextOffsetX = val
+                            sArenaMixin:UpdateDRTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    drTextOffsetY = {
+                        order = 4,
+                        name = "Vertical",
+                        type = "range",
+                        softMin = -50,
+                        softMax = 50,
+                        step = 0.5,
+                        width = 0.8,
+                        get = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            return layout.textSettings.drTextOffsetY or -4
+                        end,
+                        set = function(info, val)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.drTextOffsetY = val
+                            sArenaMixin:UpdateDRTextPositions(layout.textSettings, info, val)
+                        end,
+                    },
+                    resetDRText = {
+                        order = 5,
+                        name = "Reset",
+                        width = 0.4,
+                        type = "execute",
+                        func = function(info)
+                            local layout = info.handler.db.profile.layoutSettings[layoutName]
+                            local currentLayout = info.handler.layouts[layoutName]
+                            local defaults = currentLayout.defaultSettings.textSettings
+                            layout.textSettings = layout.textSettings or {}
+                            layout.textSettings.drTextAnchor = defaults.drTextAnchor or "BOTTOMRIGHT"
+                            layout.textSettings.drTextSize = defaults.drTextSize or 1.0
+                            layout.textSettings.drTextOffsetX = defaults.drTextOffsetX or 4
+                            layout.textSettings.drTextOffsetY = defaults.drTextOffsetY or -4
+                            sArenaMixin:UpdateDRTextPositions(layout.textSettings, info, nil)
+                            LibStub("AceConfigRegistry-3.0"):NotifyChange("sArena")
+                        end,
+                    },
+                },
+            },
         },
     }
 
@@ -2800,15 +2923,23 @@ function sArenaMixin:InitializeDRFrames()
                     drFrame.DRTextFrame:SetFrameStrata("MEDIUM")
                     drFrame.DRTextFrame:SetFrameLevel(26)
 
+                    local textSettings = layoutdb.textSettings or {}
+                    local drTextAnchor = textSettings.drTextAnchor or "BOTTOMRIGHT"
+                    local drTextSize = textSettings.drTextSize or 1.0
+                    local drTextOffsetX = textSettings.drTextOffsetX or 4
+                    local drTextOffsetY = textSettings.drTextOffsetY or -4
+
                     drFrame.DRText = drFrame.DRTextFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-                    drFrame.DRText:SetPoint("BOTTOMRIGHT", 4, -4)
+                    drFrame.DRText:SetPoint(drTextAnchor, drTextOffsetX, drTextOffsetY)
                     drFrame.DRText:SetFont("Interface\\AddOns\\sArena_MoP\\Textures\\arialn.ttf", 14, "OUTLINE")
+                    drFrame.DRText:SetScale(drTextSize)
                     drFrame.DRText:SetTextColor(0, 1, 0)
                     drFrame.DRText:SetText("½")
 
                     drFrame.DRText2 = drFrame.DRTextFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-                    drFrame.DRText2:SetPoint("BOTTOMRIGHT", 4, -4)
+                    drFrame.DRText2:SetPoint(drTextAnchor, drTextOffsetX, drTextOffsetY)
                     drFrame.DRText2:SetFont("Interface\\AddOns\\sArena_MoP\\Textures\\arialn.ttf", 14, "OUTLINE")
+                    drFrame.DRText2:SetScale(drTextSize)
                     drFrame.DRText2:SetTextColor(1, 0, 0)
                     drFrame.DRText2:SetText("%")
                     drFrame.DRText2:SetParent(drFrame.ImmunityIndicator)
@@ -2859,6 +2990,10 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
     -- For Midnight: full DR settings support with new frame structure
     if sArenaMixin.isMidnight then
         sArenaMixin.drBaseSize = db.size or 28
+        local currentLayout = self.db and self.db.profile and self.db.profile.currentLayout
+        local layoutSettings = self.db and self.db.profile and self.db.profile.layoutSettings and self.db.profile.layoutSettings[currentLayout]
+        local cropIcons = layoutSettings and layoutSettings.cropIcons or false
+        
         for i = 1, sArenaMixin.maxArenaOpponents do
             local frame = self["arena" .. i]
             -- Handle DR swipe settings (global setting) - defined here for both real and fake frames
@@ -2983,7 +3118,11 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                                 drFrame.PixelBorderImmune:Hide()
                             end
                             if drFrame.Icon then
-                                drFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                                if cropIcons then
+                                    drFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                                else
+                                    drFrame.Icon:SetTexCoord(0, 1, 0, 1)
+                                end
                             end
                             if drFrame.Cooldown then
                                 drFrame.Cooldown:SetSwipeTexture(1)
@@ -3264,7 +3403,11 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                                 fakeDRFrame.PixelBorder:Hide()
                             end
                             if fakeDRFrame.Icon then
-                                fakeDRFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                                if cropIcons then
+                                    fakeDRFrame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                                else
+                                    fakeDRFrame.Icon:SetTexCoord(0, 1, 0, 1)
+                                end
                             end
                             if fakeDRFrame.Cooldown then
                                 fakeDRFrame.Cooldown:SetSwipeTexture(1)
@@ -3432,6 +3575,13 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                 end
             end
         end
+        
+        local currentLayout = self.db and self.db.profile and self.db.profile.currentLayout
+        local layoutSettings = self.db and self.db.profile and self.db.profile.layoutSettings and self.db.profile.layoutSettings[currentLayout]
+        if layoutSettings and layoutSettings.textSettings then
+            self:UpdateDRTextPositions(layoutSettings.textSettings)
+        end
+        
         return
     end
 
@@ -3520,6 +3670,11 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                 if dr.PixelBorder then
                     dr.PixelBorder:Hide()
                 end
+                if cropIcons then
+                    dr.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+                else
+                    dr.Icon:SetTexCoord(0, 1, 0, 1)
+                end
             elseif db.thinPixelBorder then
                 dr.Border:Show()
                 if dr.PixelBorder then
@@ -3590,6 +3745,12 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                 dr.Border:SetParent(dr.Boverlay)
             end
         end
+    end
+
+    local currentLayout = self.db and self.db.profile and self.db.profile.currentLayout
+    local layoutSettings = self.db and self.db.profile and self.db.profile.layoutSettings and self.db.profile.layoutSettings[currentLayout]
+    if layoutSettings and layoutSettings.textSettings then
+        self:UpdateDRTextPositions(layoutSettings.textSettings)
     end
 end
 
@@ -3682,6 +3843,65 @@ function sArenaMixin:UpdateTextPositions(db, info, val)
 
         if frame and layout and layout.UpdateOrientation then
             layout:UpdateOrientation(frame)
+        end
+    end
+end
+
+function sArenaMixin:UpdateDRTextPositions(db, info, val)
+    if (val) then
+        db[info[#info]] = val
+    end
+
+    for i = 1, sArenaMixin.maxArenaOpponents do
+        local frame = info and info.handler["arena" .. i] or self["arena" .. i]
+        if not frame then return end
+        
+        -- Update real DR frames for Midnight
+        if sArenaMixin.isMidnight and frame.drFrames then
+            for drIndex, drFrame in ipairs(frame.drFrames) do
+                if drFrame and drFrame.DRText then
+                    drFrame.DRText:ClearAllPoints()
+                    drFrame.DRText:SetPoint(db.drTextAnchor or "BOTTOMRIGHT", 
+                        (db.drTextOffsetX or 4), 
+                        (db.drTextOffsetY or -4))
+                    drFrame.DRText:SetScale(db.drTextSize or 1.0)
+                end
+                if drFrame and drFrame.DRText2 then
+                    drFrame.DRText2:ClearAllPoints()
+                    drFrame.DRText2:SetPoint(db.drTextAnchor or "BOTTOMRIGHT", 
+                        (db.drTextOffsetX or 4), 
+                        (db.drTextOffsetY or -4))
+                    drFrame.DRText2:SetScale(db.drTextSize or 1.0)
+                end
+            end
+        end
+        
+        -- Update Retail DR frames (non-Midnight)
+        if not sArenaMixin.isMidnight then
+            for _, category in ipairs(sArenaMixin.drCategories) do
+                local drFrame = frame[category]
+                if drFrame and drFrame.DRTextFrame and drFrame.DRTextFrame.DRText then
+                    local drText = drFrame.DRTextFrame.DRText
+                    drText:ClearAllPoints()
+                    drText:SetPoint(db.drTextAnchor or "BOTTOMRIGHT", 
+                        (db.drTextOffsetX or 4), 
+                        (db.drTextOffsetY or -4))
+                    drText:SetScale(db.drTextSize or 1.0)
+                end
+            end
+        end
+        
+        -- Update fake DR frames (test mode)
+        if frame.fakeDRFrames then
+            for drIndex, fakeDRFrame in ipairs(frame.fakeDRFrames) do
+                if fakeDRFrame and fakeDRFrame.DRText then
+                    fakeDRFrame.DRText:ClearAllPoints()
+                    fakeDRFrame.DRText:SetPoint(db.drTextAnchor or "BOTTOMRIGHT", 
+                        (db.drTextOffsetX or 4), 
+                        (db.drTextOffsetY or -4))
+                    fakeDRFrame.DRText:SetScale(db.drTextSize or 1.0)
+                end
+            end
         end
     end
 end
@@ -4679,6 +4899,17 @@ else
                                         get = function(info) return info.handler.db.profile.desaturateDispelCD end,
                                         set = function(info, val)
                                             info.handler.db.profile.desaturateDispelCD = val
+                                        end
+                                    },
+                                    disableOvershields = {
+                                        order = 2.3,
+                                        name = "Disable Overshields",
+                                        desc = "Disable absorbs showing backwards onto healthbar when absorbs exceeds max hp",
+                                        type = "toggle",
+                                        width = "full",
+                                        get = function(info) return info.handler.db.profile.disableOvershields end,
+                                        set = function(info, val)
+                                            info.handler.db.profile.disableOvershields = val
                                         end
                                     },
                                 },

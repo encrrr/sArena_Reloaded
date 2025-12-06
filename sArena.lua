@@ -758,95 +758,154 @@ local ABSORB_GLOW_ALPHA = 0.6
 local ABSORB_GLOW_OFFSET = -5
 function sArenaFrameMixin:UpdateAbsorb()
     if isMidnight then return end
-    local healthBar = self.HealthBar
-    local _, maxHealth = healthBar:GetMinMaxValues()
-    local currentHealth = healthBar:GetValue()
 
-    if maxHealth <= 0 then return end
-
-    local absorbBar = self.totalAbsorbBar
+    local unit     = self.unit
+    local healthBar     = self.HealthBar
+    local absorbBar     = self.totalAbsorbBar
     local absorbOverlay = self.totalAbsorbBarOverlay
-    local glow = self.overAbsorbGlow
+    local glow          = self.overAbsorbGlow
 
-    local totalAbsorb = UnitGetTotalAbsorbs(self.unit) or 0
-    if totalAbsorb > maxHealth then totalAbsorb = maxHealth end
+    local maxHealth = UnitHealthMax(unit)
+    local totalAbsorb   = UnitGetTotalAbsorbs(unit) or 0
 
-    local isOverAbsorb = currentHealth + totalAbsorb > maxHealth
-    local isReversed = db and db.profile.reverseBarsFill or false
-
-    local healthWidth = healthBar:GetWidth()
-    local healthHeight = healthBar:GetHeight()
-
-    local absorbWidth = totalAbsorb / maxHealth * healthWidth
-    local missingHealthWidth = (maxHealth - currentHealth) / maxHealth * healthWidth
-    local absorbBarWidth = math.min(absorbWidth, missingHealthWidth)
-
-    -- Show absorb bar only for missing health
-    if absorbBarWidth > 0 then
-        absorbBar:ClearAllPoints()
-        if isReversed then
-            absorbBar:SetPoint("TOPRIGHT", healthBar, "TOPLEFT", missingHealthWidth, 0)
-        else
-            absorbBar:SetPoint("TOPLEFT", healthBar, "TOPLEFT", currentHealth / maxHealth * healthWidth, 0)
-        end
-        absorbBar:SetWidth(absorbBarWidth)
-        absorbBar:SetHeight(healthHeight)
-        absorbBar:Show()
-    else
+    if maxHealth <= 0 or totalAbsorb <= 0 then
         absorbBar:Hide()
+        absorbOverlay:Hide()
+        glow:Hide()
+        return
     end
 
-    -- Show striped overlay for full absorb width (wraps onto filled health if needed)
-    if absorbWidth > 0 then
-        absorbOverlay:SetParent(healthBar)
-        absorbOverlay:ClearAllPoints()
-        if isReversed then
-            if isOverAbsorb then
-                absorbOverlay:SetPoint("TOPLEFT", healthBar, "TOPLEFT", 0, 0)
-                absorbOverlay:SetPoint("BOTTOMLEFT", healthBar, "BOTTOMLEFT", 0, 0)
-            else
-                absorbOverlay:SetPoint("TOPLEFT", absorbBar, "TOPLEFT", 0, 0)
-                absorbOverlay:SetPoint("BOTTOMLEFT", absorbBar, "BOTTOMLEFT", 0, 0)
-            end
+    local currentHealth = UnitHealth(unit)
+    local healthWidth  = healthBar:GetWidth()
+    local healthHeight = healthBar:GetHeight()
+    local isReversed   = self.parent.db.profile.reverseBarsFill or false
+
+    -- Default, no Overshields.
+    if self.parent.db.profile.disableOvershields then
+        local isOverAbsorb = (currentHealth + totalAbsorb >= maxHealth)
+
+        -- Clamp absorbs to actual missing health
+        local missingHealth = maxHealth - currentHealth
+        totalAbsorb = math.min(totalAbsorb, missingHealth)
+
+        if isOverAbsorb then
+            glow:Show()
         else
-            if isOverAbsorb then
-                absorbOverlay:SetPoint("TOPRIGHT", healthBar, "TOPRIGHT", 0, 0)
-                absorbOverlay:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", 0, 0)
-            else
+            glow:Hide()
+        end
+
+        if totalAbsorb > 0 then
+            local absorbWidth        = healthWidth * (totalAbsorb / maxHealth)
+            local missingHealthWidth = (maxHealth - currentHealth) / maxHealth * healthWidth
+            local absorbBarWidth     = math.min(absorbWidth, missingHealthWidth)
+
+            absorbBar:ClearAllPoints()
+            absorbOverlay:ClearAllPoints()
+            if isReversed then
+                absorbBar:SetPoint("TOPRIGHT", healthBar, "TOPLEFT", missingHealthWidth, 0)
                 absorbOverlay:SetPoint("TOPRIGHT", absorbBar, "TOPRIGHT", 0, 0)
                 absorbOverlay:SetPoint("BOTTOMRIGHT", absorbBar, "BOTTOMRIGHT", 0, 0)
-            end
-        end
-        absorbOverlay:SetWidth(absorbWidth)
-        absorbOverlay:SetHeight(healthHeight)
-
-        if absorbOverlay.tileSize then
-            if isReversed then
-                absorbOverlay:SetTexCoord(0, absorbWidth / absorbOverlay.tileSize, 0, healthHeight / absorbOverlay.tileSize)
+                if absorbOverlay.tileSize then
+                    absorbOverlay:SetTexCoord(0, absorbBarWidth / absorbOverlay.tileSize, 0, healthHeight / absorbOverlay.tileSize)
+                end
             else
-                absorbOverlay:SetTexCoord(1 - (absorbWidth / absorbOverlay.tileSize), 1, 0, healthHeight / absorbOverlay.tileSize)
+                absorbBar:SetPoint("TOPLEFT", healthBar, "TOPLEFT", currentHealth / maxHealth * healthWidth, 0)
+                absorbOverlay:SetPoint("TOPLEFT", absorbBar, "TOPLEFT", 0, 0)
+                absorbOverlay:SetPoint("BOTTOMLEFT", absorbBar, "BOTTOMLEFT", 0, 0)
+                if absorbOverlay.tileSize then
+                    absorbOverlay:SetTexCoord(1 - (absorbBarWidth / absorbOverlay.tileSize), 1, 0, healthHeight / absorbOverlay.tileSize)
+                end
             end
-        end
 
-        absorbOverlay:Show()
-    else
-        absorbOverlay:Hide()
-    end
-
-    -- Glow if over-absorb occurs
-    glow:ClearAllPoints()
-    if isOverAbsorb then
-        if isReversed then
-            glow:SetPoint("TOPRIGHT", absorbOverlay, "TOPRIGHT", -ABSORB_GLOW_OFFSET, 0)
-            glow:SetPoint("BOTTOMRIGHT", absorbOverlay, "BOTTOMRIGHT", -ABSORB_GLOW_OFFSET, 0)
+            absorbBar:SetSize(absorbBarWidth, healthHeight)
+            absorbBar:Show()
+            absorbOverlay:SetSize(absorbBarWidth, healthHeight)
+            absorbOverlay:Show()
         else
-            glow:SetPoint("TOPLEFT", absorbOverlay, "TOPLEFT", ABSORB_GLOW_OFFSET, 0)
-            glow:SetPoint("BOTTOMLEFT", absorbOverlay, "BOTTOMLEFT", ABSORB_GLOW_OFFSET, 0)
+            absorbBar:Hide()
+            absorbOverlay:Hide()
         end
-        glow:SetAlpha(ABSORB_GLOW_ALPHA)
-        glow:Show()
     else
-        glow:Hide()
+        -- Overshields: wrapping overlay + overshield glow
+        local isOverAbsorb = false
+
+        if totalAbsorb > maxHealth then
+            isOverAbsorb = true
+            totalAbsorb = maxHealth
+        else
+            isOverAbsorb = (currentHealth + totalAbsorb > maxHealth)
+        end
+
+        local absorbWidth        = totalAbsorb / maxHealth * healthWidth
+        local missingHealthWidth = (maxHealth - currentHealth) / maxHealth * healthWidth
+        local absorbBarWidth     = math.min(absorbWidth, missingHealthWidth)
+
+        -- Show absorb bar only for missing health
+        if absorbBarWidth > 0 then
+            absorbBar:ClearAllPoints()
+            if isReversed then
+                absorbBar:SetPoint("TOPRIGHT", healthBar, "TOPLEFT", missingHealthWidth, 0)
+            else
+                absorbBar:SetPoint("TOPLEFT", healthBar, "TOPLEFT", currentHealth / maxHealth * healthWidth, 0)
+            end
+            absorbBar:SetSize(absorbBarWidth, healthHeight)
+            absorbBar:Show()
+        else
+            absorbBar:Hide()
+        end
+
+        -- Show striped overlay for full absorb width (wraps onto filled health if needed)
+        if absorbWidth > 0 then
+            absorbOverlay:SetParent(healthBar)
+            absorbOverlay:ClearAllPoints()
+            if isReversed then
+                if isOverAbsorb then
+                    absorbOverlay:SetPoint("TOPLEFT", healthBar, "TOPLEFT", 0, 0)
+                    absorbOverlay:SetPoint("BOTTOMLEFT", healthBar, "BOTTOMLEFT", 0, 0)
+                else
+                    absorbOverlay:SetPoint("TOPLEFT", absorbBar, "TOPLEFT", 0, 0)
+                    absorbOverlay:SetPoint("BOTTOMLEFT", absorbBar, "BOTTOMLEFT", 0, 0)
+                end
+            else
+                if isOverAbsorb then
+                    absorbOverlay:SetPoint("TOPRIGHT", healthBar, "TOPRIGHT", 0, 0)
+                    absorbOverlay:SetPoint("BOTTOMRIGHT", healthBar, "BOTTOMRIGHT", 0, 0)
+                else
+                    absorbOverlay:SetPoint("TOPRIGHT", absorbBar, "TOPRIGHT", 0, 0)
+                    absorbOverlay:SetPoint("BOTTOMRIGHT", absorbBar, "BOTTOMRIGHT", 0, 0)
+                end
+            end
+
+            absorbOverlay:SetSize(absorbWidth, healthHeight)
+
+            if absorbOverlay.tileSize then
+                if isReversed then
+                    absorbOverlay:SetTexCoord(0, absorbWidth / absorbOverlay.tileSize, 0, healthHeight / absorbOverlay.tileSize)
+                else
+                    absorbOverlay:SetTexCoord(1 - (absorbWidth / absorbOverlay.tileSize), 1, 0, healthHeight / absorbOverlay.tileSize)
+                end
+            end
+
+            absorbOverlay:Show()
+        else
+            absorbOverlay:Hide()
+        end
+
+        -- Glow if over-absorb occurs
+        glow:ClearAllPoints()
+        if isOverAbsorb then
+            if isReversed then
+                glow:SetPoint("TOPRIGHT", absorbOverlay, "TOPRIGHT", -ABSORB_GLOW_OFFSET, 0)
+                glow:SetPoint("BOTTOMRIGHT", absorbOverlay, "BOTTOMRIGHT", -ABSORB_GLOW_OFFSET, 0)
+            else
+                glow:SetPoint("TOPLEFT", absorbOverlay, "TOPLEFT", ABSORB_GLOW_OFFSET, 0)
+                glow:SetPoint("BOTTOMLEFT", absorbOverlay, "BOTTOMLEFT", ABSORB_GLOW_OFFSET, 0)
+            end
+            glow:SetAlpha(ABSORB_GLOW_ALPHA)
+            glow:Show()
+        else
+            glow:Hide()
+        end
     end
 end
 
@@ -1795,6 +1854,8 @@ function sArenaMixin:SetLayout(_, layout)
             self["arena" .. i] = _G[globalName]
         end
     end
+
+    sArenaMixin.showTrinketCircleBorder = nil
 
     layout = sArenaMixin.layouts[layout] and layout or "Gladiuish"
 
@@ -3747,6 +3808,11 @@ function sArenaMixin:Test()
                     local layout = self.db.profile.layoutSettings[self.db.profile.currentLayout]
                     local drSettings = layout.dr or {}
                     local drSize = drSettings.size or 28
+                    local textSettings = layout.textSettings or {}
+                    local drTextAnchor = textSettings.drTextAnchor or "BOTTOMRIGHT"
+                    local drTextSize = textSettings.drTextSize or 1.0
+                    local drTextOffsetX = textSettings.drTextOffsetX or 4
+                    local drTextOffsetY = textSettings.drTextOffsetY or -4
 
                     local drCategoryTextures = {
                         [1] = 136071,     -- Incap (Poly)
@@ -3801,8 +3867,9 @@ function sArenaMixin:Test()
                         fakeDRFrame.DRTextFrame:SetFrameLevel(27)
 
                         fakeDRFrame.DRText = fakeDRFrame.DRTextFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-                        fakeDRFrame.DRText:SetPoint("BOTTOMRIGHT", 4, -4)
+                        fakeDRFrame.DRText:SetPoint(drTextAnchor, drTextOffsetX, drTextOffsetY)
                         fakeDRFrame.DRText:SetFont("Interface\\AddOns\\sArena_MoP\\Textures\\arialn.ttf", 14, "OUTLINE")
+                        fakeDRFrame.DRText:SetScale(drTextSize)
                         if drIndex == 1 then
                             fakeDRFrame.DRText:SetTextColor(1, 0, 0)
                             fakeDRFrame.DRText:SetText("%")

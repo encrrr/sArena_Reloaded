@@ -87,7 +87,8 @@ layout.defaultSettings = {
     mirrored = false,
     bigHealthbar = true,
 
-    textSettings = {},
+    textSettings = {
+    },
 }
 
 local function getSetting(info)

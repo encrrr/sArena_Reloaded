@@ -87,11 +87,9 @@ layout.defaultSettings = {
     mirrored = false,
 
     textSettings = {
+        specNameSize = 0.65,
         nameAnchor = "LEFT",
     },
-
-    -- BlizzArena specific settings
-    trinketCircleBorder = false,
 }
 
 local function getSetting(info)
@@ -178,6 +176,7 @@ function layout:Initialize(frame)
 
 
     if self.db.trinketCircleBorder then
+        sArenaMixin.showTrinketCircleBorder = true
         if not trinket.Mask then
             trinket.Mask = trinket:CreateMaskTexture()
         end
@@ -202,10 +201,9 @@ function layout:Initialize(frame)
 
         if not trinket.TrinketCircleBorderHook then
             hooksecurefunc(trinket.Texture, "SetTexture", function(self, t)
-                if t == nil or t == "" or t == 0 or t == "nil" or frame.parent.db.profile.currentLayout ~= layoutName then
+                if t == nil or t == "" or t == 0 or t == "nil" or not sArenaMixin.showTrinketCircleBorder then
                     trinketCircleBorder:Hide()
                 else
-                    trinketCircleBorder:Hide()
                     trinketCircleBorder:Show()
                 end
             end)
@@ -255,6 +253,10 @@ function layout:Initialize(frame)
     local fn, fs, fstyle = frame.HealthText:GetFont()
     frame.PowerText:SetFont(fn, 10, "OUTLINE")
     frame.PowerText:SetAlpha(frame.parent.db.profile.hidePowerText and 0 or 1)
+
+    local fn, fs, fstyle = frame.SpecNameText:GetFont()
+    frame.SpecNameText:SetFont(fn, fs, "OUTLINE")
+    frame.SpecNameText:SetTextColor(1,1,1)
 
     frame.AuraStacks:SetPoint("BOTTOMLEFT", frame.ClassIcon, "BOTTOMLEFT", 1, -4)
     frame.AuraStacks:SetFont("Interface\\AddOns\\sArena_Reloaded\\Textures\\arialn.ttf", 11, "THICKOUTLINE")
