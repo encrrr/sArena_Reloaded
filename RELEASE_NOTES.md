@@ -1,3 +1,6 @@
+2.2.6c
+- Minor tweaks
+
 2.2.6b
 - Midnight: Fix a new "secret" error.
 - Midnight: Fix cooldown numbers on CC.
