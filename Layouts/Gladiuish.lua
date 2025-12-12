@@ -207,10 +207,10 @@ function layout:Initialize(frame)
     frame.SpecNameText:SetTextColor(1,1,1)
 
     frame.Trinket.Cooldown:SetSwipeTexture(1)
-    frame.Trinket.Cooldown:SetSwipeColor(0, 0, 0, 0.6)
+    frame.Trinket.Cooldown:SetSwipeColor(0, 0, 0, 0.5)
 
     frame.Dispel.Cooldown:SetSwipeTexture(1)
-    frame.Dispel.Cooldown:SetSwipeColor(0, 0, 0, 0.6)
+    frame.Dispel.Cooldown:SetSwipeColor(0, 0, 0, 0.5)
 
     frame.PowerBar:SetHeight(self.db.powerBarHeight)
 

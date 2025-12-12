@@ -3080,6 +3080,7 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                                 drFrame.Cooldown:SetDrawSwipe(false)
                                 drFrame.Cooldown:SetDrawEdge(false)
                             else
+                                drFrame.Cooldown:SetSwipeColor(0, 0, 0, 0.5)
                                 drFrame.Cooldown:SetDrawSwipe(true)
                                 drFrame.Cooldown:SetDrawEdge(not disableSwipeEdge)
                             end

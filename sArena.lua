@@ -3225,8 +3225,8 @@ function sArenaFrameMixin:SetStatusText(unit)
 
     if (db.profile.statusText.usePercentage) then
         if isMidnight then
-            self.HealthText:SetFormattedText("%0.f%%", UnitHealthPercent(unit, nil, true))
-            self.PowerText:SetFormattedText("%0.f%%", UnitPowerPercent(unit, nil, true))
+            self.HealthText:SetFormattedText("%0.f%%", UnitHealthPercent(unit, nil, CurveConstants.ScaleTo100))
+            self.PowerText:SetFormattedText("%0.f%%", UnitPowerPercent(unit, nil, CurveConstants.ScaleTo100))
         else
             local hpPercent = (hpMax > 0) and ceil((hp / hpMax) * 100) or 0
             local ppPercent = (ppMax > 0) and ceil((pp / ppMax) * 100) or 0

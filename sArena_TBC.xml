@@ -238,7 +238,7 @@
                         end
                         self:SetAllPoints(self:GetParent().ClassIcon)
                         self:SetSwipeTexture(1)
-                        self:SetSwipeColor(0, 0, 0, 0.6)
+                        self:SetSwipeColor(0, 0, 0, 0.5)
                         self:SetDrawBling(false)
                     </OnLoad>
                 </Scripts>

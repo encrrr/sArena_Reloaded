@@ -503,11 +503,11 @@ function layout:Initialize(frame)
     frame.SpecNameText:SetTextColor(1,1,1)
 
     frame.Trinket.Cooldown:SetSwipeTexture(1)
-    frame.Trinket.Cooldown:SetSwipeColor(0, 0, 0, 0.6)
+    frame.Trinket.Cooldown:SetSwipeColor(0, 0, 0, 0.5)
     frame.Trinket.Cooldown:SetUseCircularEdge(false)
 
     frame.Racial.Cooldown:SetSwipeTexture(1)
-    frame.Racial.Cooldown:SetSwipeColor(0, 0, 0, 0.6)
+    frame.Racial.Cooldown:SetSwipeColor(0, 0, 0, 0.5)
     frame.Racial.Cooldown:SetUseCircularEdge(false)
 
     if not frame.Trinket.TrinketPixelBorderHook then
