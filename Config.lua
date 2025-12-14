@@ -3511,6 +3511,7 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
             local borderSize = (db.drBorderGlowOff and 1.5) or (db.brightDRBorder and 1) or db.borderSize or 1
             local size = db.size + offset
 
+            dr:SetFrameLevel(20)
             dr:SetSize(size, size)
             dr.Border:SetPoint("TOPLEFT", dr, "TOPLEFT", -borderSize, borderSize)
             dr.Border:SetPoint("BOTTOMRIGHT", dr, "BOTTOMRIGHT", borderSize, -borderSize)
