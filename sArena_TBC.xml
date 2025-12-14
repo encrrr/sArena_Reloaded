@@ -126,7 +126,7 @@
 
             <Layer level="OVERLAY">
                 <Texture parentKey="Spark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
-                    <Size x="1.5" y="21"/>
+                    <Size x="12" y="21"/>
                     <Anchors>
                         <Anchor point="CENTER"/>
                     </Anchors>

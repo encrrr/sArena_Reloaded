@@ -1100,7 +1100,6 @@ function sArenaMixin:OnEvent(event, ...)
         if combatEvent == "SPELL_CAST_SUCCESS" or combatEvent == "SPELL_AURA_APPLIED" then
 
             -- TBC Spec Detection
-            print(spellID, combatEvent, sArenaMixin.tbcSpecSpells[spellID], sArenaMixin.tbcSpecBuffs[spellID])
             if isTBC and (sArenaMixin.tbcSpecSpells[spellID] or sArenaMixin.tbcSpecBuffs[spellID]) then
                 for i = 1, sArenaMixin.maxArenaOpponents do
                     if (sourceGUID == UnitGUID("arena" .. i)) then
@@ -2173,6 +2172,50 @@ function sArenaFrameMixin:OnLoad()
     local unit = "arena" .. self:GetID()
     self.parent = self:GetParent()
 
+    if isTBC then
+        self.ogSetShown = self.SetShown
+        self.SetShown = function(self, show)
+            local _, instanceType = IsInInstance()
+            self.shouldBeShown = show
+            if show then
+                self:SetAlpha(1)
+            else
+                self:SetAlpha(0)
+            end
+            if not InCombatLockdown() and instanceType ~= "arena" then
+                self.ogSetShown(self, show)
+            end
+        end
+        self.ogShow = self.Show
+        self.Show = function(self)
+            local _, instanceType = IsInInstance()
+            self.shouldBeShown = true
+            self:SetAlpha(1)
+            if not InCombatLockdown() and instanceType ~= "arena" then
+                self.ogShow(self)
+            end
+        end
+
+        self.ogHide = self.Hide
+        self.Hide = function(self)
+            local _, instanceType = IsInInstance()
+            self.shouldBeShown = false
+            self:SetAlpha(0)
+            if not InCombatLockdown() and instanceType ~= "arena" then
+                self.ogHide(self)
+            end
+        end
+
+        self.ogSetAlpha = self.SetAlpha
+        self.SetAlpha = function(self, alpha)
+            if self.shouldBeShown == false then
+                self.ogSetAlpha(self, 0)
+            else
+                self.ogSetAlpha(self, alpha)
+            end
+        end
+    end
+
     if not isMidnight then
         self:CreateCastBar()
         self:CreateDRFrames()
@@ -2492,10 +2535,16 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
 
         self:Initialize()
     elseif (event == "PLAYER_ENTERING_WORLD") or (event == "ARENA_PREP_OPPONENT_SPECIALIZATIONS") then
+        local _, instanceType = IsInInstance()
         if self.drTray then
-            local _, instanceType = IsInInstance()
             self.drTray:SetAlpha(instanceType == "arena" and 1 or 0)
         end
+
+        if isTBC and instanceType == "arena" and self.ogShow then
+            self.ogShow(self)
+            self:SetAlpha(0)
+        end
+
         self.Name:SetText("")
         self.CastBar:Hide()
         self.specTexture = nil
@@ -4164,6 +4213,10 @@ function sArenaMixin:Test()
             frame.CastBar.fadeOut = nil
             frame.CastBar:Hide()
             frame.CastBar:SetAlpha(0)
+        end
+
+        if isTBC then
+            frame.CastBar.Spark:Hide()
         end
 
         frame.hideStatusText = false
