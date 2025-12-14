@@ -2928,8 +2928,6 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent)
     else
         self:SetAlpha(1)
     end
-
-    self:Show()
 end
 
 function sArenaFrameMixin:SetMysteryPlayer()
