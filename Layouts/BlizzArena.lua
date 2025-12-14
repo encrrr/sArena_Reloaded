@@ -149,8 +149,8 @@ function layout:Initialize(frame)
         frame.parent:UpdateWidgetSettings(self.db.widgets)
     end
 
-    frame.ClassIconCooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
-    frame.ClassIconCooldown:SetUseCircularEdge(true)
+    frame.ClassIcon.Cooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
+    frame.ClassIcon.Cooldown:SetUseCircularEdge(true)
 
     frame:SetSize(102, 32)
     frame.SpecIcon:SetSize(14, 14)
@@ -171,8 +171,8 @@ function layout:Initialize(frame)
     local f = frame.ClassIcon
     f:SetSize(24, 24)
     f:Show()
-    f:AddMaskTexture(frame.ClassIconMask)
-    frame.ClassIconMask:SetAllPoints(f)
+    f.Texture:AddMaskTexture(f.Mask)
+    f.Mask:SetAllPoints(f.Texture)
 
     local trinket = frame.Trinket
 
@@ -391,12 +391,12 @@ function layout:UpdateOrientation(frame)
     end
 
     healthBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
 
     if (self.db.mirrored) then
         frameTexture:SetTexCoord(0.796, 0, 0, 0.5)
         healthBar:SetPoint("TOPRIGHT", -3, -9)
-        classIcon:SetPoint("TOPLEFT", 4, -4)
+        frame.ClassIcon:SetPoint("TOPLEFT", 4, -4)
     else
         frameTexture:SetTexCoord(0, 0.796, 0, 0.5)
         healthBar:SetPoint("TOPLEFT", 3, -9)

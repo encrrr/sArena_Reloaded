@@ -135,6 +135,11 @@ local function CreatePixelTextureBorder(parent, target, key, size, offset)
 
     if not parent[key] then
         local holder = CreateFrame("Frame", nil, parent)
+        if key == "classIcon" then
+            holder:SetFrameLevel(parent:GetFrameLevel() + 8)
+        else
+            holder:SetFrameLevel(parent:GetFrameLevel() + 1)
+        end
         holder:SetIgnoreParentScale(true)
         parent[key] = holder
 
@@ -511,8 +516,8 @@ function layout:Initialize(frame)
     frame.Dispel:SetSize(41, 41)
     frame.Name:SetTextColor(1,1,1)
     frame.SpecNameText:SetTextColor(1,1,1)
-    frame.ClassIconCooldown:SetUseCircularEdge(false)
-    frame.ClassIconCooldown:SetSwipeTexture(1)
+    frame.ClassIcon.Cooldown:SetUseCircularEdge(false)
+    frame.ClassIcon.Cooldown:SetSwipeTexture(1)
 
 
     frame.Trinket.Cooldown:SetSwipeTexture(1)
@@ -755,8 +760,8 @@ function layout:UpdateOrientation(frame)
 
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
-    
+    frame.ClassIcon:ClearAllPoints()
+
     -- Apply classIcon settings
     local classIconSettings = self.db.classIcon or { posX = 0, posY = 0, scale = 1 }
     local baseSize = self.db.height - 4

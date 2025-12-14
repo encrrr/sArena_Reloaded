@@ -189,31 +189,31 @@ function layout:Initialize(frame)
     local classIcon = frame.ClassIcon
     frame.ClassIcon:SetSize(42.5, 42.5)
     frame.ClassIcon:Show()
-    frame.ClassIcon:SetTexCoord(0.05, 0.95, 0.1, 0.9)
-    if not classIcon.Border then
-        classIcon.Border = frame:CreateTexture(nil, "ARTWORK", nil, 3)
+    frame.ClassIcon.Texture:SetTexCoord(0.05, 0.95, 0.1, 0.9)
+    if not classIcon.Texture.Border then
+        classIcon.Texture.Border = frame:CreateTexture(nil, "ARTWORK", nil, 3)
     end
-    local classIconBorder = classIcon.Border
-    frame.ClassIconMask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-    frame.ClassIconMask:SetAllPoints(classIcon)
-    classIcon:AddMaskTexture(frame.ClassIconMask)
-    frame.ClassIconCooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout")
-    if not classIcon.BorderParent then
-        classIcon.BorderParent = CreateFrame("Frame", nil, frame)
-        classIcon.BorderParent:SetFrameStrata("MEDIUM")
-        classIcon.BorderParent:SetFrameLevel(6)
+    local classIconBorder = classIcon.Texture.Border
+    frame.ClassIcon.Mask:SetTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+    frame.ClassIcon.Mask:SetAllPoints(classIcon.Texture)
+    classIcon.Texture:AddMaskTexture(frame.ClassIcon.Mask)
+    frame.ClassIcon.Cooldown:SetSwipeTexture("Interface\\AddOns\\sArena_Reloaded\\Textures\\talentsmasknodechoiceflyout")
+    if not classIcon.Texture.BorderParent then
+        classIcon.Texture.BorderParent = CreateFrame("Frame", nil, frame)
+        classIcon.Texture.BorderParent:SetFrameStrata("MEDIUM")
+        classIcon.Texture.BorderParent:SetFrameLevel(6)
     end
-    classIconBorder:SetParent(classIcon.BorderParent)
+    classIconBorder:SetParent(classIcon.Texture.BorderParent)
     classIconBorder:SetAtlas("plunderstorm-actionbar-slot-border")
-    classIconBorder:SetPoint("TOPLEFT", classIcon, "TOPLEFT", -8, 8)
-    classIconBorder:SetPoint("BOTTOMRIGHT", classIcon, "BOTTOMRIGHT", 8, -8)
+    classIconBorder:SetPoint("TOPLEFT", classIcon.Texture, "TOPLEFT", -8, 8)
+    classIconBorder:SetPoint("BOTTOMRIGHT", classIcon.Texture, "BOTTOMRIGHT", 8, -8)
     classIconBorder:SetDrawLayer("OVERLAY", 3)
     classIconBorder:Show()
-    classIcon.Border = classIconBorder
-    classIcon.useModernBorder = true
+    classIcon.Texture.Border = classIconBorder
+    classIcon.Texture.useModernBorder = true
 
-    if not classIcon.ClassIconBorderHook then
-        hooksecurefunc(classIcon, "SetTexture", function(self, t)
+    if not classIcon.Texture.ClassIconBorderHook then
+        hooksecurefunc(classIcon.Texture, "SetTexture", function(self, t)
             if not t or not self.useModernBorder then
                 classIconBorder:Hide()
             else
@@ -221,7 +221,7 @@ function layout:Initialize(frame)
                 classIconBorder:Show()
             end
         end)
-        classIcon.ClassIconBorderHook = true
+        classIcon.Texture.ClassIconBorderHook = true
     end
 
     local trinket = frame.Trinket
@@ -387,7 +387,7 @@ function layout:Initialize(frame)
     if not sArenaMixin.isRetail then
         trinket.Cooldown:SetUseCircularEdge(true)
         racial.Cooldown:SetUseCircularEdge(true)
-        frame.ClassIconCooldown:SetUseCircularEdge(true)
+        frame.ClassIcon.Cooldown:SetUseCircularEdge(true)
         dispel.Cooldown:SetUseCircularEdge(true)
     end
 
@@ -408,7 +408,7 @@ function layout:UpdateOrientation(frame)
     name:ClearAllPoints()
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
     specName:ClearAllPoints()
     frameTexture:ClearAllPoints()
 
@@ -527,7 +527,7 @@ function layout:UpdateOrientation(frame)
     	healthBar:SetPoint("TOPRIGHT", -4, -16)
         powerBar:SetSize(127, 10.5)
         powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, 1.5)
-        classIcon:SetPoint("TOPLEFT", 15, -14.5)
+        frame.ClassIcon:SetPoint("TOPLEFT", 15, -14.5)
     else
     	frameTexture:SetPoint("TOPLEFT", frame, "TOPLEFT", -48, -3)
         frameTexture:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 20, 3)
@@ -536,7 +536,7 @@ function layout:UpdateOrientation(frame)
     	healthBar:SetPoint("TOPLEFT", 16, -16)
     	powerBar:SetSize(127, 10.5)
     	powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, 1.5)
-    	classIcon:SetPoint("TOPRIGHT", -3, -14.5)
+    	frame.ClassIcon:SetPoint("TOPRIGHT", -3, -14.5)
     end
 end
 

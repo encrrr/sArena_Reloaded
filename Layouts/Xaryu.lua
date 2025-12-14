@@ -342,7 +342,7 @@ function layout:UpdateOrientation(frame)
 
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
 
     if (self.db.mirrored) then
         healthBar:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, -2)
@@ -351,7 +351,7 @@ function layout:UpdateOrientation(frame)
         powerBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 2)
         powerBar:SetPoint("LEFT", classIcon, "RIGHT", 2, 0)
 
-        classIcon:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
+        frame.ClassIcon:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
     else
         healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
         healthBar:SetPoint("BOTTOMRIGHT", powerBar, "TOPRIGHT")
@@ -359,7 +359,7 @@ function layout:UpdateOrientation(frame)
         powerBar:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 2)
         powerBar:SetPoint("RIGHT", classIcon, "LEFT", -2, 0)
 
-        classIcon:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
+        frame.ClassIcon:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
     end
 end
 

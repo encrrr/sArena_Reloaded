@@ -170,8 +170,8 @@ function layout:Initialize(frame)
         frame.parent:UpdateWidgetSettings(self.db.widgets)
     end
 
-    frame.ClassIconCooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
-    frame.ClassIconCooldown:SetUseCircularEdge(true)
+    frame.ClassIcon.Cooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
+    frame.ClassIcon.Cooldown:SetUseCircularEdge(true)
 
     frame:SetSize(192, 76.8)
     frame.SpecIcon:SetSize(22, 22)
@@ -203,9 +203,9 @@ function layout:Initialize(frame)
     local f = frame.ClassIcon
     f:SetSize(64, 64)
     f:Show()
-    f:AddMaskTexture(frame.ClassIconMask)
+    f.Texture:AddMaskTexture(f.Mask)
 
-    frame.ClassIconMask:SetSize(64, 64)
+    f.Mask:SetSize(64, 64)
 
     -- SpecIcon border (owned by SpecIcon)
     if not frame.SpecIcon.Border then
@@ -259,7 +259,7 @@ function layout:UpdateOrientation(frame)
     local frameTexture = frame.frameTexture
     local healthBar = frame.HealthBar
     local classIcon = frame.ClassIcon
-    local classIconMask = frame.ClassIconMask
+    local classIconMask = frame.ClassIcon.Mask
     local name = frame.Name
     local specName = frame.SpecNameText
     local healthText = frame.HealthText
@@ -374,18 +374,18 @@ function layout:UpdateOrientation(frame)
     end
 
     healthBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
     classIconMask:ClearAllPoints()
 
     if (self.db.mirrored) then
         frameTexture:SetTexCoord(0.85, 0.1, 0.05, 0.65)
         healthBar:SetPoint("RIGHT", -5, self.db.bigHealthbar and 7 or -2)
-        classIcon:SetPoint("LEFT", 5, 0)
+        frame.ClassIcon:SetPoint("LEFT", 5, 0)
         classIconMask:SetPoint("LEFT", 5, 0)
     else
         frameTexture:SetTexCoord(0.1, 0.85, 0.05, 0.65)
         healthBar:SetPoint("LEFT", 5, self.db.bigHealthbar and 7 or -2)
-        classIcon:SetPoint("RIGHT", -5, 0)
+        frame.ClassIcon:SetPoint("RIGHT", -5, 0)
         classIconMask:SetPoint("RIGHT", -5, 0)
     end
 end

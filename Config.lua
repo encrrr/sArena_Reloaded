@@ -2495,14 +2495,14 @@ function sArenaMixin:UpdateFrameSettings(db, info, val)
     local spacing = db.spacing
 
     for i = 1, sArenaMixin.maxArenaOpponents do
-        local text = self["arena" .. i].ClassIconCooldown.Text
+        local text = self["arena" .. i].ClassIcon.Cooldown.Text
         local layoutCF = (self.layoutdb and self.layoutdb.changeFont)
         local fontToUse = text.fontFile
         if layoutCF then
             fontToUse = LSM:Fetch(LSM.MediaType.FONT, self.layoutdb.cdFont)
         end
         text:SetFont(fontToUse, db.classIconFontSize, "OUTLINE")
-        local sArenaText = self["arena" .. i].ClassIconCooldown.sArenaText
+        local sArenaText = self["arena" .. i].ClassIcon.Cooldown.sArenaText
         if sArenaText then
             sArenaText:SetFont(fontToUse, db.classIconFontSize, "OUTLINE")
         end
@@ -3897,7 +3897,7 @@ end
 function sArenaFrameMixin:UpdateClassIconCooldownReverse()
     local reverse = self.parent.db.profile.invertClassIconCooldown
 
-    self.ClassIconCooldown:SetReverse(reverse)
+    self.ClassIcon.Cooldown:SetReverse(reverse)
 end
 
 function sArenaFrameMixin:UpdateTrinketRacialCooldownReverse()
@@ -3911,13 +3911,13 @@ function sArenaFrameMixin:UpdateClassIconSwipeSettings()
     local disableSwipe = self.parent.db.profile.disableClassIconSwipe
     local disableSwipeEdge = self.parent.db.profile.disableSwipeEdge
 
-    if self.ClassIconCooldown then
+    if self.ClassIcon.Cooldown then
         if disableSwipe then
-            self.ClassIconCooldown:SetDrawSwipe(false)
-            self.ClassIconCooldown:SetDrawEdge(false)
+            self.ClassIcon.Cooldown:SetDrawSwipe(false)
+            self.ClassIcon.Cooldown:SetDrawEdge(false)
         else
-            self.ClassIconCooldown:SetDrawSwipe(true)
-            self.ClassIconCooldown:SetDrawEdge(not disableSwipeEdge)
+            self.ClassIcon.Cooldown:SetDrawSwipe(true)
+            self.ClassIcon.Cooldown:SetDrawEdge(not disableSwipeEdge)
         end
     end
 end
@@ -3950,7 +3950,7 @@ end
 function sArenaFrameMixin:UpdateSwipeEdgeSettings()
     local disableEdge = self.parent.db.profile.disableSwipeEdge
 
-    self.ClassIconCooldown:SetDrawEdge(not disableEdge)
+    self.ClassIcon.Cooldown:SetDrawEdge(not disableEdge)
     self.Trinket.Cooldown:SetDrawEdge(not disableEdge)
     self.Racial.Cooldown:SetDrawEdge(not disableEdge)
 end
@@ -4581,12 +4581,12 @@ else
                                             info.handler.db.profile.hideClassIcon = val
                                             for i = 1, sArenaMixin.maxArenaOpponents do
                                                 if val then
-                                                    info.handler["arena" .. i].ClassIcon:SetTexture(nil)
+                                                    info.handler["arena" .. i].ClassIcon.Texture:SetTexture(nil)
                                                 else
                                                     if info.handler["arena" .. i].replaceClassIcon then
-                                                        info.handler["arena" .. i].ClassIcon:SetTexture(info.handler["arena" .. i].tempSpecIcon)
+                                                        info.handler["arena" .. i].ClassIcon.Texture:SetTexture(info.handler["arena" .. i].tempSpecIcon)
                                                     else
-                                                        info.handler["arena" .. i].ClassIcon:SetTexture(info.handler.classIcons[info.handler["arena" .. i].tempClass])
+                                                        info.handler["arena" .. i].ClassIcon.Texture:SetTexture(info.handler.classIcons[info.handler["arena" .. i].tempClass])
                                                     end
                                                 end
                                             end

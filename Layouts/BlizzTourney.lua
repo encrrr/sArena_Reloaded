@@ -174,8 +174,8 @@ function layout:Initialize(frame)
         frame.parent:UpdateWidgetSettings(self.db.widgets)
     end
 
-    frame.ClassIconCooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
-    frame.ClassIconCooldown:SetUseCircularEdge(true)
+    frame.ClassIcon.Cooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
+    frame.ClassIcon.Cooldown:SetUseCircularEdge(true)
 
     frame:SetSize(126, 66)
     frame.SpecIcon:SetSize(14, 14)
@@ -198,9 +198,9 @@ function layout:Initialize(frame)
     local f = frame.ClassIcon
     f:SetSize(34, 34)
     f:Show()
-    f:AddMaskTexture(frame.ClassIconMask)
+    f.Texture:AddMaskTexture(f.Mask)
 
-    frame.ClassIconMask:SetSize(34, 34)
+    f.Mask:SetSize(34, 34)
 
     local trinket = frame.Trinket
     if self.db.trinketCircleBorder then
@@ -304,7 +304,7 @@ function layout:UpdateOrientation(frame)
     local healthBar = frame.HealthBar
     local powerBar = frame.PowerBar
     local classIcon = frame.ClassIcon
-    local classIconMask = frame.ClassIconMask
+    local classIconMask = frame.ClassIcon.Mask
     local name = frame.Name
     local specName = frame.SpecNameText
     local healthText = frame.HealthText
@@ -313,7 +313,7 @@ function layout:UpdateOrientation(frame)
 
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
     classIconMask:ClearAllPoints()
     name:ClearAllPoints()
 
@@ -430,7 +430,7 @@ function layout:UpdateOrientation(frame)
 
         healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -30)
         powerBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -53)
-        classIcon:SetPoint("TOPRIGHT", -2, -2)
+        frame.ClassIcon:SetPoint("TOPRIGHT", -2, -2)
         classIconMask:SetPoint("TOPRIGHT", -2, -2)
 
         --name:SetJustifyH("RIGHT")
@@ -440,7 +440,7 @@ function layout:UpdateOrientation(frame)
 
         healthBar:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -2, -30)
         powerBar:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -2, -53)
-        classIcon:SetPoint("TOPLEFT", 3, -2)
+        frame.ClassIcon:SetPoint("TOPLEFT", 3, -2)
         classIconMask:SetPoint("TOPLEFT", 3, -2)
 
         --name:SetJustifyH("LEFT")
