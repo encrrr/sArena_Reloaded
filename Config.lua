@@ -135,7 +135,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         generalTexture = {
                             order         = 1,
                             type          = "select",
-                            name          = L["Texture_General"],
+                            name          = "|A:UI-LFG-RoleIcon-DPS-Micro:20:20|a " .. L["Texture_General"],
                             desc          = L["Texture_General_Desc"],
                             style         = "dropdown",
                             dialogControl = "LSM30_Statusbar",
@@ -160,7 +160,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         healerTexture = {
                             order         = 2,
                             type          = "select",
-                            name          = L["Texture_Healer"],
+                            name          = "|A:UI-LFG-RoleIcon-Healer-Micro:20:20|a " .. L["Texture_Healer"],
                             desc          = L["Texture_Healer_Desc"],
                             style         = "dropdown",
                             dialogControl = "LSM30_Statusbar",
@@ -708,7 +708,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         castbarStatusBarTexture = {
                             order         = 3,
                             type          = "select",
-                            name          = L["Castbar_Texture"],
+                            name          = "|A:GarrMission_ClassIcon-DemonHunter-Outcast:20:20|a " .. L["Castbar_Texture"],
                             style         = "dropdown",
                             dialogControl = "LSM30_Statusbar",
                             values        = StatusbarValues,
@@ -736,7 +736,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         castbarUninterruptibleTexture = {
                             order         = 3.5,
                             type          = "select",
-                            name          = L["Castbar_UninterruptibleTexture"],
+                            name          = "|A:GarrMission_ClassIcon-DemonHunter-Outcast:20:20|a " .. L["Castbar_UninterruptibleTexture"],
                             style         = "dropdown",
                             dialogControl = "LSM30_Statusbar",
                             values        = StatusbarValues,
@@ -1338,7 +1338,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
         args = {
             combatIndicator = {
                 order = 1,
-                name = L["Widget_CombatIndicator"],
+                name = L["Widget_CombatIndicator"] .. " |A:Food:23:23|a",
                 type = "group",
                 inline = true,
                 args = {
@@ -1426,7 +1426,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
             },
             targetIndicator = {
                 order = 2,
-                name = L["Widget_TargetIndicator"],
+                name = L["Widget_TargetIndicator"] .. " |A:TargetCrosshairs:45:45|a",
                 type = "group",
                 inline = true,
                 args = {
@@ -1514,7 +1514,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
             },
             focusIndicator = {
                 order = 3,
-                name = L["Widget_FocusIndicator"],
+                name = L["Widget_FocusIndicator"] .. " |TInterface\\AddOns\\sArena_Reloaded\\Textures\\Waypoint-MapPin-Untracked.tga:23:23|t",
                 type = "group",
                 inline = true,
                 args = {
@@ -1602,7 +1602,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
             },
             partyTargetIndicators = {
                 order = 4,
-                name = L["Widget_PartyTargetIndicators"],
+                name = L["Widget_PartyTargetIndicators"] .. " |TInterface\\AddOns\\sArena_Reloaded\\Textures\\GM-icon-headCount.tga:19:19|t",
                 type = "group",
                 inline = true,
                 args = {

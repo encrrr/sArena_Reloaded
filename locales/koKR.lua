@@ -98,9 +98,9 @@ L["Category_ClassIcon"] = "직업 아이콘"
 ---------------------------------------
 
 L["Textures"] = "텍스처"
-L["Texture_General"] = "|A:UI-LFG-RoleIcon-DPS-Micro:20:20|a 일반 텍스처"
+L["Texture_General"] = "일반 텍스처"
 L["Texture_General_Desc"] = "팁: 기본 WoW 텍스처를 사용자 정의 텍스처로 교체했고 그것을 원한다면 \"Blizzard Raid Bar\"를 선택하세요."
-L["Texture_Healer"] = "|A:UI-LFG-RoleIcon-Healer-Micro:20:20|a 힐러 텍스처"
+L["Texture_Healer"] = "힐러 텍스처"
 L["Texture_Healer_Desc"] = "팁: 기본적으로 같은 직업이 여러 명일 때만 작동합니다. 항상 텍스처를 변경하려면 \"직업 중복 시에만\" 옵션을 꺼주세요."
 L["Texture_ClassStackingOnly"] = "직업 중복 시에만"
 L["Texture_ClassStackingOnly_Desc"] = "같은 직업이 여러 명일 때만 힐러 텍스처를 변경합니다.\n\n예를 들어 적 팀에 회복 드루이드와 야성 드루이드가 모두 있을 때입니다."
@@ -149,8 +149,8 @@ L["Castbar_HideSpark"] = "시전바 스파크 숨기기"
 L["Castbar_HideSpark_Desc"] = "시전바의 뒤따르는 스파크를 숨깁니다."
 L["Castbar_HideIcon"] = "시전바 아이콘 숨기기"
 L["Castbar_HideIcon_Desc"] = "시전바의 주문 아이콘을 숨깁니다."
-L["Castbar_Texture"] = "|A:GarrMission_ClassIcon-DemonHunter-Outcast:20:20|a 시전바 텍스처"
-L["Castbar_UninterruptibleTexture"] = "|A:GarrMission_ClassIcon-DemonHunter-Outcast:20:20|a 차단 불가 텍스처"
+L["Castbar_Texture"] = "시전바 텍스처"
+L["Castbar_UninterruptibleTexture"] = "차단 불가 텍스처"
 L["Castbar_Colors"] = "시전바 색상"
 L["Castbar_RecolorCastbar"] = "시전바 색상 변경"
 L["Castbar_RecolorCastbar_Desc"] = "사용자 정의 시전바 색상 활성화"
@@ -188,16 +188,16 @@ L["DR_SpecificSizeAdjustment"] = "점감 효과 특정 크기 조정"
 -- Widgets
 ---------------------------------------
 
-L["Widget_CombatIndicator"] = "전투 표시기 |A:Food:23:23|a"
+L["Widget_CombatIndicator"] = "전투 표시기"
 L["Widget_CombatIndicator_Enable"] = "전투 표시기 활성화"
 L["Widget_CombatIndicator_Desc"] = "적이 전투 중이 아닐 때 음식 아이콘을 표시합니다."
-L["Widget_TargetIndicator"] = "대상 표시기 |A:TargetCrosshairs:45:45|a"
+L["Widget_TargetIndicator"] = "대상 표시기"
 L["Widget_TargetIndicator_Enable"] = "대상 표시기 활성화"
 L["Widget_TargetIndicator_Desc"] = "현재 대상에 아이콘을 표시합니다."
-L["Widget_FocusIndicator"] = "주시 대상 표시기 |TInterface\\AddOns\\sArena_Reloaded\\Textures\\Waypoint-MapPin-Untracked.tga:23:23|t"
+L["Widget_FocusIndicator"] = "주시 대상 표시기"
 L["Widget_FocusIndicator_Enable"] = "주시 대상 표시기 활성화"
 L["Widget_FocusIndicator_Desc"] = "현재 주시 대상에 아이콘을 표시합니다."
-L["Widget_PartyTargetIndicators"] = "파티 대상 표시기 |TInterface\\AddOns\\sArena_Reloaded\\Textures\\GM-icon-headCount.tga:19:19|t"
+L["Widget_PartyTargetIndicators"] = "파티 대상 표시기"
 L["Widget_PartyTargetIndicators_Enable"] = "파티 대상 표시기 활성화"
 L["Widget_PartyTargetIndicators_Desc"] = "파티원이 대상을 지정하는 투기장 프레임에 직업 색상 아이콘을 표시합니다."
 
@@ -232,20 +232,6 @@ L["Status_HealthPercent"] = "체력 퍼센트"
 L["Status_PowerPercent"] = "자원 퍼센트"
 L["Status_HealthAndPower"] = "체력과 자원"
 L["Status_HealthAndPowerPercent"] = "체력과 자원 퍼센트"
-
----------------------------------------
--- Layouts
----------------------------------------
-
-L["Layout_Gladiuish"] = "Gladiuish"
-L["Layout_BlizzArena"] = "BlizzArena"
-L["Layout_BlizzCompact"] = "BlizzCompact"
-L["Layout_BlizzRaid"] = "BlizzRaid"
-L["Layout_BlizzRetail"] = "BlizzRetail"
-L["Layout_BlizzTarget"] = "BlizzTarget"
-L["Layout_BlizzTourney"] = "BlizzTourney"
-L["Layout_Pixelated"] = "Pixelated"
-L["Layout_Xaryu"] = "Xaryu"
 
 ---------------------------------------
 -- Additional Options and Messages
@@ -434,6 +420,9 @@ L["Option_StreamerProfiles_Desc"] = "인기 스트리머의 사전 구성된 프
 L["Unknown"] = "알 수 없음"
 L["Unknown_Spell"] = "알 수 없는 주문"
 L["Cooldown_Seconds"] = "재사용 대기시간: %d초"
+
+L["Print_CurrentVersion"] = "현재 버전: %s"
+L["Print_MultipleVersionsLoaded"] = "두 개의 다른 sArena 버전이 로드되었습니다. /sarena를 입력하여 계속할 방법을 선택하세요."
 
 L["Conflict_MultipleVersions"] = "여러 sArena 버전 감지됨"
 L["Conflict_Warning"] = "|A:services-icon-warning:20:20|a |cffff4444두 개의 다른 sArena 버전이 활성화되어 있습니다|r |A:services-icon-warning:20:20|a"

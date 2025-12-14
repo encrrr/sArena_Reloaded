@@ -1329,7 +1329,7 @@ local function ChatCommand(input)
     elseif cmd == "convert" then
         sArenaMixin:ImportOtherForkSettings()
     elseif cmd == "ver" or cmd == "version" then
-        sArenaMixin:Print("Current Version: " .. C_AddOns.GetAddOnMetadata("sArena_Reloaded", "Version"))
+        sArenaMixin:Print(L["Print_CurrentVersion"], C_AddOns.GetAddOnMetadata("sArena_Reloaded", "Version"))
     elseif cmd:match("^test%s*[1-5]$") then
         sArenaMixin.testUnits = tonumber(cmd:match("(%d)"))
         input = "test"
@@ -1459,7 +1459,7 @@ function sArenaMixin:Initialize()
         self:SetLayout(_, db.profile.currentLayout)
     else
         C_Timer.After(5, function()
-            sArenaMixin:Print("Two different versions of sArena are loaded. Please select how you want to continue by typing /sarena")
+            sArenaMixin:Print(L["Print_MultipleVersionsLoaded"])
         end)
     end
 end

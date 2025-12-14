@@ -98,9 +98,9 @@ L["Category_ClassIcon"] = "Class Icon"
 ---------------------------------------
 
 L["Textures"] = "Textures"
-L["Texture_General"] = "|A:UI-LFG-RoleIcon-DPS-Micro:20:20|a General Texture"
+L["Texture_General"] = "General Texture"
 L["Texture_General_Desc"] = "Tip: If you have replaced your default WoW Textures with custom ones and want that then select \"Blizzard Raid Bar\"."
-L["Texture_Healer"] = "|A:UI-LFG-RoleIcon-Healer-Micro:20:20|a Healer Texture"
+L["Texture_Healer"] = "Healer Texture"
 L["Texture_Healer_Desc"] = "Tip: Only active when there is Class Stacking by default. Uncheck \"Class Stacking Only\" if you want it to always change the texture."
 L["Texture_ClassStackingOnly"] = "Class Stacking Only"
 L["Texture_ClassStackingOnly_Desc"] = "Only change the Healer texture when there is class stacking.\n\nFor example when there is both a Resto and a Feral Druid on the enemy team."
@@ -149,8 +149,8 @@ L["Castbar_HideSpark"] = "Hide Castbar Spark"
 L["Castbar_HideSpark_Desc"] = "Hides the trailing spark on the castbar"
 L["Castbar_HideIcon"] = "Hide Castbar Icon"
 L["Castbar_HideIcon_Desc"] = "Hides the spell icon on the castbar"
-L["Castbar_Texture"] = "|A:GarrMission_ClassIcon-DemonHunter-Outcast:20:20|a Castbar Texture"
-L["Castbar_UninterruptibleTexture"] = "|A:GarrMission_ClassIcon-DemonHunter-Outcast:20:20|a Uninterruptible Texture"
+L["Castbar_Texture"] = "Castbar Texture"
+L["Castbar_UninterruptibleTexture"] = "Uninterruptible Texture"
 L["Castbar_Colors"] = "Castbar Colors"
 L["Castbar_RecolorCastbar"] = "Recolor Castbar"
 L["Castbar_RecolorCastbar_Desc"] = "Enable custom castbar colors"
@@ -188,16 +188,16 @@ L["DR_SpecificSizeAdjustment"] = "DR Specific Size Adjustment"
 -- Widgets
 ---------------------------------------
 
-L["Widget_CombatIndicator"] = "Combat Indicator |A:Food:23:23|a"
+L["Widget_CombatIndicator"] = "Combat Indicator"
 L["Widget_CombatIndicator_Enable"] = "Enable Combat Indicator"
 L["Widget_CombatIndicator_Desc"] = "Shows a food icon when the enemy is not in combat"
-L["Widget_TargetIndicator"] = "Target Indicator |A:TargetCrosshairs:45:45|a"
+L["Widget_TargetIndicator"] = "Target Indicator"
 L["Widget_TargetIndicator_Enable"] = "Enable Target Indicator"
 L["Widget_TargetIndicator_Desc"] = "Shows an icon on your current target"
-L["Widget_FocusIndicator"] = "Focus Indicator |TInterface\\AddOns\\sArena_Reloaded\\Textures\\Waypoint-MapPin-Untracked.tga:23:23|t"
+L["Widget_FocusIndicator"] = "Focus Indicator"
 L["Widget_FocusIndicator_Enable"] = "Enable Focus Indicator"
 L["Widget_FocusIndicator_Desc"] = "Shows an icon on your current focus"
-L["Widget_PartyTargetIndicators"] = "Party Target Indicators |TInterface\\AddOns\\sArena_Reloaded\\Textures\\GM-icon-headCount.tga:19:19|t"
+L["Widget_PartyTargetIndicators"] = "Party Target Indicators"
 L["Widget_PartyTargetIndicators_Enable"] = "Enable Party Target Indicators"
 L["Widget_PartyTargetIndicators_Desc"] = "Shows class colored icons on the arena frames that your party members are targeting"
 
@@ -232,20 +232,6 @@ L["Status_HealthPercent"] = "Health Percent"
 L["Status_PowerPercent"] = "Power Percent"
 L["Status_HealthAndPower"] = "Health and Power"
 L["Status_HealthAndPowerPercent"] = "Health and Power Percent"
-
----------------------------------------
--- Layouts
----------------------------------------
-
-L["Layout_Gladiuish"] = "Gladiuish"
-L["Layout_BlizzArena"] = "BlizzArena"
-L["Layout_BlizzCompact"] = "BlizzCompact"
-L["Layout_BlizzRaid"] = "BlizzRaid"
-L["Layout_BlizzRetail"] = "BlizzRetail"
-L["Layout_BlizzTarget"] = "BlizzTarget"
-L["Layout_BlizzTourney"] = "BlizzTourney"
-L["Layout_Pixelated"] = "Pixelated"
-L["Layout_Xaryu"] = "Xaryu"
 
 ---------------------------------------
 -- Additional Options and Messages
@@ -434,6 +420,9 @@ L["Option_StreamerProfiles_Desc"] = "Import pre-configured profiles from popular
 L["Unknown"] = "Unknown"
 L["Unknown_Spell"] = "Unknown Spell"
 L["Cooldown_Seconds"] = "Cooldown: %d seconds"
+
+L["Print_CurrentVersion"] = "Current Version: %s"
+L["Print_MultipleVersionsLoaded"] = "Two different versions of sArena are loaded. Please select how you want to continue by typing /sarena"
 
 L["Conflict_MultipleVersions"] = "Multiple sArena versions detected"
 L["Conflict_Warning"] = "|A:services-icon-warning:20:20|a |cffff4444Two different versions of sArena are enabled|r |A:services-icon-warning:20:20|a"
