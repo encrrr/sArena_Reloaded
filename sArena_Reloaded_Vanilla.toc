@@ -1,5 +1,5 @@
-## Interface: 50502
-## Title: sArena |cffff8000Reloaded|r |T135884:16:16|t
+## Interface: 11508
+## Title: sArena |cffff8000Reloaded|r
 ## Notes: Enhanced Arena Frames
 ## Version: 2.2.9
 ## Author: Stako, "reloaded" by Bodify
@@ -11,4 +11,4 @@
 ## X-Curse-Project-ID: 1351104
 ## X-Wago-ID: 5NRebvG3
 
-sArena_MoP.xml
+sArena_TBC.xml
