@@ -56,7 +56,7 @@ LSM:Register("font", "PT Sans Narrow Bold", "Interface\\Addons\\sArena_Reloaded\
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture
 local stealthAlpha = 0.4
 local shadowsightStartTime = 95
-local shadowsightResetTime = 120
+local shadowsightResetTime = 122
 local shadowSightID = 34709
 sArenaMixin.beenInArena = false
 sArenaMixin.shadowsightTimers = {0, 0}
@@ -1266,7 +1266,7 @@ function sArenaMixin:OnEvent(event, ...)
         self:UpdatePlayerSpec()
         self:SetupGrayTrinket()
         self:AddMasqueSupport()
-        self:SetupCustomCD()
+        --self:SetupCustomCD()
         if sArena_ReloadedDB.reOpenOptions then
             sArena_ReloadedDB.reOpenOptions = nil
             C_Timer.After(0.5, function()
@@ -1296,6 +1296,11 @@ function sArenaMixin:OnEvent(event, ...)
         if isMidnight and not self.midnightDRFrames then
             self.midnightDRFrames = true
             self:InitializeDRFrames()
+        end
+
+        if not self.customCDText then
+            self.customCDText = true
+            self:SetupCustomCD()
         end
 
         if (instanceType == "arena") then
@@ -1529,7 +1534,7 @@ function sArenaMixin:StartShadowsightTimer(time)
     self.ShadowsightTimer:ClearAllPoints()
     if UIWidgetTopCenterContainerFrame then
         self.ShadowsightTimer:SetParent(UIWidgetTopCenterContainerFrame)
-        self.ShadowsightTimer:SetPoint("TOP", UIWidgetTopCenterContainerFrame, "BOTTOM", 0, -4)
+        self.ShadowsightTimer:SetPoint("TOP", UIWidgetTopCenterContainerFrame, "BOTTOM", 0, 5)
     else
         self.ShadowsightTimer:SetPoint("TOP", UIParent, "TOP", 0, -100)
     end
@@ -1722,10 +1727,19 @@ function sArenaMixin:UpdateDecimalThreshold()
     decimalThreshold = self.db.profile.decimalThreshold or 6
 end
 
-function sArenaMixin:CreateCustomCooldown(cooldown, showDecimals)
+function sArenaMixin:CreateCustomCooldown(cooldown, showDecimals, isDR)
     local text = cooldown.sArenaText or cooldown:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
     if not cooldown.sArenaText then
         cooldown.sArenaText = text
+
+        if not cooldown.Text then
+            for _, region in next, { cooldown:GetRegions() } do
+                if region:GetObjectType() == "FontString" then
+                    cooldown.Text = region;
+                    cooldown.Text.fontFile = region:GetFont();
+                end
+            end
+        end
 
         local f, s, o = cooldown.Text:GetFont()
         text:SetFont(f, s, o)
@@ -1774,6 +1788,11 @@ function sArenaMixin:CreateCustomCooldown(cooldown, showDecimals)
                 text:SetText("")
             end
         end)
+    elseif isMidnight and isDR then
+        cooldown:SetScript("OnUpdate", function(self)
+            text:SetText(self.Text:GetText())
+        end)
+        cooldown.Text:SetAlpha(0)
     else
         cooldown:SetScript("OnUpdate", nil)
         text:SetText(nil)
@@ -1789,11 +1808,20 @@ function sArenaMixin:SetupCustomCD()
         -- Class icon cooldown
         self:CreateCustomCooldown(frame.ClassIcon.Cooldown, self.db.profile.showDecimalsClassIcon)
 
-        -- DR frames
-        for _, category in ipairs(self.drCategories) do
-            local drFrame = frame[category]
-            if drFrame and drFrame.Cooldown then
-                self:CreateCustomCooldown(drFrame.Cooldown, self.db.profile.showDecimalsDR)
+        if isMidnight then
+            if frame.drFrames then
+                for _, drFrame in ipairs(frame.drFrames) do
+                    if drFrame and drFrame.Cooldown then
+                        self:CreateCustomCooldown(drFrame.Cooldown, self.db.profile.showDecimalsDR, true)
+                    end
+                end
+            end
+        else
+            for _, category in ipairs(self.drCategories) do
+                local drFrame = frame[category]
+                if drFrame and drFrame.Cooldown then
+                    self:CreateCustomCooldown(drFrame.Cooldown, self.db.profile.showDecimalsDR, true)
+                end
             end
         end
     end
@@ -3329,6 +3357,8 @@ function sArenaFrameMixin:ResetLayout()
         self.CastBar.BorderShield:SetTexture(330124)
     end
 
+    self.ClassIcon:SetFrameStrata("MEDIUM")
+    self.ClassIcon:SetFrameLevel(7)
     self.ClassIcon.Cooldown:SetUseCircularEdge(false)
     self.ClassIcon.Cooldown:SetSwipeTexture(1)
     self.AuraStacks:SetPoint("BOTTOMLEFT", self.ClassIcon.Texture, "BOTTOMLEFT", 2, 0)
@@ -4151,10 +4181,10 @@ function sArenaMixin:Test()
                     local drTextOffsetY = textSettings.drTextOffsetY or -4
 
                     local drCategoryTextures = {
-                        [1] = 136071,     -- Incap (Poly)
+                        [1] = 135899,     -- Incap (Whirl 2)
                         [2] = 135860,     -- Stun (Whirl)
                         [3] = 136100,     -- Root (Entangling Roots)
-                        [4] = 237563,     -- Fear (Dispersion)
+                        [4] = 136011,     -- Fear (Pink dispersion swirl)
                     }
 
                     for drIndex = 1, 4 do
@@ -4176,6 +4206,9 @@ function sArenaMixin:Test()
                         fakeDRFrame.Cooldown:SetAllPoints(fakeDRFrame)
                         fakeDRFrame.Cooldown:SetDrawBling(false)
                         fakeDRFrame.Cooldown:SetHideCountdownNumbers(false)
+                        fakeDRFrame.Cooldown:SetSwipeColor(0, 0, 0, 0.55)
+                        fakeDRFrame.Cooldown.Text = fakeDRFrame.Cooldown:GetCountdownFontString()
+                        fakeDRFrame.Cooldown.Text.fontFile = fakeDRFrame.Cooldown.Text:GetFont()
 
                         -- Create Border texture (identical to real DR frames)
                         fakeDRFrame.Border = fakeDRFrame:CreateTexture(nil, "OVERLAY", nil, 6)
@@ -4214,6 +4247,10 @@ function sArenaMixin:Test()
                             fakeDRFrame.DRText:SetText("½")
                         end
 
+                        if not C_AddOns.IsAddOnLoaded("OmniCC") then
+                            fakeDRFrame.Cooldown:SetHideCountdownNumbers(false)
+                            self:CreateCustomCooldown(fakeDRFrame.Cooldown, self.db.profile.showDecimalsDR, true)
+                        end
                         if self.db.profile.colorDRCooldownText and fakeDRFrame.Cooldown.sArenaText then
                             if drIndex == 1 then
                                 fakeDRFrame.Cooldown.sArenaText:SetTextColor(1, 0, 0, 1)
@@ -4234,11 +4271,9 @@ function sArenaMixin:Test()
                         fakeDRFrame.Cooldown:SetCooldown(currTime, math.random(12, 25))
                     end
 
-                    -- Apply DR settings to newly created fake frames
                     self:UpdateDRSettings(drSettings)
                 end
 
-                -- Show and update all FAKE DR frames (for every test call)
                 if frame.fakeDRFrames then
                     for n = 1, 4 do
                         local fakeDRFrame = frame.fakeDRFrames[n]

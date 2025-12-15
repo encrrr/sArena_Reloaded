@@ -1,3 +1,32 @@
+local drCategories = sArenaMixin.drCategories
+
+function sArenaFrameMixin:ResetDRCooldownTextColors()
+	if not sArenaMixin.isMidnight then
+		for i = 1, #drCategories do
+			local drFrame = self[drCategories[i]]
+			if drFrame and drFrame.Cooldown.sArenaText then
+				drFrame.Cooldown.sArenaText:SetTextColor(1, 1, 1, 1)
+			end
+		end
+	else
+		if self.drFrames then
+			for _, drFrame in ipairs(self.drFrames) do
+				if drFrame and drFrame.Cooldown and drFrame.Cooldown.sArenaText then
+					drFrame.Cooldown.sArenaText:SetTextColor(1, 1, 1, 1)
+				end
+			end
+		end
+
+		if self.fakeDRFrames then
+			for _, fakeDRFrame in ipairs(self.fakeDRFrames) do
+				if fakeDRFrame and fakeDRFrame.Cooldown and fakeDRFrame.Cooldown.sArenaText then
+					fakeDRFrame.Cooldown.sArenaText:SetTextColor(1, 1, 1, 1)
+				end
+			end
+		end
+	end
+end
+
 if sArenaMixin.isMidnight then return end
 
 local isRetail = sArenaMixin.isRetail
@@ -6,7 +35,6 @@ local isRetail = sArenaMixin.isRetail
 -- Can be changed in gui, /sarena
 local drTime = (isRetail and 18.5) or 20 -- ^^^^^^^^^^^^
 local drList = sArenaMixin.drList
-local drCategories = sArenaMixin.drCategories
 local severityColor = {
 	[1] = { 0, 1, 0, 1 },
 	[2] = { 1, 1, 0, 1 },
@@ -219,14 +247,5 @@ end
 function sArenaFrameMixin:ResetDR()
 	for i = 1, #drCategories do
 		self[drCategories[i]].Cooldown:Clear()
-	end
-end
-
-function sArenaFrameMixin:ResetDRCooldownTextColors()
-	for i = 1, #drCategories do
-		local drFrame = self[drCategories[i]]
-		if drFrame and drFrame.Cooldown.sArenaText then
-			drFrame.Cooldown.sArenaText:SetTextColor(1, 1, 1, 1)
-		end
 	end
 end
