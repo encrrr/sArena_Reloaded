@@ -91,6 +91,12 @@ function sArenaFrameMixin:FindDR(combatEvent, spellID)
         local startTime, startDuration = frame.Cooldown:GetCooldownTimes()
         startTime, startDuration = startTime/1000, startDuration/1000
 
+        -- Guard against division by zero
+        if startDuration == 0 or (1 - ((currTime - startTime) / startDuration)) == 0 then
+            sArenaMixin:Print("|cFFFF0000BUG: DR failed:|r " .. spellID .. ", " .. combatEvent .. ", " .. currTime .. ", " .. startTime .. ", " .. startDuration)
+            return
+        end
+
         local newDuration = drTime / (1 - ((currTime - startTime) / startDuration))
         local newStartTime = drTime + currTime - newDuration
 
