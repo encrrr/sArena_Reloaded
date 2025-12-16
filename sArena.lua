@@ -303,6 +303,149 @@ function sArenaMixin:CompatibilityEnsurer()
     end
 end
 
+local function TEMPShareCollectedData()
+    if not sArena_ReloadedDB or not sArena_ReloadedDB.collectData then
+        sArenaMixin:Print("Data collection is not enabled. Set db.collectData = true first.")
+        return
+    end
+
+    local hasSpells = sArena_ReloadedDB.collectedSpells and next(sArena_ReloadedDB.collectedSpells) ~= nil
+    local hasAuras = sArena_ReloadedDB.collectedAuras and next(sArena_ReloadedDB.collectedAuras) ~= nil
+
+    if not hasSpells and not hasAuras then
+        sArenaMixin:Print("No spell data has been collected yet.")
+        return
+    end
+
+    if not sArenaMixin.DataExportFrame then
+        local frame = CreateFrame("Frame", "sArenaDataExportFrame", UIParent, "BackdropTemplate")
+        frame:SetSize(600, 500)
+        frame:SetPoint("CENTER")
+        frame:SetFrameStrata("DIALOG")
+        frame:SetBackdrop({
+            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true, tileSize = 32, edgeSize = 32,
+            insets = { left = 11, right = 12, top = 12, bottom = 11 }
+        })
+        frame:SetBackdropColor(0, 0, 0, 1)
+        frame:EnableMouse(true)
+        frame:SetMovable(true)
+        frame:RegisterForDrag("LeftButton")
+        frame:SetScript("OnDragStart", frame.StartMoving)
+        frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+
+        -- Title
+        local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        title:SetPoint("TOP", 0, -15)
+        title:SetText("sArena Collected Spell Data")
+
+        -- Close button
+        local closeButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
+        closeButton:SetPoint("TOPRIGHT", -5, -5)
+
+        -- ScrollFrame for EditBox
+        local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
+        scrollFrame:SetPoint("TOPLEFT", 20, -45)
+        scrollFrame:SetPoint("BOTTOMRIGHT", -35, 50)
+
+        -- EditBox
+        local editBox = CreateFrame("EditBox", nil, scrollFrame)
+        editBox:SetMultiLine(true)
+        editBox:SetAutoFocus(false)
+        editBox:SetFontObject("ChatFontNormal")
+        editBox:SetWidth(scrollFrame:GetWidth())
+        editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
+        scrollFrame:SetScrollChild(editBox)
+
+        -- Select All button
+        local selectAllButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        selectAllButton:SetSize(120, 25)
+        selectAllButton:SetPoint("BOTTOM", 0, 15)
+        selectAllButton:SetText("Select All")
+        selectAllButton:SetScript("OnClick", function()
+            editBox:HighlightText()
+            editBox:SetFocus()
+        end)
+
+        frame.editBox = editBox
+        sArenaMixin.DataExportFrame = frame
+    end
+
+    local output = {}
+    local totalCount = 0
+
+    if hasSpells then
+        table.insert(output, "-- Collected Spell Casts")
+        table.insert(output, "sArenaMixin.collectedSpells = {")
+
+        local sortedSpellIDs = {}
+        for spellID in pairs(sArena_ReloadedDB.collectedSpells) do
+            table.insert(sortedSpellIDs, spellID)
+        end
+        table.sort(sortedSpellIDs)
+
+        for _, spellID in ipairs(sortedSpellIDs) do
+            local data = sArena_ReloadedDB.collectedSpells[spellID]
+            local spellName = data[1] or "Unknown"
+            local sourceClass = data[2] or "Unknown"
+            local type = data[3] or "Unknown"
+
+            -- Escape special characters in spell name
+            spellName = spellName:gsub("\\", "\\\\"):gsub('"', '\\"')
+
+            table.insert(output, string.format('    [%d] = {"%s", "%s", "%s"}, -- %s',
+                spellID, spellName, sourceClass, type, spellName))
+        end
+
+        table.insert(output, "}")
+        table.insert(output, "")
+        totalCount = totalCount + #sortedSpellIDs
+    end
+
+    if hasAuras then
+        table.insert(output, "-- Collected Auras (Buffs/Debuffs)")
+        table.insert(output, "sArenaMixin.collectedAuras = {")
+
+        local sortedAuraIDs = {}
+        for spellID in pairs(sArena_ReloadedDB.collectedAuras) do
+            table.insert(sortedAuraIDs, spellID)
+        end
+        table.sort(sortedAuraIDs)
+
+        for _, spellID in ipairs(sortedAuraIDs) do
+            local data = sArena_ReloadedDB.collectedAuras[spellID]
+            local spellName = data[1] or "Unknown"
+            local sourceClass = data[2] or "Unknown"
+            local auraType = data[3] or "Unknown"
+
+            -- Escape special characters in spell name
+            spellName = spellName:gsub("\\", "\\\\"):gsub('"', '\\"')
+
+            table.insert(output, string.format('    [%d] = {"%s", "%s", "%s"}, -- %s',
+                spellID, spellName, sourceClass, auraType, spellName))
+        end
+
+        table.insert(output, "}")
+        totalCount = totalCount + #sortedAuraIDs
+    end
+
+    -- Join all lines
+    local formattedData = table.concat(output, "\n")
+
+    -- Set the text and show the frame
+    sArenaMixin.DataExportFrame.editBox:SetText(formattedData)
+    sArenaMixin.DataExportFrame:Show()
+
+    -- Automatically select all text
+    C_Timer.After(0.1, function()
+        sArenaMixin.DataExportFrame.editBox:HighlightText()
+        sArenaMixin.DataExportFrame.editBox:SetFocus()
+    end)
+
+    sArenaMixin:Print("Collected %d total entries. Data displayed in export window.", totalCount)
+end
+
 local db
 local emptyLayoutOptionsTable = {
     notice = {
@@ -1147,6 +1290,32 @@ function sArenaMixin:OnEvent(event, ...)
 
             -- Old Arena Spec Detection
             if isOldArena then
+
+                -- TEMP DATACOLLECT
+                if sArena_ReloadedDB.collectData then
+                    local spellName = C_Spell.GetSpellName(spellID)
+                    local _, sourceClass = GetPlayerInfoByGUID(sourceGUID)
+
+                    if combatEvent == "SPELL_CAST_SUCCESS" then
+                        if not sArena_ReloadedDB.collectedSpells then
+                            sArena_ReloadedDB.collectedSpells = {}
+                        end
+                        if not sArena_ReloadedDB.collectedSpells[spellID] then
+                            print("added CAST spellID:", spellID)
+                            sArena_ReloadedDB.collectedSpells[spellID] = {spellName, sourceClass, "CAST"}
+                        end
+                    elseif combatEvent == "SPELL_AURA_APPLIED" then
+                        if not sArena_ReloadedDB.collectedAuras then
+                            sArena_ReloadedDB.collectedAuras = {}
+                        end
+                        if not sArena_ReloadedDB.collectedAuras[spellID] then
+                            print("added AURA spellID:", spellID, auraType)
+                            sArena_ReloadedDB.collectedAuras[spellID] = {spellName, sourceClass, auraType}
+                        end
+                    end
+                end
+                -- TEMP DATACOLLECT
+
                 if (sArenaMixin.specCasts[spellID] or sArenaMixin.specBuffs[spellID]) then
                     for i = 1, sArenaMixin.maxArenaOpponents do
                         if (sourceGUID == UnitGUID("arena" .. i)) then
@@ -1542,6 +1711,7 @@ function sArenaMixin:Initialize()
     LibStub("AceConfig-3.0"):RegisterOptionsTable("sArena", self.optionsTable)
     LibStub("AceConfigDialog-3.0"):SetDefaultSize("sArena", compatIssue and 520 or 860, compatIssue and 300 or 690)
     LibStub("AceConsole-3.0"):RegisterChatCommand("sarena", ChatCommand)
+    LibStub("AceConsole-3.0"):RegisterChatCommand("sarenasend", TEMPShareCollectedData)
     if not compatIssue then
         self:DatabaseCleanup(db)
         if not isMidnight then
