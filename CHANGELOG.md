@@ -1,3 +1,6 @@
+2.3.1
+- Add Wrath support
+
 2.3.0
 - New Shadowsight Timer setting (Global). Enabled by default on TBC, off on others.
 - New "Color DR Cooldown Text by Severity" setting (Global -> DR) (Does not work with OmniCC).

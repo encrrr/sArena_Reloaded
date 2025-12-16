@@ -13,22 +13,21 @@
 
     <Script file="sArena_Init.lua"/>
     <Script file="sArena.lua"/>
-    <Script file="Data\SpecSpells_TBC.lua"/>
+    <Script file="Data\SpecSpells_Wrath.lua"/>
     <Script file="Modules\SpecFinder.lua"/>
     <Script file="Modules\Interrupt.lua"/>
     <Script file="Modules\Racials.lua"/>
     <Script file="Modules\Dispels.lua"/>
-    <Script file="Data\DrList_TBC.lua"/>
+    <Script file="Data\DrList_Wrath.lua"/>
     <Script file="Modules\DiminishingReturns.lua"/>
     <Script file="Data\Profiles.lua"/>
     <Script file="Config.lua"/>
-    <Script file="Data\AuraList_TBC.lua"/>
+    <Script file="Data\AuraList_Wrath.lua"/>
     <Script file="Modules\Auras.lua"/>
     <Script file="Modules\Trinkets.lua"/>
     <Script file="Modules\ModernCastbar.lua"/>
     <Script file="Modules\ImportExport.lua"/>
     <Script file="Layouts\BlizzArena.lua"/>
-    <Script file="Layouts\BlizzRaid.lua"/>
     <Script file="Layouts\BlizzRetail.lua"/>
     <Script file="Layouts\BlizzCompact.lua"/>
     <Script file="Layouts\BlizzTourney.lua"/>
@@ -101,7 +100,7 @@
         </Scripts>
     </Frame>
 
-    <StatusBar name="sArenaCastBarFrameTemplate" mixin="CastingBarMixin"  enablemouse="true" movable="true" virtual="true" hidden="true">
+    <StatusBar name="sArenaCastBarFrameTemplate" enablemouse="true" movable="true" virtual="true" hidden="true">
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture setAllPoints="true">
@@ -127,7 +126,7 @@
 
             <Layer level="OVERLAY">
                 <Texture parentKey="Spark" file="Interface\CastingBar\UI-CastingBar-Spark" alphaMode="ADD">
-                    <Size x="12" y="21"/>
+                    <Size x="14" y="37"/>
                     <Anchors>
                         <Anchor point="CENTER"/>
                     </Anchors>
@@ -141,16 +140,14 @@
                 </Texture>
             </Layer>
         </Layers>
+        <Scripts>
+            <OnLoad function="CastingBarFrame_OnLoad"/>
+            <OnEvent function="CastingBarFrame_OnEvent"/>
+            <OnUpdate function="CastingBarFrame_OnUpdate"/>
+            <OnShow function="CastingBarFrame_OnShow"/>
+        </Scripts>
         <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
         <BarColor r="1.0" g="0.7" b="0.0"/>
-        <Scripts>
-            <OnLoad>
-                self:OnLoad(nil, true, false);
-            </OnLoad>
-            <OnEvent method="OnEvent" />
-            <OnUpdate method="OnUpdate" />
-            <OnShow method="OnShow" />
-        </Scripts>
     </StatusBar>
 
     <Frame name="sArenaIconFrameTemplate" enablemouse="true" movable="true" virtual="true">
@@ -243,6 +240,7 @@
                     </Layer>
                 </Layers>
             </StatusBar>
+            <StatusBar parentKey="CastBar" inherits="sArenaCastBarFrameTemplate"/>
             <Frame parentKey="ClassIcon" frameLevel="7" enablemouse="true" movable="true">
                 <Layers>
                     <Layer level="BORDER" textureSubLevel="1">
@@ -278,7 +276,7 @@
                 </Layers>
             </Frame>
 
-            <Frame parentKey="WidgetOverlay" frameStrata="HIGH" frameLevel="10" setAllPoints="true">
+            <Frame parentKey="WidgetOverlay" frameLevel="10" setAllPoints="true">
                 <Frames>
                     <Frame parentKey="targetIndicator" inherits="sArenaWidgetFrameTemplate">
                         <KeyValues>
@@ -313,6 +311,20 @@
             <Frame parentKey="Trinket" inherits="sArenaIconFrameTemplate"/>
             <Frame parentKey="Racial" inherits="sArenaIconFrameTemplate"/>
             <Frame parentKey="Dispel" inherits="sArenaIconFrameTemplate"/>
+
+            <Frame parentKey="Incapacitate" inherits="sArenaDRFrameTemplate"/>
+            <Frame parentKey="Stun" inherits="sArenaDRFrameTemplate"/>
+            <Frame parentKey="RandomStun" inherits="sArenaDRFrameTemplate"/>
+            <Frame parentKey="RandomRoot" inherits="sArenaDRFrameTemplate"/>
+			<Frame parentKey="Root" inherits="sArenaDRFrameTemplate"/>
+			<Frame parentKey="Disarm" inherits="sArenaDRFrameTemplate"/>
+			<Frame parentKey="Fear" inherits="sArenaDRFrameTemplate"/>
+            <Frame parentKey="Disorient" inherits="sArenaDRFrameTemplate"/>
+			<Frame parentKey="Silence" inherits="sArenaDRFrameTemplate"/>
+			<Frame parentKey="Horror" inherits="sArenaDRFrameTemplate"/>
+			<Frame parentKey="MindControl" inherits="sArenaDRFrameTemplate"/>
+			<Frame parentKey="Cyclone" inherits="sArenaDRFrameTemplate"/>
+			<Frame parentKey="Charge" inherits="sArenaDRFrameTemplate"/>
         </Frames>
 
         <Scripts>

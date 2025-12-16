@@ -1,6 +1,6 @@
 # sArena Reloaded
 
-New and updated sArena Frames with tons of new great features. Works for Midnight, The War Within, Mists of Pandaria and The Burning Crusade. Fork of sArena addon made by Stako, and maintained by many in the PvP community.
+New and updated sArena Frames with tons of new great features. Works for Midnight, TWW, MoP, Wrath and TBC. Fork of sArena addon made by Stako, and maintained by many in the PvP community.
 
 This is a further improvement of my sArena MoP Classic addon and it also brings it to Retail. This version will work on both Retail and MoP. This version will let you import settings from both sArena MoP and any other sArena version, see below.
 
