@@ -141,6 +141,13 @@ sArenaMixin.auraList = {
     [137143]  = 9,    -- Blood Horror
     [87204]   = 9,    -- Sin and Punishment
     [127361]  = 9,    -- Bear Hug (Symbiosis)
+    [12809]   = 9,    -- Concussion Blow
+    [20253]   = 9,    -- Intercept Stun (Rank 1)
+    [20614]   = 9,    -- Intercept Stun (Rank 2)
+    [20615]   = 9,    -- Intercept Stun (Rank 3)
+    [25273]   = 9,    -- Intercept Stun (Rank 4)
+    [13237]   = 9,    -- Goblin Mortar (Item)
+    [835]     = 9,    -- Tidal Charm (Item)
 
     -- Stun Procs
     [34510]   = 9,    -- Stun (various procs)
@@ -155,6 +162,11 @@ sArenaMixin.auraList = {
     [12359]   = 9,    -- Impact
     [12360]   = 9,    -- Impact
     [23454]   = 9,    -- Stun
+    [19410]   = 9,    -- Improved Concussive Shot
+    [20170]   = 9,    -- Seal of Justice Stun
+    [18093]   = 9,    -- Pyroclasm
+    [39796]   = 9,    -- Stoneclaw Stun
+    [12798]   = 9,    -- Revenge Stun
 
     -- Disorient / Incapacitate / Fear / Charm
     [2094]    = 9,    -- Blind
@@ -338,6 +350,7 @@ sArenaMixin.auraList = {
     [676]     = 5,    -- Disarm
     [15752]   = 5,    -- Disarm
     [14251]   = 5,    -- Riposte
+    [34097]   = 5,    -- Riposte 2 (TODO: not sure which ID is correct)
     [51722]   = 5,    -- Dismantle
     [50541]   = 5,    -- Clench (Scorpid)
     [91644]   = 5,    -- Snatch (Bird of Prey)
@@ -419,6 +432,12 @@ sArenaMixin.auraList = {
     [91807]   = 4,      -- Shambling Rush
     [135373]  = 4,      -- Entrapment
     [45334]   = 4,      -- Immobilized
+    [19306]   = 4,      -- Counterattack (Rank 1)
+    [20909]   = 4,      -- Counterattack (Rank 2)
+    [20910]   = 4,      -- Counterattack (Rank 3)
+    [27067]   = 4,      -- Counterattack (Rank 4)
+    [19229]   = 4,      -- Improved Wing Clip
+    [12494]   = 4,      -- Frostbite
 
     [22734]   = 3.6,    -- Drink
 
