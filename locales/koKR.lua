@@ -323,7 +323,7 @@ L["Racial_ShowInTrinketSlot_Desc"] = "적이 장신구를 장착하지 않았으
 L["Human_AlwaysShowTrinket"] = "인간에게 항상 얼라이언스 장신구 표시"
 L["Human_AlwaysShowTrinket_Desc"] = "인간 플레이어가 장신구를 장착하지 않았어도 항상 얼라이언스 장신구 텍스처를 표시합니다."
 
-L["Drag_Hint"] = "|cffff3300     |T132961:16|t Ctrl+shift+클릭하여 드래그|r"
+L["Drag_Hint"] = "|cffff3300|T132961:16|t Ctrl+Shift+클릭하여 드래그|r"
 
 L["Option_AddonConflict"] = "애드온 충돌"
 L["Option_Layout"] = "레이아웃"
@@ -345,6 +345,8 @@ L["Option_HideClassIconShowAurasOnly"] = "직업 아이콘 숨기기 (오라만 
 L["Option_DisableAurasOnClassIcon"] = "직업 아이콘에 오라 비활성화"
 L["Option_ShadowsightTimer"] = "어둠의 시야 타이머 활성화"
 L["Option_ShadowsightTimer_Desc"] = "투기장에서 어둠의 시야 버프가 생성될 때 화면 상단에 타이머를 표시합니다"
+L["Shadowsight_Ready"] = "어둠의 시야 준비됨"
+L["Shadowsight_SpawnsIn"] = "어둠의 시야 생성까지 %d초"
 L["Option_ColorTrinket"] = "장신구 색상"
 L["Option_ColorNonVisibleFramesGray"] = "비표시 프레임 회색으로 표시"
 L["Option_ShowDecimalsOnClassIcon"] = "직업 아이콘에 소수점 표시"

@@ -1830,10 +1830,10 @@ function sArenaMixin:UpdateShadowsightDisplay()
             return
         elseif currentTime >= spawnTime then
             local iconTexture = "|T136155:15:15|t"
-            self.ShadowsightTimer.Text:SetText("Shadowsights Ready " .. iconTexture .. " " .. iconTexture)
+            self.ShadowsightTimer.Text:SetText(L["Shadowsight_Ready"] .. " " .. iconTexture .. " " .. iconTexture)
         else
             local timeLeft = math.ceil(spawnTime - currentTime)
-            self.ShadowsightTimer.Text:SetText(string.format("Shadowsight spawns in %d sec", timeLeft))
+            self.ShadowsightTimer.Text:SetText(string.format(L["Shadowsight_SpawnsIn"], timeLeft))
         end
         return
     end
@@ -4745,7 +4745,7 @@ function sArenaMixin:Test()
         local t = f:CreateFontString(nil, "OVERLAY")
         t:SetFontObject("GameFontHighlightLarge")
         t:SetFont(self.pFont, 12, "OUTLINE")
-        t:SetText("|T132961:16|t Ctrl+Shift+Click to drag|r")
+        t:SetText(L["Drag_Hint"])
         t:SetPoint("BOTTOM", topFrame, "TOP", 17, 17)
 
         local bg = f:CreateTexture(nil, "BACKGROUND", nil, -1)

@@ -323,7 +323,7 @@ L["Racial_ShowInTrinketSlot_Desc"] = "If the enemy doesn't have a Trinket equipp
 L["Human_AlwaysShowTrinket"] = "Always Show Alliance Trinket for Humans"
 L["Human_AlwaysShowTrinket_Desc"] = "Always show the Alliance trinket texture on Human players, even if they don't have a trinket equipped."
 
-L["Drag_Hint"] = "|cffff3300     |T132961:16|t Ctrl+shift+click to drag stuff|r"
+L["Drag_Hint"] = "|cffff3300|T132961:16|t Ctrl+Shift+Click to drag|r"
 
 L["Option_AddonConflict"] = "Addon Conflict"
 L["Option_Layout"] = "Layout"
@@ -345,6 +345,8 @@ L["Option_HideClassIconShowAurasOnly"] = "Hide Class Icon (Show Auras Only)"
 L["Option_DisableAurasOnClassIcon"] = "Disable Auras on Class Icon"
 L["Option_ShadowsightTimer"] = "Enable Shadowsight Timer"
 L["Option_ShadowsightTimer_Desc"] = "Show a timer at the top of the screen for when Shadowsight buffs spawn in the arena"
+L["Shadowsight_Ready"] = "Shadowsights Ready"
+L["Shadowsight_SpawnsIn"] = "Shadowsight spawns in %d sec"
 L["Option_ColorTrinket"] = "Color Trinket"
 L["Option_ColorNonVisibleFramesGray"] = "Color Non-Visible Frames Gray"
 L["Option_ShowDecimalsOnClassIcon"] = "Show Decimals on Class Icon"
