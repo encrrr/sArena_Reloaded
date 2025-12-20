@@ -1294,7 +1294,16 @@ function sArenaMixin:OnEvent(event, ...)
                 -- TEMP DATACOLLECT
                 if sArena_ReloadedDB.collectData then
                     local spellName = C_Spell.GetSpellName(spellID)
-                    local _, sourceClass = GetPlayerInfoByGUID(sourceGUID)
+                    local _, sourceClass
+                    if sourceGUID and select(1, strsplit("-", sourceGUID)) == "Player" then
+                        _, sourceClass = GetPlayerInfoByGUID(sourceGUID)
+                    else
+                        local npcID = nil
+                        if sourceGUID and type(sourceGUID) == "string" then
+                            npcID = tonumber(sourceGUID:match("%-([0-9]+)%-%x+$"))
+                        end
+                        sourceClass = npcID and ("NPC:" .. npcID) or "NPC"
+                    end
 
                     if combatEvent == "SPELL_CAST_SUCCESS" then
                         if not sArena_ReloadedDB.collectedSpells then
