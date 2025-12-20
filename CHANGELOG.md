@@ -1,3 +1,6 @@
+2.3.1c
+- Add temporary icon for missing trinket texture (will get the retail texture eventualy)
+
 2.3.1b
 - Fixup TBC stuff.
 - Add a guard for potential DR error, will print error msg, please report back.
