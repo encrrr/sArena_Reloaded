@@ -1398,32 +1398,11 @@ function sArenaMixin:OnEvent(event, ...)
 
         -- Interrupts
         if sArenaMixin.interruptList[spellID] then
-            if combatEvent == "SPELL_INTERRUPT" then
+            if combatEvent == "SPELL_INTERRUPT" or combatEvent == "SPELL_CAST_SUCCESS" then
                 for i = 1, sArenaMixin.maxArenaOpponents do
                     if (destGUID == UnitGUID("arena" .. i)) then
                         local ArenaFrame = self["arena" .. i]
-                        ArenaFrame:FindInterrupt(combatEvent, spellID)
-                        local castBar = ArenaFrame.CastBar
-
-                        if sourceName then
-                            local name, server = strsplit("-", sourceName)
-                            local colorStr = "ffFFFFFF"
-
-                            if C_PlayerInfo.GUIDIsPlayer(sourceGUID) then
-                                local _, englishClass = GetPlayerInfoByGUID(sourceGUID)
-                                if englishClass then
-                                    colorStr = RAID_CLASS_COLORS[englishClass].colorStr
-                                end
-                            end
-
-                            local interruptedByName = string.format("|c%s[%s]|r", colorStr, name)
-                            castBar.interruptedBy = interruptedByName
-                            castBar.Text:SetText(interruptedByName)
-                            castBar:Show()
-                            C_Timer.After(1, function()
-                                castBar.interruptedBy = nil
-                            end)
-                        end
+                        ArenaFrame:FindInterrupt(combatEvent, spellID, sourceName, sourceGUID)
                         break
                     end
                 end
