@@ -3788,11 +3788,17 @@ function sArenaFrameMixin:SetStatusText(unit)
             self.HealthText:SetFormattedText("%0.f%%", UnitHealthPercent(unit, nil, CurveConstants.ScaleTo100))
             self.PowerText:SetFormattedText("%0.f%%", UnitPowerPercent(unit, nil, CurveConstants.ScaleTo100))
         else
-            local hpPercent = (hpMax > 0) and ceil((hp / hpMax) * 100) or 0
-            local ppPercent = (ppMax > 0) and ceil((pp / ppMax) * 100) or 0
+            -- UnitHealth returns percent on TBC
+            if isTBC then
+                self.HealthText:SetText(hp .. "%")
+                self.PowerText:SetText(pp .. "%")
+            else
+                local hpPercent = (hpMax > 0) and ceil((hp / hpMax) * 100) or 0
+                local ppPercent = (ppMax > 0) and ceil((pp / ppMax) * 100) or 0
 
-            self.HealthText:SetText(hpPercent .. "%")
-            self.PowerText:SetText(ppPercent .. "%")
+                self.HealthText:SetText(hpPercent .. "%")
+                self.PowerText:SetText(ppPercent .. "%")
+            end
         end
     else
         if db.profile.statusText.formatNumbers then
