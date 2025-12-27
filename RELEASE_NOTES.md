@@ -1,3 +1,6 @@
+2.3.1e
+- Fix alpha issue on stealth units.
+
 2.3.1d
 - Fix interrupts on channel spells not showing due to workaround for non-working Blizzard API being set up slightly wrong in some refactoring.
 
