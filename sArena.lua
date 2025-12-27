@@ -1677,7 +1677,7 @@ function sArenaMixin:UpdateNoTrinketTexture()
     if self.db.profile.removeUnequippedTrinketTexture then
         sArenaMixin.noTrinketTexture = nil
     else
-        sArenaMixin.noTrinketTexture = "Interface\\AddOns\\sArena_Reloaded\\Textures\\inv_pet_exitbattle.tga"
+        sArenaMixin.noTrinketTexture = 638661
     end
 end
 
@@ -2997,7 +2997,7 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
         else
             self:UpdatePlayer()
         end
-        self:SetAlpha((isOldArena and (UnitExists(self.unit) and 1 or stealthAlpha)) or 1)
+        --self:SetAlpha((isOldArena and (UnitExists(self.unit) and 1 or stealthAlpha)) or (UnitIsVisible(self.unit) and 1 or stealthAlpha))
         self.HealthBar:SetAlpha(1)
         if TestTitle then
             TestTitle:Hide()
