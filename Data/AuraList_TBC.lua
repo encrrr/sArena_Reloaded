@@ -497,6 +497,7 @@ sArenaMixin.auraList = {
     [120954]  = 3,      -- Fortifying Brew
     [115176]  = 3,      -- Zen Meditation
     [81782]   = 3,      -- Power Word: Barrier
+    [12976]   = 2.9,    -- Last Stand
     [109964]  = 2.9,    -- Spirit Shell (Buff)
     [102342]  = 2.9,    -- Ironbark
     [50461]   = 2.9,    -- Anti-Magic Zone
@@ -553,6 +554,7 @@ sArenaMixin.auraList = {
     [31643]   = 2,       -- Blazing Speed
     [84747]   = 1.9,     -- Deep Insight (Red Buff Rogue)
     [1247275] = 1.9,     -- Tigereye Brew (Monk)
+    [14177] = 1.9,       -- Cold Blood
 
     [76577]   = 1.8,     -- Smoke Bomb
     [88611]   = 1.8,     -- Smoke Bomb
@@ -563,6 +565,7 @@ sArenaMixin.auraList = {
     [126084]  = 1.6,     -- Fingers of Frost
     [44544]   = 1.6,     -- Fingers of Frost
     [77616]   = 1.6,     -- Dark Simulacrum (Buff, has spell)
+    [20216] = 1.6, -- Divine Favor
 
     -- Freedoms
     [96268]   = 1.4,    -- Deaths Advance
@@ -576,9 +579,12 @@ sArenaMixin.auraList = {
     --[102351] = 1.2, -- Cenarion Ward
     --[33763] = 1.1, -- Lifebloom
     --[121279] = 1.1, -- Lifebloom
+    [467] = 1.3, -- Thorns
+    [26992] = 1.3, -- Thorns
 
 
     -- Misc
+    [18708] = 0.9,      -- Fel Domination
     [34709]  = 0.9,     -- Shadow Sight (Arena Eye)
     [110806] = 0.9,     -- Spirit Walker's Grace (Symbiosis)
     [11426]  = 0.8,     -- Ice Barrier
@@ -602,6 +608,9 @@ sArenaMixin.auraList = {
     [60947]  = 0.4,     -- Nightmare (30%)
     [1715]   = 0.4,     -- Hamstring (50%)
     [116095] = 0.4,     -- Disable (50%)
+
+    [1953] = 0.5,      -- Blink
+    [46989] = 0.4,     -- Improved Blink (25% chance to miss attacks and spells, 4sec buff)
 
     -- Miscellaneous
     [25771]  = 0.3,     -- Forbearance (debuff)
