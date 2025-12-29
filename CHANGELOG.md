@@ -1,3 +1,6 @@
+2.3.2
+- TBC aura list cleanup and added a few things.
+
 2.3.1e
 - Fix alpha issue on stealth units.
 
