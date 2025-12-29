@@ -20,14 +20,10 @@ sArenaMixin.interruptList = {
 
 -- Auras we want tooltip info from to display as stacks
 sArenaMixin.tooltipInfoAuras = {
-    --[115867] = true, -- Mana Tea
-    [1247275] = true,     -- Tigereye Brew
 }
 
+-- Auras reducing interrupt durations
 sArenaMixin.spellLockReducer = {
-    [317920] = 0.7, -- Concentration Aura
-    [234084] = 0.5, -- Moon and Stars
-    [383020] = 0.5, -- Tranquil Air
 }
 
 sArenaMixin.auraList = {
