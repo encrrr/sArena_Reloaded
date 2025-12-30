@@ -313,8 +313,6 @@ sArenaMixin.auraList = {
 
     -- Lesser defensives
     [1966]    = 1.3,   -- Feint
-    [467] = 1.3, -- Thorns
-    [26992] = 1.3, -- Thorns
 
     -- Misc
     [18708] = 0.9,      -- Fel Domination
