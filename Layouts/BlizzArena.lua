@@ -1,6 +1,7 @@
 local layoutName = "BlizzArena"
 local layout = {}
 layout.name = "|cff00b4ffBlizz|r Arena"
+local L = sArenaMixin.L
 
 layout.defaultSettings = {
     posX = 330,
@@ -113,7 +114,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.positioning.args.mirrored = {
         order = 5,
-        name = "Mirrored Frames",
+        name = L["Option_MirroredFrames"],
         type = "toggle",
         width = "full",
         get = getSetting,
@@ -122,8 +123,8 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.other.args.trinketCircleBorder = {
         order = 3,
-        name = "Trinket Circle Border",
-        desc = "Enable circular border for trinket icons",
+        name = L["Option_TrinketCircleBorder"],
+        desc = L["Option_TrinketCircleBorder_Desc"],
         type = "toggle",
         get = getSetting,
         set = setSetting,
@@ -149,8 +150,10 @@ function layout:Initialize(frame)
         frame.parent:UpdateWidgetSettings(self.db.widgets)
     end
 
-    frame.ClassIconCooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
-    frame.ClassIconCooldown:SetUseCircularEdge(true)
+    frame.ClassIcon.Cooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
+    frame.ClassIcon.Cooldown:SetUseCircularEdge(true)
+    frame.ClassIcon:SetFrameStrata("LOW")
+    frame.ClassIcon:SetFrameLevel(7)
 
     frame:SetSize(102, 32)
     frame.SpecIcon:SetSize(14, 14)
@@ -171,8 +174,8 @@ function layout:Initialize(frame)
     local f = frame.ClassIcon
     f:SetSize(24, 24)
     f:Show()
-    f:AddMaskTexture(frame.ClassIconMask)
-    frame.ClassIconMask:SetAllPoints(f)
+    f.Texture:AddMaskTexture(f.Mask)
+    f.Mask:SetAllPoints(f.Texture)
 
     local trinket = frame.Trinket
 
@@ -391,12 +394,12 @@ function layout:UpdateOrientation(frame)
     end
 
     healthBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
 
     if (self.db.mirrored) then
         frameTexture:SetTexCoord(0.796, 0, 0, 0.5)
         healthBar:SetPoint("TOPRIGHT", -3, -9)
-        classIcon:SetPoint("TOPLEFT", 4, -4)
+        frame.ClassIcon:SetPoint("TOPLEFT", 4, -4)
     else
         frameTexture:SetTexCoord(0, 0.796, 0, 0.5)
         healthBar:SetPoint("TOPLEFT", 3, -9)

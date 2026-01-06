@@ -1,5 +1,6 @@
 local layoutName = "Xaryu"
 local layout = {}
+local L = sArenaMixin.L
 
 layout.defaultSettings = {
     posX = 410,
@@ -122,7 +123,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.positioning.args.mirrored = {
         order = 5,
-        name = "Mirrored Frames",
+        name = L["Option_MirroredFrames"],
         type = "toggle",
         width = "full",
         get = getSetting,
@@ -131,7 +132,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.width = {
         order = 3,
-        name = "Width",
+        name = L["Width"],
         type = "range",
         min = 40,
         max = 400,
@@ -142,7 +143,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.height = {
         order = 4,
-        name = "Height",
+        name = L["Height"],
         type = "range",
         min = 2,
         max = 100,
@@ -153,7 +154,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.powerBarHeight = {
         order = 5,
-        name = "Power Bar Height",
+        name = L["Option_PowerBarHeight"],
         type = "range",
         min = 1,
         max = 50,
@@ -164,7 +165,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.other.args.cropIcons = {
         order = 5,
-        name = "Crop Icons",
+        name = L["Option_CropIcons"],
         type = "toggle",
         get = getSetting,
         set = setSetting,
@@ -342,7 +343,7 @@ function layout:UpdateOrientation(frame)
 
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
 
     if (self.db.mirrored) then
         healthBar:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, -2)
@@ -351,7 +352,7 @@ function layout:UpdateOrientation(frame)
         powerBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 2)
         powerBar:SetPoint("LEFT", classIcon, "RIGHT", 2, 0)
 
-        classIcon:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
+        frame.ClassIcon:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
     else
         healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
         healthBar:SetPoint("BOTTOMRIGHT", powerBar, "TOPRIGHT")
@@ -359,7 +360,7 @@ function layout:UpdateOrientation(frame)
         powerBar:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 2)
         powerBar:SetPoint("RIGHT", classIcon, "LEFT", -2, 0)
 
-        classIcon:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
+        frame.ClassIcon:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, 0)
     end
 end
 

@@ -1,6 +1,7 @@
 local layoutName = "Gladiuish"
 local layout = {}
 layout.name = "Gladiuish |A:NewCharacter-Alliance:38:65|a"
+local L = sArenaMixin.L
 
 layout.defaultSettings = {
     posX = 355,
@@ -132,7 +133,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.positioning.args.mirrored = {
         order = 5,
-        name = "Mirrored Frames",
+        name = L["Option_MirroredFrames"],
         type = "toggle",
         width = "full",
         get = getSetting,
@@ -141,7 +142,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.width = {
         order = 3,
-        name = "Width",
+        name = L["Width"],
         type = "range",
         min = 40,
         max = 400,
@@ -152,7 +153,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.height = {
         order = 4,
-        name = "Height",
+        name = L["Height"],
         type = "range",
         min = 2,
         max = 100,
@@ -163,7 +164,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.powerBarHeight = {
         order = 5,
-        name = "Power Bar Height",
+        name = L["Option_PowerBarHeight"],
         type = "range",
         min = 1,
         max = 50,
@@ -174,7 +175,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.other.args.cropIcons = {
         order = 5,
-        name = "Crop Icons",
+        name = L["Option_CropIcons"],
         type = "toggle",
         get = getSetting,
         set = setSetting,
@@ -246,7 +247,7 @@ function layout:UpdateOrientation(frame)
 
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
     frame.ClassIcon:SetSize(self.db.height-4, self.db.height-4)
 
     if self.db.widgets then
@@ -363,7 +364,7 @@ function layout:UpdateOrientation(frame)
         powerBar:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 2)
         powerBar:SetPoint("LEFT", classIcon, "RIGHT", 0, 0)
 
-        classIcon:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
+        frame.ClassIcon:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
     else
         healthBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
         healthBar:SetPoint("BOTTOMRIGHT", powerBar, "TOPRIGHT")
@@ -371,7 +372,7 @@ function layout:UpdateOrientation(frame)
         powerBar:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 2)
         powerBar:SetPoint("RIGHT", classIcon, "LEFT", 0, 0)
 
-        classIcon:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, -2)
+        frame.ClassIcon:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, -2)
     end
 end
 

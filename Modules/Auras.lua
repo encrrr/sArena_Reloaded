@@ -1,7 +1,7 @@
 if sArenaMixin.isMidnight then return end
 
 local isRetail = sArenaMixin.isRetail
-local isTBC = sArenaMixin.isTBC
+local isOldArena = sArenaMixin.isTBC or sArenaMixin.isWrath
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture
 local auraList = sArenaMixin.auraList
 local interruptList = sArenaMixin.interruptList
@@ -109,7 +109,7 @@ function sArenaFrameMixin:FindAura()
             local priority = auraList[spellID]
 
             -- TBC Spec Detection: Check if this buff indicates a spec
-            if isTBC and i == 1 then -- Only check buffs (HELPFUL)
+            if isOldArena and i == 1 then -- Only check buffs (HELPFUL)
                 self:CheckForSpecSpell(spellID)
             end
 

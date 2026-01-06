@@ -1,6 +1,6 @@
 # sArena Reloaded
 
-New and updated sArena Frames with tons of new great features. Fork of sArena addon made by Stako, and maintained by many in the PvP community.
+New and updated sArena Frames with tons of new great features. Works for Midnight, TWW, MoP, Wrath and TBC. Fork of sArena addon made by Stako, and maintained by many in the PvP community.
 
 This is a further improvement of my sArena MoP Classic addon and it also brings it to Retail. This version will work on both Retail and MoP. This version will let you import settings from both sArena MoP and any other sArena version, see below.
 
@@ -18,6 +18,7 @@ This version comes packed with many new features such as:
 *   Frames are now class colored by default in starting room (with optional setting to keep default gray).
 *   Castbars immediately hide for easier interrupts and only lingers if an interrupt lands and it will also say who interrupted it on the castbar for a short while.
 *   Shows duration on auras that don't have durations implemented by default from Blizzard (Smoke Bomb, Earthen Wall, Barrier, etc)
+*   Shadowsight timer.
 
 Other improvements:
 

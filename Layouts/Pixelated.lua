@@ -1,6 +1,7 @@
 local layoutName = "Pixelated"
 local layout = {}
 layout.name = "Pixelated |A:NewCharacter-Alliance:38:65|a"
+local L = sArenaMixin.L
 
 layout.defaultSettings = {
     posX = 433,
@@ -124,6 +125,11 @@ local function CreatePixelTextureBorder(parent, target, key, size, offset)
 
     if not parent[key] then
         local holder = CreateFrame("Frame", nil, parent)
+        if key == "classIcon" then
+            holder:SetFrameLevel(parent:GetFrameLevel() + 8)
+        else
+            holder:SetFrameLevel(parent:GetFrameLevel() + 1)
+        end
         holder:SetIgnoreParentScale(true)
         parent[key] = holder
 
@@ -255,12 +261,8 @@ function sArenaMixin:RemovePixelBorders()
         hideBorder(frame.CastBar, "castBar")
         hideBorder(frame.CastBar, "castBarIcon")
 
-        -- Reset ClassIcon to default draw layer and scale
-        frame.ClassIcon:SetDrawLayer("BORDER", 1)
+        -- Reset ClassIcon scale
         frame.ClassIcon:SetScale(1)
-        frame.ClassIconCooldown:SetFrameStrata("HIGH")
-        frame.ClassIconCooldown:SetUseCircularEdge(false)
-        frame.ClassIconCooldown:SetSwipeTexture(1)
 
         -- Reset cast bar icon position
         frame.CastBar.Icon:ClearAllPoints()
@@ -314,7 +316,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.positioning.args.mirrored = {
         order = 5,
-        name = "Mirrored Frames",
+        name = L["Option_MirroredFrames"],
         type = "toggle",
         width = "full",
         get = getSetting,
@@ -323,7 +325,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.width = {
         order = 3,
-        name = "Width",
+        name = L["Width"],
         type = "range",
         min = 40,
         max = 400,
@@ -334,7 +336,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.height = {
         order = 4,
-        name = "Height",
+        name = L["Height"],
         type = "range",
         min = 2,
         max = 100,
@@ -345,7 +347,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.sizing.args.powerBarHeight = {
         order = 5,
-        name = "Power Bar Height",
+        name = L["Option_PowerBarHeight"],
         type = "range",
         min = 1,
         max = 50,
@@ -355,7 +357,7 @@ local function setupOptionsTable(self)
     }
     layout.optionsTable.arenaFrames.args.other.args.cropIcons = {
         order = 5,
-        name = "Crop Icons",
+        name = L["Option_CropIcons"],
         type = "toggle",
         width = "full",
         get = getSetting,
@@ -363,7 +365,7 @@ local function setupOptionsTable(self)
     }
     layout.optionsTable.arenaFrames.args.other.args.pixelBorderSize = {
         order = 6,
-        name = "Pixel Border Size",
+        name = L["Option_PixelBorderSize"],
         type = "range",
         min = 0.5,
         max = 3,
@@ -373,7 +375,7 @@ local function setupOptionsTable(self)
     }
     layout.optionsTable.arenaFrames.args.other.args.pixelBorderOffset = {
         order = 7,
-        name = "Pixel Border Offset",
+        name = L["Option_PixelBorderOffset"],
         type = "range",
         min = -3,
         max = 3,
@@ -383,7 +385,7 @@ local function setupOptionsTable(self)
     }
     layout.optionsTable.arenaFrames.args.other.args.drPixelBorderSize = {
         order = 8,
-        name = "DR Pixel Border Size",
+        name = L["Option_DRPixelBorderSize"],
         type = "range",
         min = 0.5,
         max = 3,
@@ -395,7 +397,7 @@ local function setupOptionsTable(self)
     -- Add classIcon settings specific to Pixelated layout
     layout.optionsTable.classIcon = {
         order = 1.5,
-        name = "Class Icon",
+        name = L["Category_ClassIcon"],
         type = "group",
         get = function(info) 
             return layout.db.classIcon[info[#info]] 
@@ -413,13 +415,13 @@ local function setupOptionsTable(self)
         args = {
             positioning = {
                 order = 1,
-                name = "Positioning",
+                name = L["Positioning"],
                 type = "group",
                 inline = true,
                 args = {
                     posX = {
                         order = 1,
-                        name = "Horizontal",
+                        name = L["Horizontal"],
                         type = "range",
                         min = -700,
                         max = 700,
@@ -430,7 +432,7 @@ local function setupOptionsTable(self)
                     },
                     posY = {
                         order = 2,
-                        name = "Vertical",
+                        name = L["Vertical"],
                         type = "range",
                         min = -700,
                         max = 700,
@@ -443,13 +445,13 @@ local function setupOptionsTable(self)
             },
             sizing = {
                 order = 2,
-                name = "Sizing",
+                name = L["Sizing"],
                 type = "group",
                 inline = true,
                 args = {
                     scale = {
                         order = 1,
-                        name = "Scale",
+                        name = L["Scale"],
                         type = "range",
                         min = 0.1,
                         max = 5.0,
@@ -503,9 +505,8 @@ function layout:Initialize(frame)
     frame.Dispel:SetSize(41, 41)
     frame.Name:SetTextColor(1,1,1)
     frame.SpecNameText:SetTextColor(1,1,1)
-    frame.ClassIconCooldown:SetFrameStrata("HIGH")
-    frame.ClassIconCooldown:SetUseCircularEdge(false)
-    frame.ClassIconCooldown:SetSwipeTexture(1)
+    frame.ClassIcon.Cooldown:SetUseCircularEdge(false)
+    frame.ClassIcon.Cooldown:SetSwipeTexture(1)
 
     frame.Trinket.Cooldown:SetSwipeTexture(1)
     frame.Trinket.Cooldown:SetSwipeColor(0, 0, 0, 0.55)
@@ -591,7 +592,7 @@ function layout:Initialize(frame)
     end
 
     if not frame.ClassIcon.ClassIconPixelBorderHook then
-        hooksecurefunc(frame.ClassIcon, "SetTexture", function(self, t)
+        hooksecurefunc(frame.ClassIcon.Texture, "SetTexture", function(self, t)
             if not t or not sArenaMixin.showPixelBorder then
                 frame.PixelBorders.classIcon:Hide()
             else
@@ -608,9 +609,6 @@ function layout:Initialize(frame)
     local classIconScale = self.db.classIcon and self.db.classIcon.scale or 1
     frame.ClassIcon:SetScale(classIconScale)
     frame.ClassIcon:Show()
-    
-    -- Raise ClassIcon above healthbar for overlaying
-    frame.ClassIcon:SetDrawLayer("OVERLAY", 1)
 
     local f = frame.Name
     f:SetJustifyH("LEFT")
@@ -750,8 +748,8 @@ function layout:UpdateOrientation(frame)
 
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
-    
+    frame.ClassIcon:ClearAllPoints()
+
     -- Apply classIcon settings
     local classIconSettings = self.db.classIcon or { posX = 0, posY = 0, scale = 1 }
     local baseSize = self.db.height - 4

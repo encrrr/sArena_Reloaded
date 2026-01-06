@@ -1,6 +1,7 @@
 local layoutName = "BlizzRetail"
 local layout = {}
 layout.name = "|cff00b4ffBlizz|r Retail |A:NewCharacter-Alliance:38:65|a"
+local L = sArenaMixin.L
 
 layout.defaultSettings = {
     posX = 400,
@@ -133,7 +134,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.positioning.args.mirrored = {
         order = 5,
-        name = "Mirrored Frames",
+        name = L["Option_MirroredFrames"],
         type = "toggle",
         width = "full",
         get = getSetting,
@@ -142,7 +143,7 @@ local function setupOptionsTable(self)
 
     layout.optionsTable.arenaFrames.args.other.args.hideNameBackground = {
         order = 3,
-        name = "Hide Name Background",
+        name = L["Option_HideNameBackground"],
         type = "toggle",
         get = getSetting,
         set = setSetting,
@@ -192,16 +193,21 @@ function layout:Initialize(frame)
     playerName:SetDrawLayer("OVERLAY", 6)
 
     -- portrait icon
-    frame.ClassIconCooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
-    frame.ClassIconCooldown:SetEdgeTexture("Interface\\Cooldown\\edge")
-    frame.ClassIconCooldown:SetUseCircularEdge(true)
+    frame.ClassIcon.Cooldown:SetSwipeTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
+    frame.ClassIcon.Cooldown:SetEdgeTexture("Interface\\Cooldown\\edge")
+    frame.ClassIcon.Cooldown:SetUseCircularEdge(true)
     frame.ClassIcon:SetSize(55, 55)
     frame.ClassIcon:Show()
-    frame.ClassIcon:SetTexCoord(0.05, 0.95, 0.1, 0.9)
-    frame.ClassIcon:AddMaskTexture(frame.ClassIconMask)
-    frame.ClassIconMask:ClearAllPoints()
-    frame.ClassIconMask:SetPoint("CENTER", frame.ClassIcon, 0,1)
-    frame.ClassIconMask:SetSize(60, 57)
+    frame.ClassIcon:SetFrameStrata("LOW")
+    frame.ClassIcon:SetFrameLevel(7)
+    frame.ClassIcon.Texture:SetTexCoord(0.05, 0.95, 0.1, 0.9)
+    frame.ClassIcon.Texture:AddMaskTexture(frame.ClassIcon.Mask)
+    frame.ClassIcon.Mask:ClearAllPoints()
+    frame.ClassIcon.Mask:SetPoint("CENTER", frame.ClassIcon, 0,1)
+    frame.ClassIcon.Mask:SetSize(60, 57)
+
+    frame.PowerBar:SetFrameStrata("LOW")
+    frame.PowerBar:SetFrameLevel(5)
 
     -- trinket
     local trinket = frame.Trinket
@@ -222,7 +228,7 @@ function layout:Initialize(frame)
     if not trinket.BorderParent then
         trinket.BorderParent = CreateFrame("Frame", nil, trinket)
         trinket.BorderParent:SetFrameStrata("MEDIUM")
-        trinket.BorderParent:SetFrameLevel(6)
+        trinket.BorderParent:SetFrameLevel(8)
     end
     trinketBorder:SetParent(trinket.BorderParent)
     trinketBorder:SetAtlas("plunderstorm-actionbar-slot-border")
@@ -263,7 +269,7 @@ function layout:Initialize(frame)
     if not racial.BorderParent then
         racial.BorderParent = CreateFrame("Frame", nil, racial)
         racial.BorderParent:SetFrameStrata("MEDIUM")
-        racial.BorderParent:SetFrameLevel(6)
+        racial.BorderParent:SetFrameLevel(8)
     end
     racialBorder:SetParent(racial.BorderParent)
     racialBorder:SetAtlas("plunderstorm-actionbar-slot-border")
@@ -302,7 +308,7 @@ function layout:Initialize(frame)
     if not dispel.BorderParent then
         dispel.BorderParent = CreateFrame("Frame", nil, dispel)
         dispel.BorderParent:SetFrameStrata("MEDIUM")
-        dispel.BorderParent:SetFrameLevel(6)
+        dispel.BorderParent:SetFrameLevel(8)
     end
     dispelBorder:SetParent(dispel.BorderParent)
     dispelBorder:SetAtlas("plunderstorm-actionbar-slot-border")
@@ -378,7 +384,7 @@ function layout:UpdateOrientation(frame)
     name:ClearAllPoints()
     healthBar:ClearAllPoints()
     powerBar:ClearAllPoints()
-    classIcon:ClearAllPoints()
+    frame.ClassIcon:ClearAllPoints()
     specName:ClearAllPoints()
 
     if self.db.widgets then
@@ -495,7 +501,7 @@ function layout:UpdateOrientation(frame)
     	healthBar:SetPoint("TOPRIGHT", -3, -23)
         powerBar:SetSize(136, 11)
         powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", -8, 0)
-        classIcon:SetPoint("TOPLEFT", 8, -4)
+        frame.ClassIcon:SetPoint("TOPLEFT", 8, -4)
     else
     	frameTexture:SetTexCoord(0, 1, 0, 1)
     	healthBar:SetSize(128, 21)
@@ -503,7 +509,7 @@ function layout:UpdateOrientation(frame)
     	healthBar:SetPoint("TOPLEFT", 3, -23)
     	powerBar:SetSize(137, 11)
     	powerBar:SetPoint("TOPLEFT", healthBar, "BOTTOMLEFT", 0, 0)
-    	classIcon:SetPoint("TOPRIGHT", -8, -4)
+    	frame.ClassIcon:SetPoint("TOPRIGHT", -8, -4)
     end
 end
 
