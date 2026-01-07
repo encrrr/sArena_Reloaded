@@ -4745,7 +4745,7 @@ function sArenaMixin:Test()
         local t = f:CreateFontString(nil, "OVERLAY")
         t:SetFontObject("GameFontHighlightLarge")
         t:SetFont(self.pFont, 12, "OUTLINE")
-        t:SetText(L["Drag_Hint"])
+        t:SetText("|T132961:16|t "..L["Drag_Hint"])
         t:SetPoint("BOTTOM", topFrame, "TOP", 17, 17)
 
         local bg = f:CreateTexture(nil, "BACKGROUND", nil, -1)

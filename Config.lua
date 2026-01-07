@@ -4283,7 +4283,7 @@ else
             },
             dragNotice = {
                 order = 4,
-                name = L["Drag_Hint"],
+                name = ("|T132961:16|t |cffff3300"..L["Drag_Hint"].."|r"),
                 type = "description",
                 fontSize = "medium",
                 width = 1.5,

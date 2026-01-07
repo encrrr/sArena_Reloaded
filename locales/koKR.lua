@@ -323,7 +323,7 @@ L["Racial_ShowInTrinketSlot_Desc"] = "적이 장신구를 장착하지 않았으
 L["Human_AlwaysShowTrinket"] = "인간에게 항상 얼라이언스 장신구 표시"
 L["Human_AlwaysShowTrinket_Desc"] = "인간 플레이어가 장신구를 장착하지 않았어도 항상 얼라이언스 장신구 텍스처를 표시합니다."
 
-L["Drag_Hint"] = "|cffff3300|T132961:16|t Ctrl+Shift+클릭하여 드래그|r"
+L["Drag_Hint"] = "Ctrl+Shift+클릭하여 드래그"
 
 L["Option_AddonConflict"] = "애드온 충돌"
 L["Option_Layout"] = "레이아웃"

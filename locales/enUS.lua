@@ -323,7 +323,7 @@ L["Racial_ShowInTrinketSlot_Desc"] = "If the enemy doesn't have a Trinket equipp
 L["Human_AlwaysShowTrinket"] = "Always Show Alliance Trinket for Humans"
 L["Human_AlwaysShowTrinket_Desc"] = "Always show the Alliance trinket texture on Human players, even if they don't have a trinket equipped."
 
-L["Drag_Hint"] = "|cffff3300|T132961:16|t Ctrl+Shift+Click to drag|r"
+L["Drag_Hint"] = "Ctrl+Shift+Click to drag"
 
 L["Option_AddonConflict"] = "Addon Conflict"
 L["Option_Layout"] = "Layout"
