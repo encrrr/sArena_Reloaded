@@ -1,6 +1,7 @@
 local isRetail = sArenaMixin.isRetail
 local isMidnight = sArenaMixin.isMidnight
 local isTBC = sArenaMixin.isTBC
+local L = sArenaMixin.L
 
 -- Older clients dont show opponents in spawn
 local isOldArena = sArenaMixin.isTBC or sArenaMixin.isWrath
@@ -113,9 +114,9 @@ end
 
 function sArenaMixin:FontOutlineValues()
     return {
-        [""] = "No outline",
-        ["OUTLINE"] = "Outline",
-        ["THICKOUTLINE"] = "Thick outline"
+        [""] = L["Outline_None"],
+        ["OUTLINE"] = L["Outline_Normal"],
+        ["THICKOUTLINE"] = L["Outline_Thick"]
     }
 end
 
@@ -305,7 +306,7 @@ end
 
 local function TEMPShareCollectedData()
     if not sArena_ReloadedDB or not sArena_ReloadedDB.collectData then
-        sArenaMixin:Print("Data collection is not enabled. Set db.collectData = true first.")
+        sArenaMixin:Print(L["DataCollection_NotEnabled"])
         return
     end
 
@@ -313,7 +314,7 @@ local function TEMPShareCollectedData()
     local hasAuras = sArena_ReloadedDB.collectedAuras and next(sArena_ReloadedDB.collectedAuras) ~= nil
 
     if not hasSpells and not hasAuras then
-        sArenaMixin:Print("No spell data has been collected yet.")
+        sArenaMixin:Print(L["DataCollection_NoDataYet"])
         return
     end
 
@@ -338,7 +339,7 @@ local function TEMPShareCollectedData()
         -- Title
         local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
         title:SetPoint("TOP", 0, -15)
-        title:SetText("sArena Collected Spell Data")
+        title:SetText(L["DataCollection_ExportTitle"])
 
         -- Close button
         local closeButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
@@ -362,7 +363,7 @@ local function TEMPShareCollectedData()
         local selectAllButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
         selectAllButton:SetSize(120, 25)
         selectAllButton:SetPoint("BOTTOM", 0, 15)
-        selectAllButton:SetText("Select All")
+        selectAllButton:SetText(L["SelectAll"])
         selectAllButton:SetScript("OnClick", function()
             editBox:HighlightText()
             editBox:SetFocus()
@@ -387,9 +388,9 @@ local function TEMPShareCollectedData()
 
         for _, spellID in ipairs(sortedSpellIDs) do
             local data = sArena_ReloadedDB.collectedSpells[spellID]
-            local spellName = data[1] or "Unknown"
-            local sourceClass = data[2] or "Unknown"
-            local type = data[3] or "Unknown"
+            local spellName = data[1] or L["Unknown"]
+            local sourceClass = data[2] or L["Unknown"]
+            local type = data[3] or L["Unknown"]
 
             -- Escape special characters in spell name
             spellName = spellName:gsub("\\", "\\\\"):gsub('"', '\\"')
@@ -415,9 +416,9 @@ local function TEMPShareCollectedData()
 
         for _, spellID in ipairs(sortedAuraIDs) do
             local data = sArena_ReloadedDB.collectedAuras[spellID]
-            local spellName = data[1] or "Unknown"
-            local sourceClass = data[2] or "Unknown"
-            local auraType = data[3] or "Unknown"
+            local spellName = data[1] or L["Unknown"]
+            local sourceClass = data[2] or L["Unknown"]
+            local auraType = data[3] or L["Unknown"]
 
             -- Escape special characters in spell name
             spellName = spellName:gsub("\\", "\\\\"):gsub('"', '\\"')
@@ -443,13 +444,13 @@ local function TEMPShareCollectedData()
         sArenaMixin.DataExportFrame.editBox:SetFocus()
     end)
 
-    sArenaMixin:Print("Collected %d total entries. Data displayed in export window.", totalCount)
+    sArenaMixin:Print(L["DataCollection_ExportComplete"], totalCount)
 end
 
 local db
 local emptyLayoutOptionsTable = {
     notice = {
-        name = "The selected layout doesn't appear to have any settings.",
+        name = L["Message_NoLayoutSettings"],
         type = "description",
     }
 }
@@ -1233,18 +1234,18 @@ function sArenaMixin:ShowMidnightDRWarning()
 
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOP", frame, "TOP", 0, -20)
-    title:SetText("|cffa020f0Midnight Beta Warning|r")
+    title:SetText(L["Message_MidnightWarningTitle"])
 
     local text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     text:SetPoint("TOP", title, "BOTTOM", 0, -15)
     text:SetWidth(400)
     text:SetJustifyH("CENTER")
-    text:SetText("Midnight is in Beta and Edit Mode is causing\nthe new DR's to error.\n\n|cffFFFF00Reload UI to fix.|r\n\nThis warning will be removed as soon as\nBlizzard fixes Edit Mode and DR's.")
+    text:SetText(L["Message_MidnightWarningText"])
 
     local reloadButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     reloadButton:SetSize(150, 30)
     reloadButton:SetPoint("BOTTOM", frame, "BOTTOM", 0, 20)
-    reloadButton:SetText("Reload UI")
+    reloadButton:SetText(L["Button_ReloadUI"])
     reloadButton:SetScript("OnClick", function()
         EnsureArenaFramesEnabled()
         ReloadUI()
@@ -1547,7 +1548,7 @@ local function ChatCommand(input)
     elseif cmd == "convert" then
         sArenaMixin:ImportOtherForkSettings()
     elseif cmd == "ver" or cmd == "version" then
-        sArenaMixin:Print("Current Version: " .. C_AddOns.GetAddOnMetadata("sArena_Reloaded", "Version"))
+        sArenaMixin:Print(L["Print_CurrentVersion"], C_AddOns.GetAddOnMetadata("sArena_Reloaded", "Version"))
     elseif cmd:match("^test%s*[1-5]$") then
         sArenaMixin.testUnits = tonumber(cmd:match("(%d)"))
         input = "test"
@@ -1677,7 +1678,7 @@ function sArenaMixin:UpdateNoTrinketTexture()
     if self.db.profile.removeUnequippedTrinketTexture then
         sArenaMixin.noTrinketTexture = nil
     else
-        sArenaMixin.noTrinketTexture = 638661
+        sArenaMixin.noTrinketTexture = "Interface\\AddOns\\sArena_Reloaded\\Textures\\inv_pet_exitbattle.tga"
     end
 end
 
@@ -1709,7 +1710,7 @@ function sArenaMixin:Initialize()
         self:SetLayout(_, db.profile.currentLayout)
     else
         C_Timer.After(5, function()
-            sArenaMixin:Print("Two different versions of sArena are loaded. Please select how you want to continue by typing /sarena")
+            sArenaMixin:Print(L["Print_MultipleVersionsLoaded"])
         end)
     end
 end
@@ -1817,10 +1818,10 @@ function sArenaMixin:UpdateShadowsightDisplay()
             return
         elseif currentTime >= spawnTime then
             local iconTexture = "|T136155:15:15|t"
-            self.ShadowsightTimer.Text:SetText("Shadowsights Ready " .. iconTexture .. " " .. iconTexture)
+            self.ShadowsightTimer.Text:SetText(L["Shadowsight_Ready"] .. " " .. iconTexture .. " " .. iconTexture)
         else
             local timeLeft = math.ceil(spawnTime - currentTime)
-            self.ShadowsightTimer.Text:SetText(string.format("Shadowsight spawns in %d sec", timeLeft))
+            self.ShadowsightTimer.Text:SetText(string.format(L["Shadowsight_SpawnsIn"], timeLeft))
         end
         return
     end
@@ -4738,7 +4739,7 @@ function sArenaMixin:Test()
         local t = f:CreateFontString(nil, "OVERLAY")
         t:SetFontObject("GameFontHighlightLarge")
         t:SetFont(self.pFont, 12, "OUTLINE")
-        t:SetText("|T132961:16|t Ctrl+Shift+Click to drag|r")
+        t:SetText("|T132961:16|t "..L["Drag_Hint"])
         t:SetPoint("BOTTOM", topFrame, "TOP", 17, 17)
 
         local bg = f:CreateTexture(nil, "BACKGROUND", nil, -1)
