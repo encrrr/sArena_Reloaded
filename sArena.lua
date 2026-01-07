@@ -2472,7 +2472,9 @@ end
 function sArenaMixin:SetMouseState(state)
     for i = 1, sArenaMixin.maxArenaOpponents do
         local frame = self["arena" .. i]
-        frame.CastBar:EnableMouse(state)
+        if frame.CastBar then
+            frame.CastBar:EnableMouse(state)
+        end
 
         if isMidnight and frame.drTray then
             frame.drTray:EnableMouse(false)
