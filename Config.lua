@@ -68,7 +68,7 @@ local drIcons = sArenaMixin.defaultSettings.profile.drIcons or {}
 
 local drCategoryDisplay = {}
 for category, tex in pairs(drIcons) do
-    drCategoryDisplay[category] = "|T" .. tostring(tex) .. ":16|t " .. (L["DR_" .. category] or category)
+    drCategoryDisplay[category] = "|cFFFFFFFF|T" .. tostring(tex) .. ":16|t " .. (L["DR_" .. category] or category) .. "|r"
 end
 
 local racialCategories = {}
