@@ -68,12 +68,12 @@ local drIcons = sArenaMixin.defaultSettings.profile.drIcons or {}
 
 local drCategoryDisplay = {}
 for category, tex in pairs(drIcons) do
-    drCategoryDisplay[category] = "|T" .. tostring(tex) .. ":16|t " .. category
+    drCategoryDisplay[category] = "|T" .. tostring(tex) .. ":16|t " .. (L["DR_" .. category] or category)
 end
 
 local racialCategories = {}
 for raceKey, data in pairs(sArenaMixin.racialData or {}) do
-    local name = raceKey
+    local name = L["Race_" .. raceKey] or raceKey
     local texture = data and data.texture
     if texture then
         if type(texture) == "string" then

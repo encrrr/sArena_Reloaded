@@ -79,6 +79,37 @@ L["DR_RandomRoot"] = "무작위 뿌리 묶기"
 L["DR_Charge"] = "돌진"
 
 ---------------------------------------
+-- Race Names
+---------------------------------------
+
+--L["Race_Human"] = ""
+--L["Race_Scourge"] = ""
+--L["Race_Dwarf"] = ""
+--L["Race_NightElf"] = ""
+--L["Race_Gnome"] = ""
+--L["Race_Draenei"] = ""
+--L["Race_Worgen"] = ""
+--L["Race_Pandaren"] = ""
+--L["Race_Orc"] = ""
+--L["Race_Tauren"] = ""
+--L["Race_Troll"] = ""
+--L["Race_BloodElf"] = ""
+--L["Race_Goblin"] = ""
+--L["Race_LightforgedDraenei"] = ""
+--L["Race_HighmountainTauren"] = ""
+--L["Race_Nightborne"] = ""
+--L["Race_MagharOrc"] = ""
+--L["Race_DarkIronDwarf"] = ""
+--L["Race_ZandalariTroll"] = ""
+--L["Race_VoidElf"] = ""
+--L["Race_KulTiran"] = ""
+--L["Race_Mechagnome"] = ""
+--L["Race_Vulpera"] = ""
+--L["Race_Dracthyr"] = ""
+--L["Race_EarthenDwarf"] = ""
+--L["Race_Haranir"] = ""
+
+---------------------------------------
 -- Main Categories
 ---------------------------------------
 

@@ -79,6 +79,37 @@ L["DR_RandomRoot"] = "RandomRoot"
 L["DR_Charge"] = "Charge"
 
 ---------------------------------------
+-- Race Names
+---------------------------------------
+
+L["Race_Human"] = "Human"
+L["Race_Scourge"] = "Undead"
+L["Race_Dwarf"] = "Dwarf"
+L["Race_NightElf"] = "Night Elf"
+L["Race_Gnome"] = "Gnome"
+L["Race_Draenei"] = "Draenei"
+L["Race_Worgen"] = "Worgen"
+L["Race_Pandaren"] = "Pandaren"
+L["Race_Orc"] = "Orc"
+L["Race_Tauren"] = "Tauren"
+L["Race_Troll"] = "Troll"
+L["Race_BloodElf"] = "Blood Elf"
+L["Race_Goblin"] = "Goblin"
+L["Race_LightforgedDraenei"] = "Lightforged Draenei"
+L["Race_HighmountainTauren"] = "Highmountain Tauren"
+L["Race_Nightborne"] = "Nightborne"
+L["Race_MagharOrc"] = "Mag'har Orc"
+L["Race_DarkIronDwarf"] = "Dark Iron Dwarf"
+L["Race_ZandalariTroll"] = "Zandalari Troll"
+L["Race_VoidElf"] = "Void Elf"
+L["Race_KulTiran"] = "Kul Tiran"
+L["Race_Mechagnome"] = "Mechagnome"
+L["Race_Vulpera"] = "Vulpera"
+L["Race_Dracthyr"] = "Dracthyr"
+L["Race_EarthenDwarf"] = "Earthen"
+L["Race_Haranir"] = "Haranir"
+
+---------------------------------------
 -- Main Categories
 ---------------------------------------
 
