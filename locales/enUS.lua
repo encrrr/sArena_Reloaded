@@ -1,5 +1,5 @@
--- English localization for sArena Reloaded
--- sArena Reloaded English localization
+-- English (Default) localization for sArena Reloaded
+-- Localization support by: 007bb from Korea Mate Guild
 
 local locale = GetLocale()
 if locale ~= "enUS" and locale ~= "enGB" then return end
