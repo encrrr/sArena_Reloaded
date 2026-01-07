@@ -1,3 +1,6 @@
+2.3.3
+- Localization added. Currently supports English and Korean. Thank you to 007bb for contributing.
+
 2.3.2b
 - Remove shared CD from Will of the Forsaken in TBC
 - Remove Thorns from aura list in TBC
