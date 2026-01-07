@@ -12,7 +12,7 @@
     <Script file="Ace3\Libs\LibSerialize\LibSerialize.lua"/>
 
     <Script file="sArena_Init.lua"/>
-    <Include file="locales\locales.xml"/>
+    <Include file="Locales\locales.xml"/>
     <Script file="sArena.lua"/>
     <Script file="Data\SpecSpells_Wrath.lua"/>
     <Script file="Modules\SpecFinder.lua"/>
