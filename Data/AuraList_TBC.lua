@@ -26,6 +26,16 @@ sArenaMixin.tooltipInfoAuras = {
 sArenaMixin.spellLockReducer = {
 }
 
+-- Stance auras for TBC (stances don't have real auras, only cast/aura events)
+sArenaMixin.stanceAuras = {
+    [71]   = 0, -- Defensive Stance
+    [2458] = 0, -- Berserker Stance
+    [2457] = 0, -- Battle Stance
+}
+
+-- Active stance auras per unit: [unit] = spellID (e.g. ["arena1"] = 71)
+sArenaMixin.activeStanceAuras = {}
+
 sArenaMixin.auraList = {
     -- Special
     [23920]   = 10,    -- Spell Reflection
@@ -342,9 +352,6 @@ sArenaMixin.auraList = {
     [13812]  = 0,       -- Glyph of Explosive Trap
     [6360]   = 0,       -- Whiplash
     [66]     = 0,       -- Invisibility
-    [2457]   = 0,       -- Battle Stance
-    [2458]   = 0,       -- Berserker Stance
-    [71]     = 0,       -- Defensive Stance
 
 
 

@@ -1,12 +1,15 @@
 if sArenaMixin.isMidnight then return end
 
 local isRetail = sArenaMixin.isRetail
+local isTBC = sArenaMixin.isTBC
 local isOldArena = sArenaMixin.isTBC or sArenaMixin.isWrath
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture
 local auraList = sArenaMixin.auraList
 local interruptList = sArenaMixin.interruptList
 local tooltipInfoAuras = sArenaMixin.tooltipInfoAuras
 local spellLockReducer = sArenaMixin.spellLockReducer
+local stanceAuras = sArenaMixin.stanceAuras
+local activeStanceAuras = sArenaMixin.activeStanceAuras
 
 function sArenaFrameMixin:FindInterrupt(event, spellID, sourceName, sourceGUID)
     local interruptDuration = interruptList[spellID]
@@ -185,6 +188,23 @@ function sArenaFrameMixin:FindAura()
                     currentRemaining = remaining
                     currentApplications = applications
                 end
+            end
+        end
+    end
+
+    -- TBC: Stances don't have auras so track them by mimicking a permanent aura. Stances still activate in CLEU as auras as normal.
+    if isTBC then
+        local stanceSpellID = activeStanceAuras[unit]
+        if stanceSpellID then
+            local stancePriority = stanceAuras[stanceSpellID]
+            if stancePriority and stancePriority >= currentPriority then
+                currentSpellID = stanceSpellID
+                currentDuration = 0
+                currentExpirationTime = 0
+                currentTexture = GetSpellTexture(stanceSpellID)
+                currentPriority = stancePriority
+                currentRemaining = 0
+                currentApplications = nil
             end
         end
     end

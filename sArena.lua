@@ -1366,6 +1366,18 @@ function sArenaMixin:OnEvent(event, ...)
                 end
             end
 
+            -- TBC Stance Auras (not actual auras in TBC so needs to be manually tracked)
+            if isTBC and sArenaMixin.stanceAuras[spellID] then
+                for i = 1, sArenaMixin.maxArenaOpponents do
+                    local unit = "arena" .. i
+                    if (sourceGUID == UnitGUID(unit)) then
+                        sArenaMixin.activeStanceAuras[unit] = spellID
+                        local ArenaFrame = self[unit]
+                        ArenaFrame:FindAura()
+                        break
+                    end
+                end
+            end
         end
 
         -- Dispels
@@ -1483,6 +1495,9 @@ function sArenaMixin:OnEvent(event, ...)
         if (instanceType == "arena") then
             if not isMidnight then
                 self:ResetDetectedDispels()
+                if isTBC then
+                    wipe(sArenaMixin.activeStanceAuras)
+                end
                 self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
                 self:RegisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
             else
@@ -1538,6 +1553,9 @@ function sArenaMixin:OnEvent(event, ...)
         self:UpdatePlayerSpec()
     elseif event == "ARENA_PREP_OPPONENT_SPECIALIZATIONS" then
         self:ResetDetectedDispels()
+        if isTBC then
+            wipe(sArenaMixin.activeStanceAuras)
+        end
     end
 end
 
