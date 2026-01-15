@@ -7,40 +7,6 @@ local L = sArenaMixin.L
 local noEarlyFrames = sArenaMixin.isTBC or sArenaMixin.isWrath
 local isModernArena = isRetail or isMidnight -- For old trinkets
 
-sArenaMixin.layouts = {}
-sArenaMixin.defaultSettings = {
-    profile = {
-        currentLayout = "Gladiuish",
-        classColors = true,
-        --classColorFrameTexture = (BetterBlizzFramesDB and BetterBlizzFramesDB.classColorFrameTexture) or nil,
-        showNames = true,
-        hidePowerText = true,
-        showDecimalsDR = true,
-        showDecimalsClassIcon = true,
-        decimalThreshold = 6,
-        colorDRCooldownText = false,
-        --darkMode = (BetterBlizzFramesDB and BetterBlizzFramesDB.darkModeUi) or C_AddOns.IsAddOnLoaded("FrameColor") or nil,
-        forceShowTrinketOnHuman = not isRetail and true or nil,
-        shadowSightTimer = noEarlyFrames and true or nil,
-        darkModeValue = 0.2,
-        desaturateTrinketCD = true,
-        desaturateDispelCD = true,
-        darkModeDesaturate = true,
-        statusText = {
-            alwaysShow = true,
-            formatNumbers = true,
-        },
-        castBarColors = {
-            standard = { 1.0, 0.7, 0.0, 1 },
-            channel = { 0.0, 1.0, 0.0, 1 },
-            uninterruptable = { 0.7, 0.7, 0.7, 1 },
-            interruptNotReady = { 1.0, 0.0, 0.0, 1 },
-        },
-        layoutSettings = {},
-        invertClassIconCooldown = true,
-    }
-}
-
 sArenaMixin.playerClass = select(2, UnitClass("player"))
 sArenaMixin.maxArenaOpponents = (isRetail and 3) or 5
 sArenaMixin.noTrinketTexture = (isTBC and 132311) or 638661 --temp texture for tbc. todo: export retail and include in sarena
@@ -1507,6 +1473,7 @@ function sArenaMixin:OnEvent(event, ...)
                 end
             end
             self:RegisterWidgetEvents()
+            self:RegisterInterruptEvents()
             self:UpdatePlayerSpec()
             if TestTitle then
                 TestTitle:Hide()
@@ -1534,6 +1501,7 @@ function sArenaMixin:OnEvent(event, ...)
                 self:UnregisterEvent("CHAT_MSG_BG_SYSTEM_NEUTRAL")
             end
             self:UnregisterWidgetEvents()
+            self:UnregisterInterruptEvents()
             self:ResetShadowsightTimer()
         end
     elseif event == "CHAT_MSG_BG_SYSTEM_NEUTRAL" then
@@ -4901,6 +4869,7 @@ function sArenaMixin:CastbarOnEvent(castBar)
                 castBar:SetStatusBarColor(unpack(colors.standard or { 1.0, 0.7, 0.0, 1 }))
             end
         else
+            print(sArenaMixin.interruptStatusColorOn and not sArenaMixin.interruptReady, sArenaMixin.interruptStatusColorOn, sArenaMixin.interruptReady)
             if castBar.barType == "uninterruptable" then
                 castBar:SetStatusBarColor(0.7, 0.7, 0.7)
             elseif sArenaMixin.interruptStatusColorOn and not sArenaMixin.interruptReady then
