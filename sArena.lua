@@ -4869,7 +4869,6 @@ function sArenaMixin:CastbarOnEvent(castBar)
                 castBar:SetStatusBarColor(unpack(colors.standard or { 1.0, 0.7, 0.0, 1 }))
             end
         else
-            print(sArenaMixin.interruptStatusColorOn and not sArenaMixin.interruptReady, sArenaMixin.interruptStatusColorOn, sArenaMixin.interruptReady)
             if castBar.barType == "uninterruptable" then
                 castBar:SetStatusBarColor(0.7, 0.7, 0.7)
             elseif sArenaMixin.interruptStatusColorOn and not sArenaMixin.interruptReady then
