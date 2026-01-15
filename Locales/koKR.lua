@@ -108,7 +108,7 @@ L["Race_Mechagnome"] = "기계노움"
 L["Race_Vulpera"] = "불페라"
 L["Race_Dracthyr"] = "드랙티르"
 L["Race_EarthenDwarf"] = "토석인"
-L["Race_Haranir"] = "하라니르"
+L["Race_Harronir"] = "하라니르"
 
 ---------------------------------------
 -- Main Categories
