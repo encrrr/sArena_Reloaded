@@ -1,3 +1,7 @@
+2.3.3b
+- Midnight: Fix party target feature due to new Beta changes.
+- Midnight: Headsup: Currently if you reload UI in an arena that has started (gates opened) the Blizzard UI shits the bed, which also causes sArena to shit the bed. Blizzard needs to fix this.
+
 2.3.3
 - TBC: Warrior stances now show up as auras on sArena like normal (workaround required for TBC since they not *real* auras)
 - Localization added. Currently supports English and Korean. Thank you to 007bb for contributing.
