@@ -4,7 +4,7 @@ local isTBC = sArenaMixin.isTBC
 local L = sArenaMixin.L
 
 -- Older clients dont show opponents in spawn
-local isOldArena = sArenaMixin.isTBC or sArenaMixin.isWrath
+local noEarlyFrames = sArenaMixin.isTBC or sArenaMixin.isWrath
 local isModernArena = isRetail or isMidnight -- For old trinkets
 
 sArenaMixin.layouts = {}
@@ -21,7 +21,7 @@ sArenaMixin.defaultSettings = {
         colorDRCooldownText = false,
         --darkMode = (BetterBlizzFramesDB and BetterBlizzFramesDB.darkModeUi) or C_AddOns.IsAddOnLoaded("FrameColor") or nil,
         forceShowTrinketOnHuman = not isRetail and true or nil,
-        shadowSightTimer = isOldArena and true or nil,
+        shadowSightTimer = noEarlyFrames and true or nil,
         darkModeValue = 0.2,
         desaturateTrinketCD = true,
         desaturateDispelCD = true,
@@ -68,7 +68,7 @@ sArenaMixin.shadowsightTimers = {0, 0}
 sArenaMixin.shadowsightAvailable = 2
 
 -- Track which arena units we've seen (to work around UnitExists returning false for stealthed units)
-if isOldArena then
+if noEarlyFrames then
     sArenaMixin.seenArenaUnits = {}
 end
 
@@ -433,7 +433,7 @@ local emptyLayoutOptionsTable = {
 local blizzFrame
 local changedParent
 local UpdateBlizzVisibility
-if isRetail and not isOldArena then
+if isRetail and not noEarlyFrames then
     UpdateBlizzVisibility = function()
         -- Hide Blizzard Arena Frames while in Arena
         if CompactArenaFrame.isHidden then return end
@@ -1098,7 +1098,7 @@ function sArenaMixin:HandleArenaStart()
         local frame = self["arena" .. i]
         if frame:IsShown() then break end
         if UnitExists("arena"..i) then
-            if isOldArena then
+            if noEarlyFrames then
                 sArenaMixin.seenArenaUnits[i] = true
             end
             frame:UpdateVisible()
@@ -1287,7 +1287,7 @@ function sArenaMixin:OnEvent(event, ...)
         if combatEvent == "SPELL_CAST_SUCCESS" or combatEvent == "SPELL_AURA_APPLIED" then
 
             -- Old Arena Spec Detection
-            if isOldArena then
+            if noEarlyFrames then
 
                 -- TEMP DATACOLLECT
                 if sArena_ReloadedDB.collectData then
@@ -1467,7 +1467,7 @@ function sArenaMixin:OnEvent(event, ...)
         UpdateBlizzVisibility(instanceType)
         self:SetMouseState(instanceType ~= "arena")
 
-        if isOldArena then
+        if noEarlyFrames then
             sArenaMixin.seenArenaUnits = {}
             if instanceType == "arena" then
                 sArenaMixin.justEnteredArena = true
@@ -2523,7 +2523,7 @@ function sArenaMixin:SetMouseState(state)
             child:EnableMouse(state)
         end
 
-        if isOldArena and not InCombatLockdown() then
+        if noEarlyFrames and not InCombatLockdown() then
             local shouldEnableMouse
             if state then
                 -- Outside arena: always clickable
@@ -2621,7 +2621,7 @@ function sArenaFrameMixin:OnLoad()
     local unit = "arena" .. self:GetID()
     self.parent = self:GetParent()
 
-    if isOldArena then
+    if noEarlyFrames then
         self.ogSetShown = self.SetShown
         self.SetShown = function(self, show)
             local _, instanceType = IsInInstance()
@@ -2989,7 +2989,7 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
             self.drTray:SetAlpha(instanceType == "arena" and 1 or 0)
         end
 
-        if isOldArena and instanceType == "arena" and self.ogShow then
+        if noEarlyFrames and instanceType == "arena" and self.ogShow then
             self.ogShow(self)
             self:SetAlpha(0)
         end
@@ -3015,7 +3015,7 @@ function sArenaFrameMixin:OnEvent(event, eventUnit, arg1)
         else
             self:UpdatePlayer()
         end
-        --self:SetAlpha((isOldArena and (UnitExists(self.unit) and 1 or stealthAlpha)) or (UnitIsVisible(self.unit) and 1 or stealthAlpha))
+        --self:SetAlpha((noEarlyFrames and (UnitExists(self.unit) and 1 or stealthAlpha)) or (UnitIsVisible(self.unit) and 1 or stealthAlpha))
         self.HealthBar:SetAlpha(1)
         if TestTitle then
             TestTitle:Hide()
@@ -3073,13 +3073,13 @@ end
 local function GetNumArenaOpponentsFallback()
     local count = 0
     for i = 1, sArenaMixin.maxArenaOpponents do
-        if UnitExists("arena" .. i) or (isOldArena and sArenaMixin.seenArenaUnits[i]) then
+        if UnitExists("arena" .. i) or (noEarlyFrames and sArenaMixin.seenArenaUnits[i]) then
             count = count + 1
         end
     end
 
     -- TBC: Use party size as fallback, but only after the match has started or we're not in the starting room
-    if isOldArena and count < GetNumGroupMembers() then
+    if noEarlyFrames and count < GetNumGroupMembers() then
         local inPreparation = C_UnitAuras.GetPlayerAuraBySpellID(32727)
         if not inPreparation and not sArenaMixin.justEnteredArena and sArenaMixin.arenaMatchStarted then
             count = GetNumGroupMembers() or count
@@ -3105,7 +3105,7 @@ function sArenaFrameMixin:UpdateVisible()
     local numSpecs = GetNumArenaOpponentSpecs()
     local numOpponents = (numSpecs == 0) and GetNumArenaOpponentsFallback() or numSpecs
 
-    if numOpponents >= id or (isOldArena and sArenaMixin.seenArenaUnits[id]) then
+    if numOpponents >= id or (noEarlyFrames and sArenaMixin.seenArenaUnits[id]) then
         self:Show()
     else
         self:Hide()
@@ -3290,7 +3290,7 @@ end
 function sArenaFrameMixin:UpdatePlayer(unitEvent)
     local unit = self.unit
 
-    if isOldArena and UnitExists(unit) then
+    if noEarlyFrames and UnitExists(unit) then
         sArenaMixin.seenArenaUnits[self:GetID()] = true
     end
 
@@ -3356,7 +3356,7 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent)
         self.HealthBar:SetStatusBarColor(0, 1.0, 0, 1.0)
     end
 
-    if isOldArena and not UnitExists(unit) then
+    if noEarlyFrames and not UnitExists(unit) then
         self:SetAlpha(stealthAlpha)
     else
         self:SetAlpha(1)
@@ -3364,7 +3364,7 @@ function sArenaFrameMixin:UpdatePlayer(unitEvent)
 
     -- Workaround to show frames in older arenas in combat.
     -- Does not actually call Show(), but SetAlpha() on older arenas.
-    if isOldArena then
+    if noEarlyFrames then
         self:Show()
     end
 end
@@ -3444,7 +3444,7 @@ function sArenaFrameMixin:GetClass()
     elseif (not self.class) then
         local id = self:GetID()
 
-        if not isOldArena then
+        if not noEarlyFrames then
             if (GetNumArenaOpponentSpecs() >= id) then
                 local specID = GetArenaOpponentSpec(id) or 0
                 if (specID > 0) then
@@ -3465,7 +3465,7 @@ function sArenaFrameMixin:GetClass()
             end
         end
 
-        if (not self.class and (isOldArena or UnitExists(self.unit))) then
+        if (not self.class and (noEarlyFrames or UnitExists(self.unit))) then
             self.classLocal, self.class = UnitClass(self.unit)
         end
     end
@@ -3822,9 +3822,9 @@ end
 local specTemplates = {
     BM_HUNTER = {
         class = "HUNTER",
-        specIcon = isOldArena and 132164 or 461112,
+        specIcon = noEarlyFrames and 132164 or 461112,
         castName = "Cobra Shot",
-        castIcon = isOldArena and 132211 or 461114,
+        castIcon = noEarlyFrames and 132211 or 461114,
         racial = 135726,
         race = "Orc",
         specName = "Beast Mastery",
@@ -3832,7 +3832,7 @@ local specTemplates = {
     },
     MM_HUNTER = {
         class = "HUNTER",
-        specIcon = isOldArena and 132222 or 461113,
+        specIcon = noEarlyFrames and 132222 or 461113,
         castName = "Aimed Shot",
         castIcon = 132222,
         racial = 136225,
@@ -3842,7 +3842,7 @@ local specTemplates = {
     },
     SURV_HUNTER = {
         class = "HUNTER",
-        specIcon = isOldArena and 132215 or 461113,
+        specIcon = noEarlyFrames and 132215 or 461113,
         castName = "Mending Bandage",
         castIcon = isRetail and 1014022 or 133690,
         racial = 136225,
@@ -3861,7 +3861,7 @@ local specTemplates = {
     },
     ENH_SHAMAN = {
         class = "SHAMAN",
-        specIcon = isOldArena and 136051 or 237581,
+        specIcon = noEarlyFrames and 136051 or 237581,
         castName = "Stormstrike",
         castIcon = 132314,
         racial = 135726,
@@ -3937,7 +3937,7 @@ local specTemplates = {
         class = "DRUID",
         specIcon = 132115,
         castName = "Cyclone",
-        castIcon = isOldArena and 136022 or 132469,
+        castIcon = noEarlyFrames and 136022 or 132469,
         racial = 132089,
         race = "NightElf",
         specName = "Feral",
