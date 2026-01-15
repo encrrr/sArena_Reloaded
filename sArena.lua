@@ -204,30 +204,6 @@ local TestTitle
 local feignDeathID = 5384
 local FEIGN_DEATH = GetSpellName(feignDeathID) -- Localized name for Feign Death
 
-local BlizzardUnitIsUnit = UnitIsUnit
-
-local nonSecretUnits = {
-    ["target"] = true,
-    ["focus"] = true,
-}
-
-local function MidnightUnitIsUnit(unit1, unit2)
-    local p1 = C_NamePlate.GetNamePlateForUnit(unit1, issecure())
-    local p2 = C_NamePlate.GetNamePlateForUnit(unit2, issecure())
-    return p1 and p2 and p1 == p2
-end
-
-local function UnitIsUnit(unit1, unit2)
-    if isMidnight then
-        if nonSecretUnits[unit1] or nonSecretUnits[unit2] then
-            return BlizzardUnitIsUnit(unit1, unit2)
-        end
-        return MidnightUnitIsUnit(unit1, unit2)
-    else
-        return BlizzardUnitIsUnit(unit1, unit2)
-    end
-end
-
 --[[
     ImportOtherForkSettings: Migrates settings from other sArena versions to sArena Reloaded
     
@@ -789,36 +765,57 @@ function sArenaFrameMixin:UpdatePartyTargets(unit)
 
     if not unit or not UnitExists(unit) then return end
 
-    -- Check which party members are targeting this arena enemy
-    local targets = {}
-    if UnitIsUnit("party1target", unit) then
-        table.insert(targets, "party1")
-    end
-    if UnitIsUnit("party2target", unit) then
-        table.insert(targets, "party2")
-    end
+    if isMidnight then
+        local isParty1Target = UnitIsUnit("party1target", unit)
+        local isParty2Target = UnitIsUnit("party2target", unit)
 
-    -- Update Icons Based on Targets Found
-    if #targets >= 1 then
-        local class1 = select(2, UnitClass(targets[1]))
+        local class1 = select(2, UnitClass("party1"))
         if class1 then
             local color = RAID_CLASS_COLORS[class1]
             self.WidgetOverlay.partyTarget1.Texture:SetVertexColor(color.r, color.g, color.b)
         end
-        self.WidgetOverlay.partyTarget1:Show()
-    else
-        self.WidgetOverlay.partyTarget1:Hide()
-    end
 
-    if #targets >= 2 then
-        local class2 = select(2, UnitClass(targets[2]))
+        local class2 = select(2, UnitClass("party2"))
         if class2 then
             local color = RAID_CLASS_COLORS[class2]
             self.WidgetOverlay.partyTarget2.Texture:SetVertexColor(color.r, color.g, color.b)
         end
+
+        self.WidgetOverlay.partyTarget1:Show()
         self.WidgetOverlay.partyTarget2:Show()
+        self.WidgetOverlay.partyTarget1:SetAlphaFromBoolean(isParty1Target, 1, 0)
+        self.WidgetOverlay.partyTarget2:SetAlphaFromBoolean(isParty2Target, 1, 0)
     else
-        self.WidgetOverlay.partyTarget2:Hide()
+        local targets = {}
+        if UnitIsUnit("party1target", unit) then
+            table.insert(targets, "party1")
+        end
+        if UnitIsUnit("party2target", unit) then
+            table.insert(targets, "party2")
+        end
+
+        -- Update Icons Based on Targets Found
+        if #targets >= 1 then
+            local class1 = select(2, UnitClass(targets[1]))
+            if class1 then
+                local color = RAID_CLASS_COLORS[class1]
+                self.WidgetOverlay.partyTarget1.Texture:SetVertexColor(color.r, color.g, color.b)
+            end
+            self.WidgetOverlay.partyTarget1:Show()
+        else
+            self.WidgetOverlay.partyTarget1:Hide()
+        end
+
+        if #targets >= 2 then
+            local class2 = select(2, UnitClass(targets[2]))
+            if class2 then
+                local color = RAID_CLASS_COLORS[class2]
+                self.WidgetOverlay.partyTarget2.Texture:SetVertexColor(color.r, color.g, color.b)
+            end
+            self.WidgetOverlay.partyTarget2:Show()
+        else
+            self.WidgetOverlay.partyTarget2:Hide()
+        end
     end
 end
 
