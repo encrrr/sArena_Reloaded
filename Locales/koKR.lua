@@ -108,7 +108,7 @@ L["DR_Charge"] = "돌진"
 --L["Race_Vulpera"] = ""
 --L["Race_Dracthyr"] = ""
 --L["Race_EarthenDwarf"] = ""
---L["Race_Haranir"] = ""
+--L["Race_Harronir"] = ""
 
 ---------------------------------------
 -- Main Categories

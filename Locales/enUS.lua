@@ -107,7 +107,7 @@ L["Race_Mechagnome"] = "Mechagnome"
 L["Race_Vulpera"] = "Vulpera"
 L["Race_Dracthyr"] = "Dracthyr"
 L["Race_EarthenDwarf"] = "Earthen"
-L["Race_Haranir"] = "Haranir"
+L["Race_Harronir"] = "Haranir"
 
 ---------------------------------------
 -- Main Categories
