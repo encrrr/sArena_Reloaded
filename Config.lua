@@ -4057,7 +4057,7 @@ local function setDRIcons()
                 elseif type(icon) == "string" then
                     textureString = "|T" .. icon .. ":24|t "
                 end
-                return textureString .. category .. ":"
+                return textureString .. (L["DR_" .. category] or category) .. ":"
             end,
             desc = string.format(L["Option_DefaultIcon_Desc"], defaultIcon, defaultIcon),
             type = "input",
