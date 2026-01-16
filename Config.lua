@@ -5342,7 +5342,10 @@ else
 
                                     args["healer_dispels"].args["spell_" .. spellID] = {
                                         order = healerOrder,
-                                        name = "|T" .. (data.texture or "") .. ":16|t " .. data.name,
+                                        name = function()
+                                            local spellName = GetSpellInfoCompat(spellID)
+                                            return "|T" .. (data.texture or "") .. ":16|t " .. (spellName or data.name)
+                                        end,
                                         type = "toggle",
                                         disabled = function(info) return not info.handler.db.profile.showDispels end,
                                         get = function(info) return info.handler.db.profile.dispelCategories[settingKey] end,
@@ -5408,7 +5411,10 @@ else
 
                                     args["dps_dispels"].args["spell_" .. spellID] = {
                                         order = dpsOrder,
-                                        name = "|T" .. (data.texture or "134400") .. ":16|t " .. data.name,
+                                        name = function()
+                                            local spellName = GetSpellInfoCompat(spellID)
+                                            return "|T" .. (data.texture or "134400") .. ":16|t " .. (spellName or data.name)
+                                        end,
                                         type = "toggle",
                                         disabled = function(info) return not info.handler.db.profile.showDispels end,
                                         get = function(info) return info.handler.db.profile.dispelCategories[settingKey] end,
@@ -5438,7 +5444,7 @@ else
                                                 table.insert(tooltipLines, "|cFF00FF00" .. cooldownText .. "|r")
                                             end
                                             table.insert(tooltipLines, "|cFF808080Spell ID: " .. spellID .. "|r")
-                                            table.insert(tooltipLines, "|cFFFFA500Only shows after having been used once|r")
+                                            table.insert(tooltipLines, "|cFFFFA500" .. L["Dispel_ShowsAfterUse"] .. "|r")
 
                                             return table.concat(tooltipLines, "\n\n")
                                         end,
