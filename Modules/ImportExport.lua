@@ -1,51 +1,41 @@
 local LibDeflate = LibStub("LibDeflate")
 local LibSerialize = LibStub("LibSerialize")
 local L = sArenaMixin.L
-
--- Reusable confirmation dialog frame
 local confirmDialog
 
--- Helper function to create confirmation dialogs
 local function ShowImportConfirmDialog(message, onAccept, data)
-    -- Reuse existing frame if it exists and is shown
     if confirmDialog and confirmDialog:IsShown() then
         return
     end
-    
-    -- Create frame on first use
+
     if not confirmDialog then
         local frame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
         frame:SetSize(320, 160)
         frame:SetPoint("CENTER")
         frame:SetFrameStrata("TOOLTIP")
         frame:SetFrameLevel(1000)
-        
-        -- Background
+
         frame:SetBackdrop({
             bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
             edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
             tile = true, tileSize = 32, edgeSize = 32,
             insets = { left = 11, right = 12, top = 12, bottom = 11 }
         })
-        
-        -- Title
+
         frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         frame.title:SetPoint("TOP", 0, -15)
         frame.title:SetText(L["ImportExport_DialogTitle"])
-        
-        -- Message text
+
         frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
         frame.text:SetPoint("TOP", 0, -45)
         frame.text:SetWidth(270)
         frame.text:SetJustifyH("CENTER")
-        
-        -- Yes button
+
         frame.yesButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
         frame.yesButton:SetSize(100, 22)
         frame.yesButton:SetPoint("BOTTOM", frame, "BOTTOM", -55, 20)
         frame.yesButton:SetText(L["Yes"])
-        
-        -- No button
+
         frame.noButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
         frame.noButton:SetSize(100, 22)
         frame.noButton:SetPoint("BOTTOM", frame, "BOTTOM", 55, 20)
@@ -53,11 +43,10 @@ local function ShowImportConfirmDialog(message, onAccept, data)
         frame.noButton:SetScript("OnClick", function()
             frame:Hide()
         end)
-        
+
         confirmDialog = frame
     end
-    
-    -- Update message and callback
+
     confirmDialog.text:SetText(message)
     confirmDialog.yesButton:SetScript("OnClick", function()
         confirmDialog:Hide()
@@ -65,16 +54,16 @@ local function ShowImportConfirmDialog(message, onAccept, data)
             onAccept(data)
         end
     end)
-    
+
     confirmDialog:Show()
 end
 
-function sArenaMixin:ExportProfile()
+function sArenaMixin:ExportProfile(profileKeySupplied)
     local name, realm = UnitName("player")
     realm = realm or GetRealmName()
     local fullKey = name .. " - " .. realm
 
-    local profileKey = sArena_ReloadedDB.profileKeys[fullKey]
+    local profileKey = profileKeySupplied or sArena_ReloadedDB.profileKeys[fullKey]
     if not profileKey then
         return nil, L["Message_NoProfileFound"]
     end
@@ -96,7 +85,7 @@ function sArenaMixin:ExportProfile()
     return "!sArena:" .. encoded .. ":sArena!"
 end
 
-function sArenaMixin:ImportProfile(encodedString, customProfileName)
+function sArenaMixin:ImportProfile(encodedString, customProfileName, externalSource)
     -- Trim leading and trailing whitespace
     encodedString = encodedString:match("^%s*(.-)%s*$")
 
@@ -149,8 +138,10 @@ function sArenaMixin:ImportProfile(encodedString, customProfileName)
         sArena_ReloadedDB.profileKeys[nameRealm] = newName
     end
 
-    sArena_ReloadedDB.reOpenOptions = true
-    ReloadUI()
+    if not externalSource then
+        sArena_ReloadedDB.reOpenOptions = true
+        ReloadUI()
+    end
     return true
 end
 
@@ -178,7 +169,7 @@ function sArenaMixin:ImportStreamerProfile(streamerName, profileString, displayN
         end
         return
     end
-    
+
     -- Profile exists, ask for confirmation to overwrite
     -- Format the name with class color like the button does
     local coloredName = (classColor or "|cffffffff") .. (displayName or streamerName) .. "|r"
