@@ -1,3 +1,6 @@
+2.3.3d
+- Add Interface Version 120000 to toc file, wouldnt load on prepatch with just 120001.
+
 2.3.3c
 - Fix interrupt checker for Midnight
 - Restructure and cleanup a few things behind the scenes.
