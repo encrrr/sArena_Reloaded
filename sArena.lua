@@ -4316,7 +4316,7 @@ function sArenaMixin:Test()
         end
 
         if db.profile.showDispels then
-            local dispelInfo = frame:GetTestModeDispelData()
+            local dispelInfo = frame.GetTestModeDispelData and frame:GetTestModeDispelData()
             if dispelInfo then
                 frame.Dispel.Texture:SetTexture(dispelInfo.texture)
                 frame.Dispel:Show()
