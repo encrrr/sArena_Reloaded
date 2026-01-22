@@ -14,7 +14,6 @@ sArenaMixin.trinketTexture = (isRetail and 1322720) or 133453
 sArenaMixin.trinketID = (isRetail and 336126) or 42292
 sArenaMixin.showPixelBorder = false
 sArenaMixin.interruptReady = true
-sArenaMixin.pFont = "Interface\\AddOns\\sArena_Reloaded\\Textures\\Prototype.ttf"
 C_AddOns.EnableAddOn("sArena_Reloaded")
 local LSM = LibStub("LibSharedMedia-3.0")
 local decimalThreshold = 6 -- Default value, will be updated from db
@@ -22,8 +21,11 @@ LSM:Register("statusbar", "Blizzard RetailBar", [[Interface\AddOns\sArena_Reload
 LSM:Register("statusbar", "sArena Default", [[Interface\AddOns\sArena_Reloaded\Textures\sArenaDefault]])
 LSM:Register("statusbar", "sArena Stripes", [[Interface\AddOns\sArena_Reloaded\Textures\sArenaHealer]])
 LSM:Register("statusbar", "sArena Stripes 2", [[Interface\AddOns\sArena_Reloaded\Textures\sArenaRetailHealer]])
+-- Prototype font only supports western languages and Russian, so LSM will automatically reject registration on unsupported locales
 LSM:Register("font", "Prototype", "Interface\\Addons\\sArena_Reloaded\\Textures\\Prototype.ttf", LSM.LOCALE_BIT_western + LSM.LOCALE_BIT_ruRU)
 LSM:Register("font", "PT Sans Narrow Bold", "Interface\\Addons\\sArena_Reloaded\\Textures\\PTSansNarrow-Bold.ttf", LSM.LOCALE_BIT_western + LSM.LOCALE_BIT_ruRU)
+-- Fetch pFont through LSM: use Prototype if registered, otherwise fall back to LSM's default font for the current locale
+sArenaMixin.pFont = LSM:Fetch(LSM.MediaType.FONT, "Prototype") or LSM:Fetch(LSM.MediaType.FONT, LSM:GetDefault(LSM.MediaType.FONT))
 local GetSpellTexture = GetSpellTexture or C_Spell.GetSpellTexture
 local stealthAlpha = 0.4
 local shadowsightStartTime = 95
@@ -32,6 +34,7 @@ local shadowSightID = 34709
 sArenaMixin.beenInArena = false
 sArenaMixin.shadowsightTimers = {0, 0}
 sArenaMixin.shadowsightAvailable = 2
+
 
 -- Track which arena units we've seen (to work around UnitExists returning false for stealthed units)
 if noEarlyFrames then
