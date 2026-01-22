@@ -1177,6 +1177,7 @@ local function GetFactionTrinketIconByRace(race)
 end
 
 function sArenaMixin:ShowMidnightDRWarning()
+    if sArenaSkipDrWarning then return end
     if self.midnightWarningFrame then
         self.midnightWarningFrame:Show()
         return
