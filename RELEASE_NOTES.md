@@ -1,3 +1,6 @@
+2.3.3e
+- Fix Prepatch/Midnight trying to use functions from Dispel Module (which is disabled on Prepatch/Midnight) causing error and test mode to bug.
+
 2.3.3d
 - Add Interface Version 120000 to toc file, wouldnt load on prepatch with just 120001.
 
