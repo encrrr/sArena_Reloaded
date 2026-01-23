@@ -1,3 +1,6 @@
+2.3.4
+- Update Mes profile
+
 2.3.3e
 - Add test global to skip DR Warning/Reload for testing. Macro: /run sArenaSkipDrWarning = true
 - Fix Prepatch/Midnight trying to use functions from Dispel Module (which is disabled on Prepatch/Midnight) causing error and test mode to bug.
