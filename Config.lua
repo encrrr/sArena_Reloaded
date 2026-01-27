@@ -1499,6 +1499,30 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             info.handler:Test()
                         end,
                     },
+                    useBorder = {
+                        order = 1.5,
+                        name = L["Widget_UseBorder"],
+                        desc = L["Widget_UseBorder_Desc"],
+                        type = "toggle",
+                        width = "full",
+                        set = function(info, val)
+                            local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
+                            widgets = widgets or {}
+                            widgets.targetIndicator = widgets.targetIndicator or {}
+                            widgets.targetIndicator.useBorder = val
+                            info.handler.db.profile.layoutSettings[layoutName].widgets = widgets
+                            self:UpdateWidgetSettings(widgets, info, val)
+                            info.handler:Test()
+                        end,
+                        get = function(info)
+                            local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
+                            return widgets and widgets.targetIndicator and widgets.targetIndicator.useBorder
+                        end,
+                        disabled = function(info)
+                            local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
+                            return not (widgets and widgets.targetIndicator and widgets.targetIndicator.enabled)
+                        end,
+                    },
                     scale = {
                         order = 2,
                         name = L["Scale"],
@@ -1511,7 +1535,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         width = 0.95,
                         disabled = function(info)
                             local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
-                            return not (widgets and widgets.targetIndicator and widgets.targetIndicator.enabled)
+                            return not (widgets and widgets.targetIndicator and widgets.targetIndicator.enabled) or (widgets and widgets.targetIndicator and widgets.targetIndicator.useBorder)
                         end,
                     },
                     posX = {
@@ -1525,7 +1549,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         width = 0.95,
                         disabled = function(info)
                             local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
-                            return not (widgets and widgets.targetIndicator and widgets.targetIndicator.enabled)
+                            return not (widgets and widgets.targetIndicator and widgets.targetIndicator.enabled) or (widgets and widgets.targetIndicator and widgets.targetIndicator.useBorder)
                         end,
                     },
                     posY = {
@@ -1539,7 +1563,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         width = 0.95,
                         disabled = function(info)
                             local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
-                            return not (widgets and widgets.targetIndicator and widgets.targetIndicator.enabled)
+                            return not (widgets and widgets.targetIndicator and widgets.targetIndicator.enabled) or (widgets and widgets.targetIndicator and widgets.targetIndicator.useBorder)
                         end,
                     },
                     resetTargetIndicator = {
@@ -1587,6 +1611,30 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                             info.handler:Test()
                         end,
                     },
+                    useBorder = {
+                        order = 1.5,
+                        name = L["Widget_UseBorder"],
+                        desc = L["Widget_UseBorder_Desc"],
+                        type = "toggle",
+                        width = "full",
+                        set = function(info, val)
+                            local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
+                            widgets = widgets or {}
+                            widgets.focusIndicator = widgets.focusIndicator or {}
+                            widgets.focusIndicator.useBorder = val
+                            info.handler.db.profile.layoutSettings[layoutName].widgets = widgets
+                            self:UpdateWidgetSettings(widgets, info, val)
+                            info.handler:Test()
+                        end,
+                        get = function(info)
+                            local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
+                            return widgets and widgets.focusIndicator and widgets.focusIndicator.useBorder
+                        end,
+                        disabled = function(info)
+                            local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
+                            return not (widgets and widgets.focusIndicator and widgets.focusIndicator.enabled)
+                        end,
+                    },
                     scale = {
                         order = 2,
                         name = L["Scale"],
@@ -1599,7 +1647,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         width = 0.95,
                         disabled = function(info)
                             local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
-                            return not (widgets and widgets.focusIndicator and widgets.focusIndicator.enabled)
+                            return not (widgets and widgets.focusIndicator and widgets.focusIndicator.enabled) or (widgets and widgets.focusIndicator and widgets.focusIndicator.useBorder)
                         end,
                     },
                     posX = {
@@ -1613,7 +1661,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         width = 0.95,
                         disabled = function(info)
                             local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
-                            return not (widgets and widgets.focusIndicator and widgets.focusIndicator.enabled)
+                            return not (widgets and widgets.focusIndicator and widgets.focusIndicator.enabled) or (widgets and widgets.focusIndicator and widgets.focusIndicator.useBorder)
                         end,
                     },
                     posY = {
@@ -1627,7 +1675,7 @@ function sArenaMixin:GetLayoutOptionsTable(layoutName)
                         width = 0.95,
                         disabled = function(info)
                             local widgets = info.handler.db.profile.layoutSettings[layoutName].widgets
-                            return not (widgets and widgets.focusIndicator and widgets.focusIndicator.enabled)
+                            return not (widgets and widgets.focusIndicator and widgets.focusIndicator.enabled) or (widgets and widgets.focusIndicator and widgets.focusIndicator.useBorder)
                         end,
                     },
                     resetFocusIndicator = {
@@ -3915,6 +3963,17 @@ function sArenaMixin:UpdateWidgetSettings(db, info, val)
         frame.WidgetOverlay.focusIndicator:SetScale(db.focusIndicator.scale or 1)
         frame.WidgetOverlay.partyTarget1:SetScale(db.partyTargetIndicators.scale or 1)
         frame.WidgetOverlay.partyTarget2:SetScale(db.partyTargetIndicators.scale or 1)
+
+        if frame.TargetBorder then
+            frame.TargetBorder:ClearAllPoints()
+            frame.TargetBorder:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
+            frame.TargetBorder:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
+        end
+        if frame.FocusBorder then
+            frame.FocusBorder:ClearAllPoints()
+            frame.FocusBorder:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
+            frame.FocusBorder:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
+        end
 
         -- Only try to update orientation if called from config (with info parameter)
         if info and info.handler then
