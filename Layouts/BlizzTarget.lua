@@ -257,17 +257,6 @@ function layout:Initialize(frame)
         frame.NameBackground:Show()
     end
 
-    if frame.TargetBorder then
-        frame.TargetBorder:ClearAllPoints()
-        frame.TargetBorder:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
-        frame.TargetBorder:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
-    end
-    if frame.FocusBorder then
-        frame.FocusBorder:ClearAllPoints()
-        frame.FocusBorder:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
-        frame.FocusBorder:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
-    end
-
     self:UpdateOrientation(frame)
 end
 

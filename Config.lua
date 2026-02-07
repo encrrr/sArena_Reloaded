@@ -3370,6 +3370,13 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                                 drFrame.Cooldown:SetSwipeTexture(1)
                             end
                         end
+
+                        if drFrame.DRTextFrame then
+                            drFrame.DRTextFrame:SetShown(db.showDRText == true)
+                        end
+                        if drFrame.DRText2 then
+                            drFrame.DRText2:SetShown(db.showDRText == true)
+                        end
                     end
                 end
             end
@@ -3605,6 +3612,13 @@ function sArenaMixin:UpdateDRSettings(db, info, val)
                             if fakeDRFrame.Cooldown then
                                 fakeDRFrame.Cooldown:SetSwipeTexture(1)
                             end
+                        end
+
+                        if fakeDRFrame.DRTextFrame then
+                            fakeDRFrame.DRTextFrame:SetShown(db.showDRText == true)
+                        end
+                        if fakeDRFrame.DRText2 then
+                            fakeDRFrame.DRText2:SetShown(db.showDRText == true)
                         end
                     end
                 end
@@ -3974,6 +3988,8 @@ function sArenaMixin:UpdateWidgetSettings(db, info, val)
             frame.FocusBorder:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
             frame.FocusBorder:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
         end
+
+        -- Only try to update orientation if called from config (with info parameter)
 
         -- Only try to update orientation if called from config (with info parameter)
         if info and info.handler then
